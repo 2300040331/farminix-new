@@ -113,6 +113,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
     { id: 'nav-7', label: 'Snacks & Beverages', catId: 'snacks', enabled: true, order: 7 },
     { id: 'nav-8', label: 'Household', catId: 'household', enabled: true, order: 8 },
     { id: 'nav-9', label: 'Offers', catId: 'offers', badge: 'HOT', enabled: true, order: 9 },
+    { id: 'nav-10', label: 'Manufacturer', catId: 'manufacturer', enabled: true, order: 10 },
   ],
   hero: {
     enabled: true,

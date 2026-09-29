@@ -58,7 +58,8 @@ export const Navbar: React.FC = () => {
           const isActive = 
             (item.catId === null && isHomeRoute && selectedCategory === null) || 
             (item.catId === 'offers' && currentRoute.pathname === '/offers') ||
-            (item.catId !== null && item.catId !== 'offers' && selectedCategory === item.catId);
+            (item.catId === 'manufacturer' && currentRoute.pathname === '/manufacturer') ||
+            (item.catId !== null && item.catId !== 'offers' && item.catId !== 'manufacturer' && selectedCategory === item.catId);
           return (
             <button
               key={item.id}
@@ -67,6 +68,8 @@ export const Navbar: React.FC = () => {
                 navigate('/');
               } else if (item.catId === 'offers') {
                 navigate('/offers');
+              } else if (item.catId === 'manufacturer') {
+                navigate('/manufacturer');
               } else {
                 const catMatch = activeCategories.find((c) => c.id === item.catId || c.name.toLowerCase() === item.label.toLowerCase());
                 navigate('/products', `category=${encodeURIComponent(catMatch ? catMatch.name : item.label)}`);
