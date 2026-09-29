@@ -84,6 +84,12 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
           bottomFeatureStrip: { ...defaultSiteConfig.bottomFeatureStrip, ...(parsed.bottomFeatureStrip || {}) },
+          navItems: (() => {
+            const saved = parsed.navItems || [];
+            const savedIds = new Set(saved.map((n: NavItemConfig) => n.id));
+            const missing = defaultSiteConfig.navItems.filter((n) => !savedIds.has(n.id));
+            return [...saved, ...missing];
+          })(),
         };
       }
     } catch (e) {
@@ -109,6 +115,12 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
           bottomFeatureStrip: { ...defaultSiteConfig.bottomFeatureStrip, ...(parsed.bottomFeatureStrip || {}) },
           shopNowConfig: { ...defaultSiteConfig.shopNowConfig, ...(parsed.shopNowConfig || {}) },
+          navItems: (() => {
+            const s = parsed.navItems || [];
+            const ids = new Set(s.map((n: NavItemConfig) => n.id));
+            const miss = defaultSiteConfig.navItems.filter((n) => !ids.has(n.id));
+            return [...s, ...miss];
+          })(),
         };
       }
       
@@ -127,6 +139,12 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
           bottomFeatureStrip: { ...defaultSiteConfig.bottomFeatureStrip, ...(parsed.bottomFeatureStrip || {}) },
           shopNowConfig: { ...defaultSiteConfig.shopNowConfig, ...(parsed.shopNowConfig || {}) },
+          navItems: (() => {
+            const s = parsed.navItems || [];
+            const ids = new Set(s.map((n: NavItemConfig) => n.id));
+            const miss = defaultSiteConfig.navItems.filter((n) => !ids.has(n.id));
+            return [...s, ...miss];
+          })(),
         };
       }
     } catch (e) {
