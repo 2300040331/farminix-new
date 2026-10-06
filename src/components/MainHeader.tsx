@@ -45,16 +45,13 @@ export const MainHeader: React.FC = () => {
             <button
               key={link.label}
               onClick={() => navigate(link.path)}
-              className={`text-xs sm:text-sm font-extrabold transition-all py-2 px-1 sm:px-2 whitespace-nowrap cursor-pointer relative ${
+              className={`text-xs sm:text-sm font-extrabold transition-all py-2 px-1 sm:px-2 whitespace-nowrap cursor-pointer ${
                 link.isActive
                   ? 'text-[#7C3AED]'
                   : 'text-slate-600 hover:text-[#7C3AED]'
               }`}
             >
               <span>{link.label}</span>
-              {link.isActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7C3AED] rounded-full" />
-              )}
             </button>
           ))}
         </nav>
