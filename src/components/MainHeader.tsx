@@ -18,9 +18,16 @@ export const MainHeader: React.FC = () => {
   const isAboutActive = currentRoute.pathname === '/about';
   const isManufacturerActive = currentRoute.pathname === '/manufacturer';
 
+  const navLinks = [
+    { label: 'Home', path: '/', isActive: isHomeActive },
+    { label: 'Products', path: '/products', isActive: isProductsActive },
+    { label: 'About Farminix', path: '/about', isActive: isAboutActive },
+    { label: 'Manufacturer', path: '/manufacturer', isActive: isManufacturerActive },
+  ];
+
   return (
     <header className="w-full bg-white border-b border-slate-100 sticky top-0 z-30 select-none shadow-xs">
-      <div className="max-w-7xl mx-auto h-16 sm:h-20 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-6 w-full">
+      <div className="max-w-7xl mx-auto h-16 sm:h-20 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 w-full">
         {/* Left: Farminix Logo */}
         <div className="flex items-center shrink-0">
           <div onClick={() => navigate('/')} className="flex items-center cursor-pointer group">
@@ -32,60 +39,31 @@ export const MainHeader: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Navigation Options (Home, Products, About Farminix) */}
-        <nav className="flex items-center justify-center gap-2 sm:gap-8 md:gap-10 flex-wrap">
-          <button
-            onClick={() => navigate('/')}
-            className={`text-xs sm:text-sm font-extrabold transition-all py-1.5 px-2.5 sm:px-3 rounded-lg cursor-pointer ${
-              isHomeActive
-                ? 'text-[#7C3AED] bg-purple-50 sm:bg-transparent sm:border-b-2 sm:border-[#7C3AED] sm:rounded-none'
-                : 'text-slate-600 hover:text-[#7C3AED] hover:bg-slate-50 sm:hover:bg-transparent'
-            }`}
-          >
-            Home
-          </button>
-
-          <button
-            onClick={() => navigate('/products')}
-            className={`text-xs sm:text-sm font-extrabold transition-all py-1.5 px-2.5 sm:px-3 rounded-lg cursor-pointer ${
-              isProductsActive
-                ? 'text-[#7C3AED] bg-purple-50 sm:bg-transparent sm:border-b-2 sm:border-[#7C3AED] sm:rounded-none'
-                : 'text-slate-600 hover:text-[#7C3AED] hover:bg-slate-50 sm:hover:bg-transparent'
-            }`}
-          >
-            Products
-          </button>
-
-          <button
-            onClick={() => navigate('/about')}
-            className={`text-xs sm:text-sm font-extrabold transition-all py-1.5 px-2.5 sm:px-3 rounded-lg whitespace-nowrap cursor-pointer ${
-              isAboutActive
-                ? 'text-[#7C3AED] bg-purple-50 sm:bg-transparent sm:border-b-2 sm:border-[#7C3AED] sm:rounded-none'
-                : 'text-slate-600 hover:text-[#7C3AED] hover:bg-slate-50 sm:hover:bg-transparent'
-            }`}
-          >
-            About Farminix
-          </button>
+        {/* Center: Navigation Options - Equal spacing across all options */}
+        <nav className="flex items-center justify-center gap-5 sm:gap-8 md:gap-10">
+          {navLinks.map((link) => (
+            <button
+              key={link.label}
+              onClick={() => navigate(link.path)}
+              className={`text-xs sm:text-sm font-extrabold transition-all py-2 px-1 sm:px-2 whitespace-nowrap cursor-pointer relative ${
+                link.isActive
+                  ? 'text-[#7C3AED]'
+                  : 'text-slate-600 hover:text-[#7C3AED]'
+              }`}
+            >
+              <span>{link.label}</span>
+              {link.isActive && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7C3AED] rounded-full" />
+              )}
+            </button>
+          ))}
         </nav>
 
-        {/* Right: Manufacturer & Cart */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Manufacturer Link */}
-          <button
-            onClick={() => navigate('/manufacturer')}
-            className={`px-2.5 sm:px-4 py-2 text-xs font-extrabold rounded-xl sm:rounded-[10px] transition-all cursor-pointer ${
-              isManufacturerActive
-                ? 'bg-purple-100 text-[#6D28D9]'
-                : 'text-purple-900 hover:text-[#7C3AED] hover:bg-purple-50'
-            }`}
-          >
-            Manufacturer
-          </button>
-
-          {/* Cart Button */}
+        {/* Right: Cart Button */}
+        <div className="flex items-center shrink-0">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs font-bold text-white bg-[#7C3AED] hover:bg-[#6D28D9] border border-transparent rounded-xl sm:rounded-[10px] transition-all shadow-2xs cursor-pointer"
+            className="relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs font-bold text-white bg-[#7C3AED] hover:bg-[#6D28D9] border border-transparent rounded-xl sm:rounded-[10px] transition-all shadow-2xs cursor-pointer"
             title="Open Shopping Cart"
           >
             <ShoppingCart className="w-4 h-4 text-white shrink-0" />
