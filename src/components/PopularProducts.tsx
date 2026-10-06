@@ -10,7 +10,6 @@ export const PopularProducts: React.FC = () => {
     cart,
     addToCart,
     updateQuantity,
-    selectedCategory,
     wishlist,
     toggleWishlist,
     setIsCartOpen,
@@ -21,24 +20,10 @@ export const PopularProducts: React.FC = () => {
 
   if (!popularConfig.enabled) return null;
 
-  // Only keep Daawat rice in Popular Today
-  const daawatProducts = (publishedConfig.products && publishedConfig.products.length > 0
+  // Catalog contains only Farminix Family Choice Rice
+  const displayedProducts = (publishedConfig.products && publishedConfig.products.length > 0
     ? publishedConfig.products
-    : products).filter((p) => p.id === 'r1' || p.name.toLowerCase().includes('daawat'));
-
-  const displayedProducts = selectedCategory
-    ? publishedConfig.products.filter((p) => {
-        if (selectedCategory === 'dals') return p.category === 'Dals & Pulses';
-        if (selectedCategory === 'rice') return p.category === 'Rice & Grains';
-        if (selectedCategory === 'atta') return p.category === 'Atta & Flours';
-        if (selectedCategory === 'oils') return p.category === 'Oils & Ghee';
-        if (selectedCategory === 'masala') return p.category === 'Masala & Spices';
-        if (selectedCategory === 'snacks') return p.category === 'Snacks & Beverages';
-        if (selectedCategory === 'household') return p.category === 'Household Essentials';
-        if (selectedCategory === 'sugarSalt') return p.category === 'Sugar & Salt';
-        return true;
-      })
-    : daawatProducts;
+    : products);
 
   return (
     <section className="w-full py-8 border-b border-slate-100">

@@ -40,12 +40,14 @@ export const ProductDetailPage: React.FC = () => {
     return decodeURIComponent(parts[parts.length - 1] || '');
   }, [currentRoute.pathname]);
 
-  // 2. Find product by slug or id
+  // 2. Find product by slug or id (fallback to single catalog product)
   const product = useMemo(() => {
-    if (!productIdentifier) return null;
+    if (!productIdentifier) return allProducts[0] || null;
     return (
       allProducts.find((p) => getProductSlug(p.name) === productIdentifier) ||
-      allProducts.find((p) => p.id === productIdentifier)
+      allProducts.find((p) => p.id === productIdentifier) ||
+      allProducts[0] ||
+      null
     );
   }, [allProducts, productIdentifier]);
 

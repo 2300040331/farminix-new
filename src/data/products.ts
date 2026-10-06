@@ -1,455 +1,164 @@
 import type { Product, Category, DealCard } from '../types';
-import { BrandLogos, ExactCategoryImages, ExactProductImages } from '../assets/graphics';
+import { BrandLogos } from '../assets/graphics';
 
 export const categories: Category[] = [
-  { id: 'dals',      name: 'Dals & Pulses',         image: ExactCategoryImages.dals,      itemCount: 42 },
-  { id: 'rice',      name: 'Rice & Grains',          image: ExactCategoryImages.rice,      itemCount: 38 },
-  { id: 'atta',      name: 'Atta & Flours',          image: ExactCategoryImages.atta,      itemCount: 25 },
-  { id: 'oils',      name: 'Oils & Ghee',            image: ExactCategoryImages.oils,      itemCount: 30 },
-  { id: 'masala',    name: 'Masala & Spices',        image: ExactCategoryImages.masala,    itemCount: 65 },
-  { id: 'snacks',    name: 'Snacks & Beverages',     image: ExactCategoryImages.snacks,    itemCount: 85 },
-  { id: 'household', name: 'Household Essentials',   image: ExactCategoryImages.household, itemCount: 50 },
-  { id: 'sugarSalt', name: 'Sugar & Salt',           image: ExactCategoryImages.sugarSalt, itemCount: 20 },
+  { id: 'rice', name: 'Rice & Grains', image: '/farminix_rice_front.png', itemCount: 1 },
 ];
 
+export const farminixRiceProduct: Product = {
+  id: 'r1',
+  name: 'Farminix Family Choice Rice',
+  category: 'Rice & Grains',
+  price: 1399,
+  oldPrice: 1699,
+  weight: '26 Kg',
+  weightOptions: ['26 Kg'],
+  image: '/farminix_rice_front.png',
+  galleryImages: ['/farminix_rice_back.png'],
+  deliveryTime: 'Express Delivery (10-30 Mins)',
+  rating: 4.9,
+  reviewsCount: 2840,
+  inStock: true,
+  stockCount: 150,
+  brand: 'Farminix',
+  description:
+    "Farminix Signature Family Choice Rice (ఫ్యామిలీ ఛాయిస్ రైస్ | फैमिली चॉइस राइस | குடும்பத் தேர்வு அரிసి) is safely selected from quality harvests across India's fertile rice-growing regions. Every grain is chosen for its consistency, purity, and taste, tested in professional facilities, processed, and hygienically packed to deliver fresh, wholesome rice for your family's everyday meals.",
+  ingredients: ['100% Quality Harvest Milled Rice (Premium Select Grains)'],
+  nutritionalInfo: {
+    energy: '160 kcal (Per 45g / 1/4 cup serving)',
+    protein: '3 g',
+    carbs: '37 g (13% DV)',
+    fat: '0 g (0% DV)',
+    fiber: '1 g',
+    sugar: '0 g',
+    sodium: '0 mg (0% DV)',
+  },
+  badges: ['Farminix Official', '100% Genuine', 'Direct from Mill', '26 Kg Family Bag'],
+  highlights: [
+    {
+      icon: '🌾',
+      title: 'Premium Quality Harvest',
+      desc: "Safely selected from India's most fertile rice-growing regions for supreme aroma, texture, and grain integrity.",
+    },
+    {
+      icon: '✨',
+      title: 'Everyday Family Choice',
+      desc: 'Tested in professional facilities and hygienically packed to deliver wholesome meals for your family every day.',
+    },
+    {
+      icon: '📦',
+      title: 'Heavy-Duty 26 Kg Packaging',
+      desc: 'Durable, heat-sealed, reinforced bulk bag designed to preserve aroma and prevent moisture.',
+    },
+    {
+      icon: '⚡',
+      title: 'Express Doorstep Delivery',
+      desc: 'Delivered directly from Farminix local processing units in Guntur straight to your home.',
+    },
+  ],
+  benefits: [
+    'Every single grain is selected for uniform length, smooth texture, and non-sticky cooking.',
+    'Rich in clean complex carbohydrates for sustained all-day energy with 0g Fat and 0mg Sodium.',
+    'Hygienically machine-cleaned, de-stoned, and packed under strict FSSAI food safety regulations.',
+    'Economical 26 Kg family bag size providing 260+ hearty servings for joint families and gatherings.',
+  ],
+  specifications: [
+    { label: 'Brand', value: 'Farminix' },
+    { label: 'Product Name', value: 'Farminix Family Choice Rice' },
+    { label: 'Net Quantity', value: '26 Kg' },
+    { label: 'Dietary Preference', value: '100% Vegetarian 🟢' },
+    { label: 'FSSAI License No.', value: '20126142000933' },
+    { label: 'Manufactured & Marketed By', value: 'Farminix Private Limited' },
+    { label: 'Registered Address', value: 'Flat No 302, Srinivasa Towers, Gorantla, Guntur - 522034, Andhra Pradesh' },
+    { label: 'Customer Contact', value: '+91 7989743595' },
+    { label: 'Customer Support Email', value: 'info@farminix.in' },
+    { label: 'Official Website', value: 'www.farminix.in' },
+    { label: 'Shelf Life', value: '24 Months from Packaging Date' },
+    { label: 'Barcode', value: '8908032796002' },
+    { label: 'Country of Origin', value: 'India' },
+  ],
+  howToUse: [
+    '1. Open Pan: Bring a large pan of water to a rolling boil. Add measured rice, return to a medium boil and cook uncovered for 10 min. Drain and rinse with fresh boiling water.',
+    '2. Covered Pan: Put measured rice and cold water into a heavy-based pan. Bring to boil, stir, cover and turn down to a gentle simmer for 10 min. Turn off heat and leave covered for 5 min.',
+    '3. Microwave: Put measured amount of rice and cold water into a deep microwaveable bowl. Cover with cling film pierced 3 times. Cook on high for 8 min. Uncover, stir, and cook for another 8 min.',
+  ],
+  storageInstructions:
+    'Always store bags off the ground in a hygienic, cool, dry place, away from sunlight and moisture. Once opened, store in an airtight container.',
+  faqs: [
+    {
+      question: 'What is the exact net weight of this Farminix rice bag?',
+      answer: 'This bag contains exactly 26 Kg of Farminix Family Choice Rice, designed as an economical monthly pack for families.',
+    },
+    {
+      question: 'Where is Farminix Family Choice Rice packed and distributed from?',
+      answer: 'It is manufactured and marketed by Farminix Private Limited at Srinivasa Towers, Gorantla, Guntur, Andhra Pradesh (FSSAI Lic No: 20126142000933).',
+    },
+    {
+      question: 'Does this rice bag come with front and back quality guarantee?',
+      answer: 'Yes, both front and back bag specifications are authentic Farminix standards with full barcode and FSSAI traceability.',
+    },
+    {
+      question: 'How many servings are in a 26 Kg bag?',
+      answer: 'Based on the standard 45g (1/4 cup) serving size, each 26 Kg pack provides over 260+ wholesome servings.',
+    },
+  ],
+  reviewsList: [
+    {
+      id: 'rev-1',
+      userName: 'Hitaishi Devarapalli',
+      rating: 5,
+      date: 'Yesterday',
+      verified: true,
+      comment:
+        'Farminix Family Choice Rice has truly surpassed our expectations. Grains are spotless, aroma is delightful, and it cooks fluffy without getting mushy. The 26 Kg bag arrived in pristine condition!',
+      helpfulCount: 54,
+    },
+    {
+      id: 'rev-2',
+      userName: 'Venkatesh Rao',
+      rating: 5,
+      date: '3 days ago',
+      verified: true,
+      comment:
+        'Best everyday rice in Guntur. Having the genuine Farminix 26kg bag delivered straight home saves a lot of supermarket hassle. Taste and texture are 10/10.',
+      helpfulCount: 38,
+    },
+    {
+      id: 'rev-3',
+      userName: 'Lakshmi Narayana',
+      rating: 5,
+      date: '1 week ago',
+      verified: true,
+      comment:
+        'Clean, long grains with great cooking consistency. Perfectly packed bag. Very happy with the quality from Farminix.',
+      helpfulCount: 22,
+    },
+  ],
+};
+
+// Catalog contains exclusively the Farminix Family Choice Rice
 export const allProducts: Product[] = [
-  // ─── RICE & GRAINS ───────────────────────────────────────────────
-  {
-    id: 'r1', name: 'Daawat Super Basmati Rice', category: 'Rice & Grains',
-    price: 209, oldPrice: 260, weight: '1 kg', weightOptions: ['1 kg', '5 kg', '10 kg'],
-    image: ExactProductImages.daawatRice, deliveryTime: '10 Mins', rating: 4.8, reviewsCount: 1420,
-    inStock: true, stockCount: 45, brand: 'Daawat',
-    description: 'Extra-long grain aged basmati rice perfect for biryani, pulao, and everyday meals. Rich aroma and authentic fluffy texture.',
-    ingredients: ['100% Aged Basmati Rice'], nutritionalInfo: { energy: '350 kcal', protein: '8.5 g', carbs: '78 g', fat: '0.6 g', fiber: '2.1 g', sugar: '0 g', sodium: '5 mg' },
-    badges: ['Bestseller', '20% OFF', 'Aged Basmati'],
-    highlights: [
-      { icon: '🌾', title: 'Extra-Long Grains', desc: 'Elongates to twice its size when cooked without breaking.' },
-      { icon: '✨', title: 'Naturally Aromatic', desc: 'Distinctive sweet aroma characteristic of authentic aged Himalayan basmati.' },
-      { icon: '⏳', title: 'Aged for Perfection', desc: 'Aged for 24 months to yield non-sticky, fluffy separate grains.' },
-      { icon: '🍲', title: 'Ideal for Biryani & Pulao', desc: 'The gold standard rice choice for festive feasts and royal biryanis.' },
-    ],
-    benefits: [
-      'Versatile everyday staple pairing excellently with curries, gravies, and dals.',
-      'Low glycemic index rice offering sustained energy release and light digestion.',
-      '100% pure, unadulterated Himalayan basmati grains with zero artificial fragrance.',
-    ],
-    specifications: [
-      { label: 'Brand', value: 'Daawat' },
-      { label: 'Grain Type', value: 'Extra-Long Basmati' },
-      { label: 'Aging', value: '2 Years Aged' },
-      { label: 'Dietary Type', value: 'Vegetarian 🟢' },
-      { label: 'Country of Origin', value: 'India' },
-      { label: 'Shelf Life', value: '24 Months' },
-      { label: 'Storage', value: 'Store in a cool, dry place in an airtight container.' },
-    ],
-    howToUse: [
-      'Rinse 1 cup of rice 2-3 times in cold water until water runs clear.',
-      'Soak in lukewarm water for 30 minutes for maximum grain expansion.',
-      'Add 2 cups of water per 1 cup of rice. Boil, cover, and simmer for 12-15 minutes.',
-    ],
-    storageInstructions: 'Store in a cool, dry, and hygienic place. Once opened, transfer to a sealed airtight glass or stainless steel container.',
-    faqs: [
-      { question: 'What makes Daawat Super Basmati Rice special?', answer: 'Daawat Super is aged for 2 years in climate-controlled granaries, which enhances its aroma and ensures every grain remains separate and fluffy when cooked.' },
-      { question: 'How much water is needed to cook 1 cup of rice?', answer: 'Use 2 cups of water for every 1 cup of soaked Daawat Super Basmati rice for optimal fluffy results.' },
-      { question: 'Is this rice suitable for daily consumption?', answer: 'Yes, it is easy to digest and perfect for both daily lunch/dinner and special occasion biryanis.' },
-    ]
-  },
-  {
-    id: 'r2', name: 'India Gate Classic Basmati Rice', category: 'Rice & Grains',
-    price: 185, oldPrice: 220, weight: '1 kg', weightOptions: ['1 kg', '5 kg'],
-    image: ExactProductImages.basmatiRice, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 980,
-    inStock: true, stockCount: 30, brand: 'India Gate',
-    description: 'Premium classic basmati with naturally aged aroma. Perfect fluffy texture every time.',
-    ingredients: ['100% Basmati Rice'], nutritionalInfo: { energy: '345 kcal', protein: '8 g', carbs: '77 g', fat: '0.5 g' },
-  },
-  {
-    id: 'r3', name: 'Brown Rice (Unpolished)', category: 'Rice & Grains',
-    price: 120, oldPrice: 145, weight: '1 kg', weightOptions: ['500 g', '1 kg', '2 kg'],
-    image: ExactProductImages.brownRice, deliveryTime: '10 Mins', rating: 4.5, reviewsCount: 540,
-    inStock: true, stockCount: 20, brand: 'Farminix Fresh',
-    description: 'Whole grain unpolished brown rice. High in fiber and nutrients, ideal for a healthy diet.',
-    ingredients: ['100% Unpolished Brown Rice'], nutritionalInfo: { energy: '332 kcal', protein: '7.5 g', carbs: '70 g', fat: '2.7 g' },
-  },
-  {
-    id: 'r4', name: 'Sona Masoori Rice', category: 'Rice & Grains',
-    price: 68, oldPrice: 80, weight: '1 kg', weightOptions: ['1 kg', '5 kg', '10 kg'],
-    image: ExactProductImages.daawatRice, deliveryTime: '10 Mins', rating: 4.6, reviewsCount: 730,
-    inStock: true, stockCount: 60, brand: 'Farminix Fresh',
-    description: 'Lightweight, low-starch Sona Masoori rice from Andhra Pradesh. Great for daily meals, idli, and dosa.',
-    ingredients: ['100% Sona Masoori Raw Rice'], nutritionalInfo: { energy: '340 kcal', protein: '7 g', carbs: '76 g', fat: '0.4 g' },
-  },
-  {
-    id: 'r5', name: 'Ponni Boiled Rice', category: 'Rice & Grains',
-    price: 55, oldPrice: 65, weight: '1 kg', weightOptions: ['1 kg', '5 kg'],
-    image: ExactProductImages.basmatiRice, deliveryTime: '10 Mins', rating: 4.4, reviewsCount: 410,
-    inStock: true, stockCount: 40, brand: 'Farminix Fresh',
-    description: 'South Indian Ponni parboiled rice. Easy to digest, high energy, ideal for everyday meals.',
-    ingredients: ['Parboiled Ponni Rice'], nutritionalInfo: { energy: '345 kcal', protein: '6.8 g', carbs: '76 g', fat: '0.5 g' },
-  },
-  {
-    id: 'r6', name: 'Quinoa (Organic)', category: 'Rice & Grains',
-    price: 250, oldPrice: 310, weight: '500 g', weightOptions: ['500 g', '1 kg'],
-    image: ExactProductImages.brownRice, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 320,
-    inStock: true, stockCount: 15, brand: 'Farminix Fresh',
-    description: 'Organic white quinoa — complete protein source with all 9 essential amino acids. Gluten-free superfood.',
-    ingredients: ['100% Organic White Quinoa'], nutritionalInfo: { energy: '368 kcal', protein: '14 g', carbs: '64 g', fat: '6 g' },
-  },
-
-  // ─── DALS & PULSES ────────────────────────────────────────────────
-  {
-    id: 'd1', name: 'Toor Dal (Yellow Pigeon Peas)', category: 'Dals & Pulses',
-    price: 125, oldPrice: 140, weight: '1 kg', weightOptions: ['500 g', '1 kg', '2 kg'],
-    image: ExactProductImages.toorDal, deliveryTime: '10 Mins', rating: 4.6, reviewsCount: 980,
-    inStock: true, stockCount: 50, brand: 'Farminix Fresh',
-    description: 'Premium unpolished yellow split pigeon peas. High protein, no artificial polish. Perfect for sambar and dal tadka.',
-    ingredients: ['100% Unpolished Toor Dal'], nutritionalInfo: { energy: '335 kcal', protein: '22 g', carbs: '62 g', fat: '1.5 g' },
-  },
-  {
-    id: 'd2', name: 'Moong Dal (Split Green Gram)', category: 'Dals & Pulses',
-    price: 110, oldPrice: 130, weight: '1 kg', weightOptions: ['500 g', '1 kg', '2 kg'],
-    image: ExactProductImages.moongDal, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 740,
-    inStock: true, stockCount: 45, brand: 'Farminix Fresh',
-    description: 'Washed and split green gram dal. Light, easily digestible. Ideal for khichdi and soups.',
-    ingredients: ['100% Split Moong Dal'], nutritionalInfo: { energy: '347 kcal', protein: '24 g', carbs: '59 g', fat: '1.2 g' },
-  },
-  {
-    id: 'd3', name: 'Chana Dal (Bengal Gram)', category: 'Dals & Pulses',
-    price: 98, oldPrice: 115, weight: '1 kg', weightOptions: ['500 g', '1 kg', '2 kg'],
-    image: ExactProductImages.chanaDal, deliveryTime: '10 Mins', rating: 4.5, reviewsCount: 560,
-    inStock: true, stockCount: 35, brand: 'Farminix Fresh',
-    description: 'Split and husked Bengal gram. Low glycemic index, high protein. Great for dal curries and snacks.',
-    ingredients: ['100% Chana Dal'], nutritionalInfo: { energy: '360 kcal', protein: '20 g', carbs: '60 g', fat: '5 g' },
-  },
-  {
-    id: 'd4', name: 'Masoor Dal (Red Lentils)', category: 'Dals & Pulses',
-    price: 88, oldPrice: 105, weight: '1 kg', weightOptions: ['500 g', '1 kg'],
-    image: ExactProductImages.toorDal, deliveryTime: '10 Mins', rating: 4.6, reviewsCount: 620,
-    inStock: true, stockCount: 40, brand: 'Farminix Fresh',
-    description: 'Red split lentils, cooks quickly and needs no soaking. Rich in iron and folate.',
-    ingredients: ['100% Red Masoor Dal'], nutritionalInfo: { energy: '358 kcal', protein: '26 g', carbs: '60 g', fat: '1 g' },
-  },
-  {
-    id: 'd5', name: 'Whole Urad Dal (Black Gram)', category: 'Dals & Pulses',
-    price: 135, oldPrice: 155, weight: '1 kg', weightOptions: ['500 g', '1 kg', '2 kg'],
-    image: ExactProductImages.moongDal, deliveryTime: '10 Mins', rating: 4.4, reviewsCount: 390,
-    inStock: true, stockCount: 25, brand: 'Farminix Fresh',
-    description: 'Whole black urad dal for authentic dal makhani. Rich, creamy texture when cooked slowly.',
-    ingredients: ['100% Whole Urad Dal'], nutritionalInfo: { energy: '342 kcal', protein: '25 g', carbs: '58 g', fat: '1.8 g' },
-  },
-  {
-    id: 'd6', name: 'Kabuli Chana (White Chickpeas)', category: 'Dals & Pulses',
-    price: 115, oldPrice: 135, weight: '1 kg', weightOptions: ['500 g', '1 kg'],
-    image: ExactProductImages.chanaDal, deliveryTime: '10 Mins', rating: 4.5, reviewsCount: 480,
-    inStock: true, stockCount: 30, brand: 'Farminix Fresh',
-    description: 'Large white chickpeas for chole, hummus, and chaat. High protein and dietary fiber.',
-    ingredients: ['100% Kabuli Chana'], nutritionalInfo: { energy: '364 kcal', protein: '19 g', carbs: '60 g', fat: '6 g' },
-  },
-
-  // ─── ATTA & FLOURS ────────────────────────────────────────────────
-  {
-    id: 'a1', name: 'Aashirvaad Atta (Whole Wheat)', category: 'Atta & Flours',
-    price: 248, oldPrice: 285, weight: '5 kg', weightOptions: ['1 kg', '5 kg', '10 kg'],
-    image: ExactProductImages.aashirvaadAtta, deliveryTime: '10 Mins', rating: 4.9, reviewsCount: 3890,
-    inStock: true, stockCount: 80, brand: 'Aashirvaad',
-    description: '100% whole wheat atta from selected wheat. Provides soft fluffy rotis packed with natural fiber.',
-    ingredients: ['100% Whole Wheat Grain Flour'], nutritionalInfo: { energy: '364 kcal', protein: '11.8 g', carbs: '73 g', fat: '1.7 g' },
-  },
-  {
-    id: 'a2', name: 'Maida (Refined Flour)', category: 'Atta & Flours',
-    price: 42, oldPrice: 50, weight: '1 kg', weightOptions: ['500 g', '1 kg', '5 kg'],
-    image: ExactProductImages.maida, deliveryTime: '10 Mins', rating: 4.4, reviewsCount: 680,
-    inStock: true, stockCount: 55, brand: 'Farminix Fresh',
-    description: 'Finely milled white refined wheat flour. Ideal for bakery items, naan, bhatura, and sweets.',
-    ingredients: ['Refined Wheat Flour'], nutritionalInfo: { energy: '370 kcal', protein: '10 g', carbs: '76 g', fat: '1 g' },
-  },
-  {
-    id: 'a3', name: 'Besan (Chickpea Flour)', category: 'Atta & Flours',
-    price: 68, oldPrice: 82, weight: '1 kg', weightOptions: ['500 g', '1 kg', '2 kg'],
-    image: ExactProductImages.aashirvaadAtta, deliveryTime: '10 Mins', rating: 4.6, reviewsCount: 520,
-    inStock: true, stockCount: 40, brand: 'Farminix Fresh',
-    description: 'Finely ground chickpea flour. High protein, gluten-free. Perfect for pakoras, kadhi, and sweets.',
-    ingredients: ['100% Chickpea (Bengal Gram) Flour'], nutritionalInfo: { energy: '387 kcal', protein: '22 g', carbs: '58 g', fat: '6 g' },
-  },
-  {
-    id: 'a4', name: 'Sooji / Rava (Semolina)', category: 'Atta & Flours',
-    price: 38, oldPrice: 45, weight: '1 kg', weightOptions: ['500 g', '1 kg'],
-    image: ExactProductImages.maida, deliveryTime: '10 Mins', rating: 4.5, reviewsCount: 410,
-    inStock: true, stockCount: 50, brand: 'Farminix Fresh',
-    description: 'Coarsely ground wheat semolina. Used for upma, halwa, rava idli, and many South Indian dishes.',
-    ingredients: ['Semolina (Durum Wheat)'], nutritionalInfo: { energy: '360 kcal', protein: '12 g', carbs: '73 g', fat: '1.2 g' },
-  },
-  {
-    id: 'a5', name: 'Multigrain Atta', category: 'Atta & Flours',
-    price: 88, oldPrice: 105, weight: '1 kg', weightOptions: ['1 kg', '5 kg'],
-    image: ExactProductImages.aashirvaadAtta, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 340,
-    inStock: true, stockCount: 30, brand: 'Aashirvaad',
-    description: 'Blend of 6 grains — wheat, soya, channa, oat, maize, psyllium husk. Nutritious everyday flour.',
-    ingredients: ['Whole Wheat', 'Soya', 'Channa', 'Oat', 'Maize', 'Psyllium Husk'], nutritionalInfo: { energy: '358 kcal', protein: '13 g', carbs: '70 g', fat: '2.5 g' },
-  },
-
-  // ─── OILS & GHEE ─────────────────────────────────────────────────
-  {
-    id: 'o1', name: 'Fortune Sunflower Oil', category: 'Oils & Ghee',
-    price: 129, oldPrice: 150, weight: '1 L', weightOptions: ['1 L', '2 L', '5 L'],
-    image: ExactProductImages.fortuneOil, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 2150,
-    inStock: true, stockCount: 60, brand: 'Fortune',
-    description: 'Refined sunflower oil enriched with Vitamin A & D. High smoke point ideal for Indian cooking.',
-    ingredients: ['Refined Sunflower Oil', 'Vitamin A', 'Vitamin D'], nutritionalInfo: { energy: '900 kcal', protein: '0 g', carbs: '0 g', fat: '100 g' },
-  },
-  {
-    id: 'o2', name: 'Kachi Ghani Mustard Oil', category: 'Oils & Ghee',
-    price: 168, oldPrice: 195, weight: '1 L', weightOptions: ['500 ml', '1 L', '5 L'],
-    image: ExactProductImages.mustardOil, deliveryTime: '10 Mins', rating: 4.6, reviewsCount: 890,
-    inStock: true, stockCount: 35, brand: 'Patanjali',
-    description: 'Cold-pressed mustard oil retaining all natural nutrients and pungent flavour. For pickles and Bengali cuisine.',
-    ingredients: ['100% Pure Mustard Oil'], nutritionalInfo: { energy: '884 kcal', protein: '0 g', carbs: '0 g', fat: '100 g' },
-  },
-  {
-    id: 'o3', name: 'Virgin Coconut Oil', category: 'Oils & Ghee',
-    price: 320, oldPrice: 380, weight: '500 ml', weightOptions: ['200 ml', '500 ml', '1 L'],
-    image: ExactProductImages.coconutOil, deliveryTime: '10 Mins', rating: 4.8, reviewsCount: 610,
-    inStock: true, stockCount: 20, brand: 'Parachute',
-    description: 'Cold-pressed virgin coconut oil. Medium-chain fatty acids for energy. Use for cooking or skin care.',
-    ingredients: ['100% Virgin Coconut Oil'], nutritionalInfo: { energy: '862 kcal', protein: '0 g', carbs: '0 g', fat: '100 g' },
-  },
-  {
-    id: 'o4', name: 'Amul Pure Ghee', category: 'Oils & Ghee',
-    price: 295, oldPrice: 340, weight: '500 ml', weightOptions: ['200 ml', '500 ml', '1 L'],
-    image: ExactProductImages.fortuneOil, deliveryTime: '10 Mins', rating: 4.9, reviewsCount: 1840,
-    inStock: true, stockCount: 25, brand: 'Amul',
-    description: 'Pure cow ghee made from fresh cream. Rich aroma, golden colour. Adds authentic taste to every dish.',
-    ingredients: ['Pasteurised Milk Fat (Deshi Cow Ghee)'], nutritionalInfo: { energy: '900 kcal', protein: '0 g', carbs: '0 g', fat: '100 g' },
-  },
-  {
-    id: 'o5', name: 'Saffola Gold Refined Oil', category: 'Oils & Ghee',
-    price: 145, oldPrice: 170, weight: '1 L', weightOptions: ['1 L', '2 L', '5 L'],
-    image: ExactProductImages.mustardOil, deliveryTime: '10 Mins', rating: 4.6, reviewsCount: 760,
-    inStock: true, stockCount: 45, brand: 'Saffola',
-    description: 'Blended edible vegetable oil with Oryzanol for heart health. Balanced cooking oil for daily use.',
-    ingredients: ['Rice Bran Oil', 'Safflower Oil', 'Oryzanol'], nutritionalInfo: { energy: '900 kcal', protein: '0 g', carbs: '0 g', fat: '100 g' },
-  },
-
-  // ─── MASALA & SPICES ──────────────────────────────────────────────
-  {
-    id: 'm1', name: 'Tata Turmeric Powder', category: 'Masala & Spices',
-    price: 28, oldPrice: 35, weight: '100 g', weightOptions: ['100 g', '200 g', '500 g'],
-    image: ExactProductImages.tataTurmeric, deliveryTime: '10 Mins', rating: 4.8, reviewsCount: 1650,
-    inStock: true, stockCount: 95, brand: 'Tata Sampann',
-    description: 'Salem turmeric with minimum 3% natural Curcumin. Rich golden colour and immunity benefits.',
-    ingredients: ['100% Pure Ground Turmeric'], nutritionalInfo: { energy: '349 kcal', protein: '7.8 g', carbs: '65 g', fat: '9.8 g' },
-  },
-  {
-    id: 'm2', name: 'MDH Chana Masala', category: 'Masala & Spices',
-    price: 55, oldPrice: 65, weight: '100 g', weightOptions: ['50 g', '100 g', '200 g'],
-    image: ExactProductImages.redChilli, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 980,
-    inStock: true, stockCount: 70, brand: 'MDH',
-    description: 'Perfect blend of spices for restaurant-style chole. Authentic aroma and bold flavour.',
-    ingredients: ['Coriander', 'Cumin', 'Red Chilli', 'Amchur', 'Black Pepper', 'Anardana'], nutritionalInfo: { energy: '310 kcal', protein: '12 g', carbs: '55 g', fat: '8 g' },
-  },
-  {
-    id: 'm3', name: 'Everest Kitchen King Masala', category: 'Masala & Spices',
-    price: 62, oldPrice: 75, weight: '100 g', weightOptions: ['50 g', '100 g', '200 g'],
-    image: ExactProductImages.garam, deliveryTime: '10 Mins', rating: 4.8, reviewsCount: 1120,
-    inStock: true, stockCount: 60, brand: 'Everest',
-    description: 'All-purpose masala for vegetables and gravies. Enhances flavour with aromatic whole spices.',
-    ingredients: ['Cumin', 'Coriander', 'Turmeric', 'Red Chilli', 'Fennel', 'Bay Leaf'], nutritionalInfo: { energy: '318 kcal', protein: '13 g', carbs: '52 g', fat: '9 g' },
-  },
-  {
-    id: 'm4', name: 'Red Chilli Powder', category: 'Masala & Spices',
-    price: 35, oldPrice: 42, weight: '100 g', weightOptions: ['100 g', '200 g', '500 g'],
-    image: ExactProductImages.redChilli, deliveryTime: '10 Mins', rating: 4.6, reviewsCount: 840,
-    inStock: true, stockCount: 80, brand: 'Tata Sampann',
-    description: 'Vibrant red chilli powder ground from whole dried chillis. Bold heat and natural colour for curries.',
-    ingredients: ['100% Pure Dried Red Chilli'], nutritionalInfo: { energy: '282 kcal', protein: '13 g', carbs: '50 g', fat: '14 g' },
-  },
-  {
-    id: 'm5', name: 'Cumin Seeds (Jeera)', category: 'Masala & Spices',
-    price: 48, oldPrice: 58, weight: '100 g', weightOptions: ['100 g', '200 g', '500 g'],
-    image: ExactProductImages.garam, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 590,
-    inStock: true, stockCount: 65, brand: 'Farminix Fresh',
-    description: 'Aromatic cumin seeds harvested from Rajasthan. Essential for tadka and rice preparations.',
-    ingredients: ['100% Pure Cumin Seeds'], nutritionalInfo: { energy: '375 kcal', protein: '18 g', carbs: '44 g', fat: '22 g' },
-  },
-
-  // ─── SNACKS & BEVERAGES ───────────────────────────────────────────
-  {
-    id: 's1', name: "Lay's Classic Salted Chips", category: 'Snacks & Beverages',
-    price: 20, oldPrice: 20, weight: '26 g', weightOptions: ['26 g', '52 g'],
-    image: ExactProductImages.chips, deliveryTime: '10 Mins', rating: 4.5, reviewsCount: 3200,
-    inStock: true, stockCount: 100, brand: "Lay's",
-    description: 'Crispy potato chips with classic salted flavour. Thin-sliced for perfect crunch.',
-    ingredients: ['Potatoes', 'Edible Vegetable Oil', 'Salt'], nutritionalInfo: { energy: '536 kcal', protein: '7 g', carbs: '53 g', fat: '34 g' },
-  },
-  {
-    id: 's2', name: 'Parle-G Biscuits', category: 'Snacks & Beverages',
-    price: 10, oldPrice: 10, weight: '200 g', weightOptions: ['100 g', '200 g', '800 g'],
-    image: ExactProductImages.biscuits, deliveryTime: '10 Mins', rating: 4.8, reviewsCount: 5400,
-    inStock: true, stockCount: 200, brand: 'Parle',
-    description: "India's favourite glucose biscuits. Sweet, crispy, and made with milk and wheat.",
-    ingredients: ['Wheat Flour', 'Sugar', 'Edible Vegetable Fat', 'Milk Solids'], nutritionalInfo: { energy: '472 kcal', protein: '6.7 g', carbs: '68 g', fat: '15 g' },
-  },
-  {
-    id: 's3', name: 'Kurkure Masala Munch', category: 'Snacks & Beverages',
-    price: 20, oldPrice: 20, weight: '90 g', weightOptions: ['40 g', '90 g'],
-    image: ExactProductImages.chips, deliveryTime: '10 Mins', rating: 4.4, reviewsCount: 2100,
-    inStock: true, stockCount: 80, brand: 'Kurkure',
-    description: 'Crunchy corn puffs with tangy masala flavour. A beloved evening snack for all ages.',
-    ingredients: ['Corn Meal', 'Rice Meal', 'Gram Meal', 'Edible Vegetable Oil', 'Spices'], nutritionalInfo: { energy: '520 kcal', protein: '8 g', carbs: '62 g', fat: '27 g' },
-  },
-  {
-    id: 's4', name: 'Nescafé Classic Instant Coffee', category: 'Snacks & Beverages',
-    price: 199, oldPrice: 235, weight: '100 g', weightOptions: ['50 g', '100 g', '200 g'],
-    image: ExactProductImages.biscuits, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 1870,
-    inStock: true, stockCount: 50, brand: 'Nescafé',
-    description: 'Aromatic pure instant coffee. 100% coffee with signature bold taste. Just add hot water.',
-    ingredients: ['100% Pure Instant Coffee'], nutritionalInfo: { energy: '353 kcal', protein: '14 g', carbs: '39 g', fat: '15 g' },
-  },
-
-  // ─── HOUSEHOLD ESSENTIALS ─────────────────────────────────────────
-  {
-    id: 'h1', name: 'Surf Excel Easy Wash Detergent', category: 'Household Essentials',
-    price: 68, oldPrice: 80, weight: '500 g', weightOptions: ['500 g', '1 kg', '3 kg'],
-    image: ExactProductImages.detergent, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 1540,
-    inStock: true, stockCount: 70, brand: 'Surf Excel',
-    description: 'Removes 10 tough stains in just 10 minutes. Gentle on hands, tough on dirt.',
-    ingredients: ['Anionic Surfactants', 'Enzymes', 'Optical Brighteners'], nutritionalInfo: { energy: 'N/A', protein: 'N/A', carbs: 'N/A', fat: 'N/A' },
-  },
-  {
-    id: 'h2', name: 'Dettol Original Soap', category: 'Household Essentials',
-    price: 40, oldPrice: 48, weight: '75 g', weightOptions: ['75 g', '125 g'],
-    image: ExactProductImages.soap, deliveryTime: '10 Mins', rating: 4.8, reviewsCount: 2340,
-    inStock: true, stockCount: 100, brand: 'Dettol',
-    description: 'Antibacterial soap protecting against 100 illness-causing germs. Dermatologically tested.',
-    ingredients: ['Sodium Palmate', 'Aqua', 'Chloroxylenol (PCMX)', 'Fragrance'], nutritionalInfo: { energy: 'N/A', protein: 'N/A', carbs: 'N/A', fat: 'N/A' },
-  },
-  {
-    id: 'h3', name: 'Harpic Power Plus Toilet Cleaner', category: 'Household Essentials',
-    price: 65, oldPrice: 78, weight: '500 ml', weightOptions: ['500 ml', '1 L'],
-    image: ExactProductImages.detergent, deliveryTime: '10 Mins', rating: 4.5, reviewsCount: 890,
-    inStock: true, stockCount: 55, brand: 'Harpic',
-    description: 'Removes tough stains and limescale with maximum strength formula. Kills 99.9% germs.',
-    ingredients: ['Hydrochloric Acid', 'Surfactants', 'Fragrance'], nutritionalInfo: { energy: 'N/A', protein: 'N/A', carbs: 'N/A', fat: 'N/A' },
-  },
-  {
-    id: 'h4', name: 'Colgate Strong Teeth Toothpaste', category: 'Household Essentials',
-    price: 88, oldPrice: 102, weight: '200 g', weightOptions: ['100 g', '200 g', '300 g'],
-    image: ExactProductImages.soap, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 1240,
-    inStock: true, stockCount: 80, brand: 'Colgate',
-    description: 'With Calcium Boost for stronger teeth. Protects enamel and freshens breath all day.',
-    ingredients: ['Sodium Fluoride', 'Calcium Carbonate', 'Sorbitol', 'Hydrated Silica', 'Mint Flavour'], nutritionalInfo: { energy: 'N/A', protein: 'N/A', carbs: 'N/A', fat: 'N/A' },
-  },
-
-  // ─── SUGAR & SALT ─────────────────────────────────────────────────
-  {
-    id: 'ss1', name: 'Tata Salt (Iodized)', category: 'Sugar & Salt',
-    price: 20, oldPrice: 24, weight: '1 kg', weightOptions: ['1 kg', '2 kg'],
-    image: ExactProductImages.tataSalt, deliveryTime: '10 Mins', rating: 4.9, reviewsCount: 5120,
-    inStock: true, stockCount: 150, brand: 'Tata',
-    description: "India's favourite vacuum-evaporated iodized salt. Pure white crystals for taste and health.",
-    ingredients: ['Refined Iodized Salt', 'Potassium Iodate'], nutritionalInfo: { energy: '0 kcal', protein: '0 g', carbs: '0 g', fat: '0 g' },
-  },
-  {
-    id: 'ss2', name: 'Sugar (Refined Crystal)', category: 'Sugar & Salt',
-    price: 45, oldPrice: 52, weight: '1 kg', weightOptions: ['1 kg', '5 kg'],
-    image: ExactProductImages.sugar, deliveryTime: '10 Mins', rating: 4.5, reviewsCount: 870,
-    inStock: true, stockCount: 120, brand: 'Farminix Fresh',
-    description: 'Pure refined white crystal sugar. Consistent grain size for uniform sweetness in all recipes.',
-    ingredients: ['100% Refined Cane Sugar'], nutritionalInfo: { energy: '400 kcal', protein: '0 g', carbs: '100 g', fat: '0 g' },
-  },
-  {
-    id: 'ss3', name: 'Pink Himalayan Salt', category: 'Sugar & Salt',
-    price: 95, oldPrice: 115, weight: '500 g', weightOptions: ['250 g', '500 g', '1 kg'],
-    image: ExactProductImages.tataSalt, deliveryTime: '10 Mins', rating: 4.7, reviewsCount: 460,
-    inStock: true, stockCount: 30, brand: 'Farminix Fresh',
-    description: 'Natural pink rock salt from the Himalayas. Contains 84+ minerals and trace elements. Unrefined.',
-    ingredients: ['Himalayan Pink Rock Salt'], nutritionalInfo: { energy: '0 kcal', protein: '0 g', carbs: '0 g', fat: '0 g' },
-  },
-  {
-    id: 'ss4', name: 'Brown Sugar (Demerara)', category: 'Sugar & Salt',
-    price: 75, oldPrice: 90, weight: '500 g', weightOptions: ['500 g', '1 kg'],
-    image: ExactProductImages.sugar, deliveryTime: '10 Mins', rating: 4.6, reviewsCount: 320,
-    inStock: true, stockCount: 40, brand: 'Farminix Fresh',
-    description: 'Unrefined raw cane sugar with natural molasses. Rich caramel flavour for baking and coffee.',
-    ingredients: ['Raw Cane Sugar', 'Natural Molasses'], nutritionalInfo: { energy: '380 kcal', protein: '0 g', carbs: '95 g', fat: '0 g' },
-  },
+  farminixRiceProduct,
 ];
 
-// Products shown on home page "Popular Today" — only keep Daawat rice
+// Popular Today contains only Farminix Family Choice Rice
 export const popularProducts: Product[] = [
-  allProducts.find(p => p.id === 'r1')!,
+  farminixRiceProduct,
 ];
 
 export const epicDeals: DealCard[] = [
-  { id: 'd1', categoryName: 'Rice & Grains',          discountBadge: 'MIN. 50% OFF', image: '/deals/epic_deal_rice.jpg',      brands: [{ name: 'Daawat',      logo: BrandLogos.daawat     }, { name: 'India Gate',  logo: BrandLogos.indiaGate  }] },
-  { id: 'd2', categoryName: 'Oils & Ghee',            discountBadge: 'MIN. 40% OFF', image: '/deals/epic_deal_oils.jpg',      brands: [{ name: 'Fortune',     logo: BrandLogos.fortune    }, { name: 'Sunpure',    logo: BrandLogos.sunpure    }] },
-  { id: 'd3', categoryName: 'Dals & Pulses',          discountBadge: 'MIN. 45% OFF', image: '/deals/epic_deal_dals.jpg',      brands: [{ name: 'Tata Sampann',logo: BrandLogos.tataSampann}, { name: 'Pro Nature', logo: BrandLogos.proNature  }] },
-  { id: 'd4', categoryName: 'Masala & Spices',        discountBadge: 'MIN. 50% OFF', image: '/deals/epic_deal_masala.jpg',    brands: [{ name: 'MDH',         logo: BrandLogos.mdh        }, { name: 'Everest',    logo: BrandLogos.everest    }] },
-  { id: 'd5', categoryName: 'Snacks & Beverages',     discountBadge: 'MIN. 40% OFF', image: '/deals/epic_deal_snacks.jpg',    brands: [{ name: "Lay's",       logo: BrandLogos.lays       }, { name: 'Coca-Cola',  logo: BrandLogos.cocaCola   }] },
-  { id: 'd6', categoryName: 'Household Essentials',   discountBadge: 'MIN. 35% OFF', image: '/deals/epic_deal_household.jpg', brands: [{ name: 'Surf Excel',  logo: BrandLogos.surfExcel  }, { name: 'Dettol',    logo: BrandLogos.dettol     }] },
+  { id: 'd1', categoryName: 'Rice & Grains', discountBadge: 'SPECIAL PRICE', image: '/farminix_rice_front.png', brands: [{ name: 'Farminix', logo: BrandLogos.daawat }] },
 ];
 
 export const brandLogosList = [
-  { name: 'Daawat',    logo: BrandLogos.daawat    },
-  { name: 'Aashirvaad',logo: BrandLogos.aashirvaad},
-  { name: 'Fortune',   logo: BrandLogos.fortune   },
-  { name: 'Tata',      logo: BrandLogos.tata      },
-  { name: 'Amul',      logo: BrandLogos.amul      },
-  { name: 'Maggi',     logo: BrandLogos.maggi     },
-  { name: 'Nescafe',   logo: BrandLogos.nescafe   },
-  { name: 'Tide',      logo: BrandLogos.tide      },
-  { name: 'Tata Salt', logo: BrandLogos.tataSalt  },
+  { name: 'Farminix', logo: '/farminix_logo.png' },
 ];
 
 export const SUB_CATEGORIES: Record<string, string[]> = {
-  'Dals & Pulses': ['Toor Dal', 'Moong Dal', 'Chana Dal', 'Urad Dal', 'Rajma & Chole', 'Mix Dals'],
-  'Rice & Grains': ['Basmati Rice', 'Sona Masoori Rice', 'Brown & Health Rice', 'Poha, Sabudana & Murmura', 'Millets & Quinoa'],
-  'Atta & Flours': ['Wheat Atta', 'Multigrain Atta', 'Besan, Sooji & Maida', 'Rice & Specialty Flours'],
-  'Oils & Ghee': ['Sunflower & Health Oils', 'Mustard & Groundnut Oil', 'Olive & Canola Oil', 'Pure Ghee', 'Cold Pressed Oils'],
-  'Masala & Spices': ['Whole Spices', 'Powdered Spices', 'Blended Masalas', 'Herbs & Seasonings', 'Pastes & Purees'],
-  'Snacks & Beverages': ['Biscuits & Cookies', 'Namkeen & Snacks', 'Tea & Coffee', 'Health Drinks & Supplements', 'Juices & Soft Drinks'],
-  'Household Essentials': ['Laundry Care', 'Dishwashing Needs', 'Floor & Toilet Cleaners', 'Pooja Needs', 'Repellents & Fresheners'],
+  'Rice & Grains': ['Family Choice Rice', '26 Kg Bags'],
 };
 
 export const SUBCATEGORY_KEYWORDS: Record<string, string[]> = {
-  'Toor Dal': ['toor', 'arhar'],
-  'Moong Dal': ['moong'],
-  'Chana Dal': ['chana', 'chickpea', 'kabuli'],
-  'Urad Dal': ['urad'],
-  'Rajma & Chole': ['rajma', 'chole', 'kidney bean'],
-  'Mix Dals': ['mix dal', 'mixed dal'],
-
-  'Basmati Rice': ['basmati'],
-  'Sona Masoori Rice': ['sona', 'masoori'],
-  'Brown & Health Rice': ['brown rice', 'red rice', 'black rice', 'wild rice'],
-  'Poha, Sabudana & Murmura': ['poha', 'sabudana', 'murmura', 'puffed rice', 'flattened rice'],
-  'Millets & Quinoa': ['millet', 'quinoa', 'ragi', 'jowar', 'bajra'],
-
-  'Wheat Atta': ['wheat atta', 'gehun', 'whole wheat'],
-  'Multigrain Atta': ['multigrain'],
-  'Besan, Sooji & Maida': ['besan', 'sooji', 'rava', 'maida', 'semolina', 'gram flour'],
-  'Rice & Specialty Flours': ['rice flour', 'gluten free flour', 'ragi flour'],
-
-  'Sunflower & Health Oils': ['sunflower', 'saffola', 'rice bran'],
-  'Mustard & Groundnut Oil': ['mustard', 'groundnut', 'peanut'],
-  'Olive & Canola Oil': ['olive', 'canola', 'extra virgin'],
-  'Pure Ghee': ['ghee'],
-  'Cold Pressed Oils': ['cold pressed', 'kachi ghani', 'virgin oil'],
-
-  'Whole Spices': ['jeera', 'cumin seed', 'cardamom', 'clove', 'cinnamon', 'pepper corn', 'mustard seed'],
-  'Powdered Spices': ['turmeric powder', 'chilli powder', 'coriander powder', 'haldi', 'mirch'],
-  'Blended Masalas': ['masala', 'garam masala', 'kitchen king', 'chana masala', 'sambhar powder'],
-  'Herbs & Seasonings': ['oregano', 'basil', 'thyme', 'chilli flake'],
-  'Pastes & Purees': ['ginger garlic paste', 'tomato puree', 'paste'],
-
-  'Biscuits & Cookies': ['biscuit', 'cookie', 'cookies', 'parle', 'britannia', 'good day'],
-  'Namkeen & Snacks': ['namkeen', 'chips', 'lays', 'kurkure', 'bhujia', 'snack'],
-  'Tea & Coffee': ['tea', 'coffee', 'nescafe', 'taj mahal', 'bru'],
-  'Health Drinks & Supplements': ['horlicks', 'bournvita', 'pediasure', 'complan', 'supplement'],
-  'Juices & Soft Drinks': ['juice', 'coke', 'pepsi', 'sprite', 'soft drink', 'real juice'],
-
-  'Laundry Care': ['tide', 'surf', 'ariel', 'detergent', 'laundry'],
-  'Dishwashing Needs': ['vim', 'dishwash', 'dish washing', 'pril'],
-  'Floor & Toilet Cleaners': ['harpic', 'lizol', 'phenyl', 'floor cleaner'],
-  'Pooja Needs': ['agarbatti', 'camphor', 'pooja', 'incense'],
-  'Repellents & Fresheners': ['all out', 'good knight', 'odomak', 'air freshener', 'godrej aer'],
+  'Family Choice Rice': ['family choice', 'rice', 'farminix', '26kg', '26 kg'],
+  '26 Kg Bags': ['26kg', '26 kg', 'bag', 'bags'],
 };
