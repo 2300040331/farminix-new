@@ -14,7 +14,7 @@ export const HeroBanner: React.FC = () => {
       {/* ── Full-Width Hero Image Container ── */}
       <div className="relative w-full overflow-hidden group">
         <img 
-          src={hero.bannerImage || '/hero_banner_original.jpg'} 
+          src={hero.bannerImage ? (hero.bannerImage.includes('?') ? hero.bannerImage : `${hero.bannerImage}?v=2`) : '/hero_banner_original.jpg?v=2'} 
           alt={hero.altText || 'Farminix Fresh Groceries'} 
           className="w-full h-auto block" 
           draggable="false"
