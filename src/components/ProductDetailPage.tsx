@@ -364,7 +364,7 @@ export const ProductDetailPage: React.FC = () => {
           <div className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-24">
             
             {/* Main Stage Image Container */}
-            <div className="relative w-full aspect-square bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-200/80 overflow-hidden flex items-center justify-center p-4 sm:p-6 group shadow-xs">
+            <div className="relative w-full aspect-square bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 overflow-hidden flex items-center justify-center p-4 sm:p-6 group shadow-xs">
               
               {/* Badges Overlay */}
               <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex flex-col gap-1.5 sm:gap-2 z-10">
@@ -406,7 +406,7 @@ export const ProductDetailPage: React.FC = () => {
                 <button
                   key={i}
                   onClick={() => setSelectedImage(img)}
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl border-2 bg-slate-50 p-1 transition-all cursor-pointer shrink-0 overflow-hidden ${
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl border-2 bg-white p-1 transition-all cursor-pointer shrink-0 overflow-hidden ${
                     (selectedImage || product.image) === img
                       ? 'border-[#7C3AED] ring-2 ring-purple-200'
                       : 'border-slate-200 opacity-70 hover:opacity-100'
@@ -939,9 +939,9 @@ export const ProductDetailPage: React.FC = () => {
                   >
                     <div
                       onClick={() => navigate('/product/' + getProductSlug(rp.name))}
-                      className="relative w-full aspect-square bg-slate-50 cursor-pointer overflow-hidden shrink-0"
+                      className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0"
                     >
-                      <img src={rp.image} alt={rp.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <img src={rp.image} alt={rp.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" />
                       <div className="absolute top-2 left-2 bg-white/80 backdrop-blur-md px-1.5 py-0.5 rounded text-[9px] font-black text-slate-800">
                         ⭐ {rp.rating}
                       </div>
@@ -998,7 +998,7 @@ export const ProductDetailPage: React.FC = () => {
                   onClick={() => navigate('/product/' + getProductSlug(rv.name))}
                   className="bg-white rounded-2xl p-3 border border-slate-200/80 hover:border-purple-300 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200 shadow-2xs hover:-translate-y-1"
                 >
-                  <div className="w-full aspect-square bg-slate-50 rounded-xl overflow-hidden p-2">
+                  <div className="w-full aspect-square bg-white rounded-xl overflow-hidden p-2">
                     <img src={rv.image} alt={rv.name} className="w-full h-full object-contain" />
                   </div>
                   <div className="text-xs font-bold text-slate-800 text-center line-clamp-1 w-full">{rv.name}</div>

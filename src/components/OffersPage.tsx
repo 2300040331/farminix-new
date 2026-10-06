@@ -567,11 +567,11 @@ export const OffersPage: React.FC = () => {
                   onClick={() => setSelectedProduct(product)}
                   className="shrink-0 w-40 sm:w-48 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden cursor-pointer hover:-translate-y-2 transition-transform duration-200"
                 >
-                  <div className="relative w-full aspect-square bg-slate-50 overflow-hidden">
+                  <div className="relative w-full aspect-square bg-white overflow-hidden">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain p-2 hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow-sm">
                       {discount}% OFF
@@ -676,13 +676,13 @@ export const OffersPage: React.FC = () => {
                     >
                       {/* Image */}
                       <div
-                        className="relative w-full aspect-square bg-slate-50 cursor-pointer overflow-hidden shrink-0"
+                        className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0"
                         onClick={() => setSelectedProduct(product)}
                       >
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="w-full h-full object-cover transition-transform duration-400 hover:scale-110"
+                          className="w-full h-full object-contain p-2 transition-transform duration-400 hover:scale-110"
                         />
 
                         {/* Rating badge */}

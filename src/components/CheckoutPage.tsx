@@ -596,7 +596,7 @@ export const CheckoutPage: React.FC = () => {
                 {cart.map((item) => (
                   <div key={`${item.product.id}-${item.selectedWeight}`} className="pt-2 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <img src={item.product.image} alt={item.product.name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain bg-slate-50 p-1 rounded-xl border border-slate-100 shrink-0" />
+                      <img src={item.product.image} alt={item.product.name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain bg-white p-1 rounded-xl border border-slate-100 shrink-0" />
                       <div className="min-w-0">
                         <div className="text-xs font-bold text-slate-900 truncate max-w-[140px] xs:max-w-[180px] sm:max-w-[200px]">{item.product.name}</div>
                         <div className="text-[10px] text-slate-500 font-semibold">{item.selectedWeight} • Qty: {item.quantity}</div>

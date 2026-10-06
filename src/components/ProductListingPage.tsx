@@ -265,13 +265,13 @@ export const ProductListingPage: React.FC = () => {
                     >
                       {/* Product Image and Overlay Badges */}
                       <div
-                        className="relative w-full aspect-square bg-slate-50 cursor-pointer overflow-hidden shrink-0"
+                        className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0"
                         onClick={() => navigate('/product/' + getProductSlug(product.name))}
                       >
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                         />
 
                         {/* Rating Badge (top-left, 12px margins) */}
@@ -426,13 +426,13 @@ export const ProductListingPage: React.FC = () => {
                       >
                         {/* Product Image */}
                         <div
-                          className="relative w-full aspect-square bg-slate-50 cursor-pointer overflow-hidden shrink-0"
+                          className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0"
                           onClick={() => navigate('/product/' + getProductSlug(product.name))}
                         >
                           <img
                             src={product.image}
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                           />
                           {/* Rating Badge */}
                           <div className="absolute top-3 left-3 bg-white/70 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-extrabold text-slate-800 flex items-center gap-0.5 shadow-sm border border-white/40">

@@ -455,8 +455,10 @@ export const AccountDashboard: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {allProducts.slice(0, 4).map(product => (
-                      <div key={product.id} className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
-                        <img src={product.image} alt={product.name} className="w-full h-24 object-cover rounded-xl mb-2" />
+                      <div key={product.id} className="p-3 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between shadow-2xs">
+                        <div className="w-full h-24 bg-white rounded-xl mb-2 flex items-center justify-center p-1">
+                          <img src={product.image} alt={product.name} className="h-full object-contain" />
+                        </div>
                         <div>
                           <div className="text-xs font-bold text-slate-800 line-clamp-1">{product.name}</div>
                           <div className="text-[10px] text-slate-500 font-semibold">{product.weight}</div>
@@ -530,7 +532,7 @@ export const AccountDashboard: React.FC = () => {
                           {order.items.map((item, idx) => (
                             <div key={idx} className="flex items-center justify-between text-xs">
                               <div className="flex items-center gap-3">
-                                <img src={item.product.image} alt={item.product.name} className="w-10 h-10 rounded-xl object-cover border border-slate-100" />
+                                <img src={item.product.image} alt={item.product.name} className="w-10 h-10 rounded-xl object-contain bg-white p-0.5 border border-slate-100" />
                                 <div>
                                   <div className="font-bold text-slate-800">{item.product.name}</div>
                                   <div className="text-[10px] text-slate-400">{item.selectedWeight} × {item.quantity}</div>
@@ -736,8 +738,8 @@ export const AccountDashboard: React.FC = () => {
                       .filter((p) => wishlist.some(id => String(id) === String(p.id) || String(id) === String(p.name)))
                       .map((product) => (
                         <div key={product.id} className="p-3.5 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between hover:shadow-md transition-shadow">
-                          <div className="relative mb-2">
-                            <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded-xl" />
+                          <div className="relative mb-2 w-full h-32 bg-white rounded-xl flex items-center justify-center p-1 border border-slate-100">
+                            <img src={product.image} alt={product.name} className="h-full object-contain" />
                             <button
                               onClick={() => {
                                 toggleWishlist(product.id);

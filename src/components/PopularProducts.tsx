@@ -61,12 +61,12 @@ export const PopularProducts: React.FC = () => {
               {/* Product Image and Overlay Badges */}
               <div
                 onClick={() => navigate('/product/' + getProductSlug(product.name))}
-                className="relative w-full aspect-square bg-slate-50 cursor-pointer overflow-hidden shrink-0"
+                className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0"
               >
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                 />
 
                 {/* Rating Badge (top-left, 12px margins) */}

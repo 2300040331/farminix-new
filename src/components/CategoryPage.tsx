@@ -307,13 +307,13 @@ export const CategoryPage: React.FC = () => {
                   >
                     {/* Product Image and Overlay Badges */}
                     <div
-                      className="relative w-full aspect-square bg-slate-50 cursor-pointer overflow-hidden shrink-0"
+                      className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0"
                       onClick={() => { setActiveCategoryPage(null); navigate('/product/' + getProductSlug(product.name)); }}
                     >
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                       />
 
                       {/* Rating Badge (top-left) */}
@@ -433,8 +433,8 @@ export const CategoryPage: React.FC = () => {
                     : 0;
                   return (
                     <div key={product.id} className="bg-white rounded-[16px] border border-gray-100 shadow-[0_4px_18px_rgba(0,0,0,0.06)] flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-all duration-200">
-                      <div className="relative w-full aspect-square bg-slate-50 cursor-pointer overflow-hidden shrink-0" onClick={() => { setActiveCategoryPage(null); navigate('/product/' + getProductSlug(product.name)); }}>
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <div className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0" onClick={() => { setActiveCategoryPage(null); navigate('/product/' + getProductSlug(product.name)); }}>
+                        <img src={product.image} alt={product.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" />
                         <div className="absolute top-3 left-3 bg-white/70 backdrop-blur-md px-2 py-0.75 rounded-md text-[10px] font-extrabold text-slate-800 flex items-center gap-0.5 shadow-2xs border border-white/40"><span>⭐</span><span>{product.rating}</span></div>
                         <button onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }} className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/75 backdrop-blur-md shadow-xs border border-white/50 flex items-center justify-center text-slate-400 hover:text-red-500 hover:scale-110 active:scale-95 transition-all cursor-pointer z-10">
                           <Heart className={`w-4 h-4 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
