@@ -44,13 +44,13 @@ export const SectionOrderingHub: React.FC<{ onNavigateToSection: (id: string) =>
   const handleReset = () => {
     const defaultOrder: SectionOrderItem[] = [
       { id: 'hero', name: 'Hero Banner', enabled: true, order: 1 },
-      { id: 'brandMarquee', name: 'Trusted Brands Marquee', enabled: true, order: 2 },
-      { id: 'featureStrip', name: 'Top 5 Feature Strip', enabled: true, order: 3 },
-      { id: 'categorySection', name: 'Shop by Category', enabled: true, order: 4 },
+      { id: 'brandMarquee', name: 'Trusted Brands Marquee', enabled: false, order: 2 },
+      { id: 'featureStrip', name: 'Top 5 Feature Strip', enabled: false, order: 3 },
+      { id: 'categorySection', name: 'Shop by Category', enabled: false, order: 4 },
       { id: 'popularProducts', name: 'Popular Today ⚡', enabled: true, order: 5 },
-      { id: 'epicDeals', name: 'Epic Deals All Day', enabled: true, order: 6 },
-      { id: 'futureArrivals', name: 'Future Arrivals', enabled: true, order: 7 },
-      { id: 'bottomFeatureStrip', name: 'Bottom Benefits Strip', enabled: true, order: 8 },
+      { id: 'epicDeals', name: 'Epic Deals All Day', enabled: false, order: 6 },
+      { id: 'futureArrivals', name: 'Future Arrivals', enabled: false, order: 7 },
+      { id: 'bottomFeatureStrip', name: 'Bottom Benefits Strip', enabled: false, order: 8 },
     ];
     setSections(defaultOrder);
     updateSectionOrder(defaultOrder);

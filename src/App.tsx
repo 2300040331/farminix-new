@@ -4,15 +4,9 @@ import { AdminConfigProvider, useAdminConfig } from './admin/context/AdminConfig
 import { MainHeader } from './components/MainHeader';
 import { Navbar } from './components/Navbar';
 import { HeroBanner } from './components/HeroBanner';
-import { BrandMarquee } from './components/BrandMarquee';
-import { FeatureStrip } from './components/FeatureStrip';
-import { CategorySection } from './components/CategorySection';
-import { CategoryPage } from './components/CategoryPage';
 import { PopularProducts } from './components/PopularProducts';
-import { DealsSection } from './components/DealsSection';
-import { FutureArrivals } from './components/FutureArrivals';
-import { BottomFeatureStrip } from './components/BottomFeatureStrip';
 import { Footer } from './components/Footer';
+import { CategoryPage } from './components/CategoryPage';
 
 // Pages
 import { ProductListingPage } from './components/ProductListingPage';
@@ -77,13 +71,7 @@ export function AppContent() {
 
     const sectionComponentMap: Record<string, React.ReactNode> = {
       hero: <HeroBanner key="hero" />,
-      brandMarquee: <BrandMarquee key="brandMarquee" />,
-      featureStrip: <FeatureStrip key="featureStrip" />,
-      categorySection: <CategorySection key="categorySection" />,
       popularProducts: <PopularProducts key="popularProducts" />,
-      epicDeals: <DealsSection key="epicDeals" />,
-      futureArrivals: <FutureArrivals key="futureArrivals" />,
-      bottomFeatureStrip: <BottomFeatureStrip key="bottomFeatureStrip" />,
     };
 
     return (
