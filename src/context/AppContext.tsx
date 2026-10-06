@@ -17,6 +17,7 @@ interface AppContextType {
   allProducts: Product[];
   currentRoute: { pathname: string; searchParams: URLSearchParams };
   navigate: (pathname: string, searchString?: string) => void;
+  goBack: () => void;
   
   // Cart
   cart: CartItem[];
@@ -111,6 +112,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
+  };
+
+  const goBack = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      navigate('/');
+    }
   };
 
   const [cart, setCart] = useState<CartItem[]>([
@@ -346,6 +355,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActiveCategoryPage,
         currentRoute,
         navigate,
+        goBack,
         cart,
         addToCart,
         removeFromCart,

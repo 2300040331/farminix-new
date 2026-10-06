@@ -11,6 +11,7 @@ import type { UserAddress, Order } from '../types';
 export const CheckoutPage: React.FC = () => {
   const {
     navigate,
+    goBack,
     cart,
     cartTotal,
     cartDiscount,
@@ -268,19 +269,20 @@ export const CheckoutPage: React.FC = () => {
       {/* ── BREADCRUMB BAR ── */}
       <div className="border-b border-slate-200/80 bg-white py-3.5 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-2 text-slate-500 font-medium">
-            <button onClick={() => navigate('/')} className="hover:text-[#7C3AED] transition-colors cursor-pointer">Home</button>
-            <span>/</span>
-            <span className="text-slate-900 font-bold">Checkout</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={goBack}
+              className="inline-flex items-center gap-1.5 font-bold text-slate-700 hover:text-[#7C3AED] transition-colors cursor-pointer shrink-0 pr-3 border-r border-slate-200"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back</span>
+            </button>
+            <div className="flex items-center gap-2 text-slate-500 font-medium">
+              <button onClick={() => navigate('/')} className="hover:text-[#7C3AED] transition-colors cursor-pointer">Home</button>
+              <span>/</span>
+              <span className="text-slate-900 font-bold">Checkout</span>
+            </div>
           </div>
-
-          <button
-            onClick={() => navigate('/')}
-            className="inline-flex items-center gap-1.5 font-bold text-slate-600 hover:text-[#7C3AED] transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Continue Shopping</span>
-          </button>
         </div>
       </div>
 

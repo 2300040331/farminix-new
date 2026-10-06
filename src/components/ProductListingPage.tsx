@@ -34,6 +34,7 @@ export const ProductListingPage: React.FC = () => {
   const {
     currentRoute,
     navigate,
+    goBack,
     allProducts,
     cart,
     addToCart,
@@ -184,14 +185,16 @@ export const ProductListingPage: React.FC = () => {
 
   return (
     <div className="w-full bg-white min-h-[60vh] py-8">
-      {/* Breadcrumb & Back navigation */}
+      {/* Breadcrumb & Back navigation (Left side) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/')}
-            className="w-10 h-10 rounded-full bg-white shadow-xs border border-gray-200/80 hover:bg-emerald-50 flex items-center justify-center text-slate-600 hover:text-[#16A34A] transition-all cursor-pointer"
+            onClick={goBack}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white shadow-2xs border border-gray-200/80 hover:bg-emerald-50 text-slate-700 hover:text-[#16A34A] text-xs font-bold transition-all cursor-pointer"
+            title="Go Back"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back</span>
           </button>
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -202,14 +205,6 @@ export const ProductListingPage: React.FC = () => {
             </p>
           </div>
         </div>
-
-        {/* Home link */}
-        <button
-          onClick={() => navigate('/')}
-          className="text-xs sm:text-sm font-bold text-[#16A34A] hover:text-[#15803D] transition-colors cursor-pointer"
-        >
-          Back to Home
-        </button>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

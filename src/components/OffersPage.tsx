@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import {
   Heart, Minus, Plus, SlidersHorizontal, Star,
   ShoppingBag, Tag, Truck, Shield,
-  Eye, RotateCcw, ChevronDown, ChevronUp, Clock, Zap, Gift,
+  Eye, RotateCcw, ChevronDown, ChevronUp, Clock, Zap, Gift, ArrowLeft,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
@@ -244,7 +244,7 @@ const FilterSidebar: React.FC<FilterProps> = ({
 // ─────────────────────────────────────────────────────────────────────────────
 export const OffersPage: React.FC = () => {
   const {
-    allProducts, navigate,
+    allProducts, navigate, goBack,
     cart, addToCart, updateQuantity,
     wishlist, toggleWishlist,
     setSelectedProduct, setIsCartOpen,
@@ -379,6 +379,17 @@ export const OffersPage: React.FC = () => {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className="w-full bg-white">
+
+      {/* Top Back Navigation Bar (Left side) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
+        <button
+          onClick={goBack}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white shadow-2xs border border-gray-200/80 hover:bg-purple-50 text-slate-700 hover:text-[#7C3AED] text-xs font-bold transition-all cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back</span>
+        </button>
+      </div>
 
       {/* HERO */}
       <div className="offers-hero w-full px-4 sm:px-8 pt-16 pb-10 sm:pt-24 sm:pb-16 flex flex-col items-center text-center relative">

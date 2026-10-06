@@ -5,6 +5,8 @@ interface IntroVideoOverlayProps {
   onFinish?: () => void;
 }
 
+let hasIntroPlayedInSession = false;
+
 export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }) => {
   const [isDesktop, setIsDesktop] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
@@ -12,11 +14,21 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
   });
   const [isOpen, setIsOpen] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
+    if (hasIntroPlayedInSession) return false;
     try {
-      return !sessionStorage.getItem('farminix_intro_played');
+      if (sessionStorage.getItem('farminix_intro_played') || localStorage.getItem('farminix_intro_played')) {
+        hasIntroPlayedInSession = true;
+        return false;
+      }
     } catch {
       return false;
     }
+    hasIntroPlayedInSession = true;
+    try {
+      sessionStorage.setItem('farminix_intro_played', 'true');
+      localStorage.setItem('farminix_intro_played', 'true');
+    } catch {}
+    return true;
   });
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [isPlayBlocked, setIsPlayBlocked] = useState(false);

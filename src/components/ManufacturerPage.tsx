@@ -1,13 +1,25 @@
 import React from 'react';
-import { Clock, ArrowRight } from 'lucide-react';
+import { Clock, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const ManufacturerPage: React.FC = () => {
-  const { navigate } = useApp();
+  const { navigate, goBack } = useApp();
 
   return (
-    <div className="w-full min-h-[70vh] flex items-center justify-center px-4 py-16 bg-gradient-to-b from-purple-50/40 to-white">
-      <div className="max-w-lg w-full text-center space-y-6">
+    <div className="w-full min-h-[70vh] px-4 py-8 bg-gradient-to-b from-purple-50/40 to-white">
+      {/* Top Back Navigation Bar (Left side) */}
+      <div className="max-w-7xl mx-auto pb-6">
+        <button
+          onClick={goBack}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white shadow-2xs border border-gray-200/80 hover:bg-purple-50 text-slate-700 hover:text-[#7C3AED] text-xs font-bold transition-all cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back</span>
+        </button>
+      </div>
+
+      <div className="flex items-center justify-center py-8">
+        <div className="max-w-lg w-full text-center space-y-6">
         {/* Icon */}
         <div className="mx-auto w-16 h-16 rounded-2xl bg-purple-100 flex items-center justify-center">
           <Clock className="w-8 h-8 text-[#7C3AED]" />
@@ -37,6 +49,7 @@ export const ManufacturerPage: React.FC = () => {
           <span>Back to Home</span>
           <ArrowRight className="w-4 h-4" />
         </button>
+        </div>
       </div>
     </div>
   );
