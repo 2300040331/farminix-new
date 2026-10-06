@@ -1516,11 +1516,11 @@ export const ProductDetailPage: React.FC = () => {
                   <button
                     onClick={() => {
                       setIsBuyNowModalOpen(false);
-                      navigate('/account');
+                      navigate('/');
                     }}
                     className="w-full sm:flex-1 py-3 px-4 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer"
                   >
-                    View in My Orders
+                    Back to Home
                   </button>
 
                   <button

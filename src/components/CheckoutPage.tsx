@@ -6,7 +6,7 @@ import {
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import { detectUserLocation, lookupPincode } from '../utils/location';
-import type { UserAddress } from '../types';
+import type { UserAddress, Order } from '../types';
 
 export const CheckoutPage: React.FC = () => {
   const {
@@ -53,6 +53,7 @@ export const CheckoutPage: React.FC = () => {
   const [selectedBank, setSelectedBank] = useState('HDFC Bank');
   const [deliveryNote, setDeliveryNote] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
 
   // Address Modal / Form state
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
@@ -154,20 +155,82 @@ export const CheckoutPage: React.FC = () => {
     setIsProcessing(true);
 
     setTimeout(() => {
+      const newOrd = createOrder(selectedAddress, paymentMethod);
       setIsProcessing(false);
-      createOrder(selectedAddress, paymentMethod);
+      setPlacedOrder(newOrd);
 
       // Trigger Celebration Confetti!
-      confetti({
-        particleCount: 140,
-        spread: 80,
-        origin: { y: 0.5 },
-      });
-
-      // Navigate to Account / Track Order
-      navigate('/account', 'section=orders');
-    }, 1200);
+      try {
+        confetti({
+          particleCount: 140,
+          spread: 80,
+          origin: { y: 0.5 },
+        });
+      } catch (err) {
+        console.warn('Confetti error:', err);
+      }
+    }, 1000);
   };
+
+  if (placedOrder) {
+    return (
+      <div className="w-full min-h-[75vh] bg-white flex flex-col items-center justify-center p-4 sm:p-6 text-center animate-in zoom-in-95 duration-200">
+        <div className="max-w-md w-full bg-slate-50/80 p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xl space-y-6">
+          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 shadow-lg shadow-emerald-600/20">
+            <CheckCircle2 className="w-10 h-10 animate-bounce" />
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+              Order Placed Successfully!
+            </span>
+            <h1 className="text-2xl font-black text-slate-900 pt-2">
+              Thank You for Your Order!
+            </h1>
+            <p className="text-xs text-slate-500 font-semibold">
+              Order ID: <span className="text-[#7C3AED] font-black">{placedOrder.id}</span>
+            </p>
+          </div>
+
+          <div className="p-4 bg-white rounded-2xl border border-slate-200 text-left space-y-2 text-xs">
+            <div className="flex justify-between border-b border-slate-100 pb-2">
+              <span className="text-slate-500">Items:</span>
+              <span className="font-bold text-slate-900">{placedOrder.items.length} Item(s)</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-100 pb-2">
+              <span className="text-slate-500">Grand Total:</span>
+              <span className="font-black text-[#7C3AED] text-sm">₹{placedOrder.finalAmount}</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-100 pb-2">
+              <span className="text-slate-500">Payment:</span>
+              <span className="font-bold text-slate-800">{placedOrder.paymentMethod}</span>
+            </div>
+            <div className="flex justify-between items-start">
+              <span className="text-slate-500 shrink-0">Deliver To:</span>
+              <span className="font-bold text-slate-800 text-right">
+                {placedOrder.deliveryAddress.street}, {placedOrder.deliveryAddress.city}
+              </span>
+            </div>
+          </div>
+
+          <div className="p-3.5 bg-purple-50/70 border border-purple-200/80 rounded-2xl flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 font-bold text-slate-800">
+              <Truck className="w-4 h-4 text-[#7C3AED]" />
+              <span>Arriving In:</span>
+            </span>
+            <span className="font-black text-[#7C3AED] text-sm">15–20 Mins</span>
+          </div>
+
+          <button
+            onClick={() => navigate('/')}
+            className="w-full py-3.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-black rounded-xl shadow-md transition-all cursor-pointer"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (cart.length === 0) {
     return (

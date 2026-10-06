@@ -11,7 +11,6 @@ import { CategoryPage } from './components/CategoryPage';
 import { ProductListingPage } from './components/ProductListingPage';
 import { ProductDetailPage } from './components/ProductDetailPage';
 import { OffersPage } from './components/OffersPage';
-import { AccountDashboard } from './components/AccountDashboard';
 import { CheckoutPage } from './components/CheckoutPage';
 import { ManufacturerPage } from './components/ManufacturerPage';
 import { AboutPage } from './components/AboutPage';
@@ -85,7 +84,6 @@ export function AppContent() {
     const isSearchPage = currentRoute.pathname === '/products' || currentRoute.searchParams.has('search') || currentRoute.searchParams.has('category');
     const isDetailPage = currentRoute.pathname.startsWith('/product/');
     const isOffersPage = currentRoute.pathname === '/offers';
-    const isAccountPage = currentRoute.pathname === '/account';
     const isCheckoutPage = currentRoute.pathname === '/checkout';
     const isManufacturerPage = currentRoute.pathname === '/manufacturer';
     const isAboutPage = currentRoute.pathname === '/about';
@@ -100,10 +98,6 @@ export function AppContent() {
 
     if (isAboutPage) {
       return <AboutPage />;
-    }
-
-    if (isAccountPage) {
-      return <AccountDashboard />;
     }
 
     if (isOffersPage) {
