@@ -2,7 +2,6 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { AdminConfigProvider, useAdminConfig } from './admin/context/AdminConfigContext';
 import { MainHeader } from './components/MainHeader';
-import { Navbar } from './components/Navbar';
 import { HeroBanner } from './components/HeroBanner';
 import { PopularProducts } from './components/PopularProducts';
 import { Footer } from './components/Footer';
@@ -120,9 +119,6 @@ export function AppContent() {
     <div className="w-full min-h-screen bg-white text-slate-900 font-sans flex flex-col relative">
       {/* MAIN HEADER */}
       <MainHeader />
-
-      {/* NAVIGATION */}
-      <Navbar />
 
       {/* MAIN CONTENT BODY */}
       <main className="flex-1 w-full">
