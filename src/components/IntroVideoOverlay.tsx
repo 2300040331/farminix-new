@@ -10,10 +10,23 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
     if (typeof window === 'undefined') return false;
     return window.innerWidth >= 768;
   });
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return !sessionStorage.getItem('farminix_intro_played');
+    } catch {
+      return false;
+    }
+  });
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [isPlayBlocked, setIsPlayBlocked] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('farminix_intro_played', 'true');
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -25,6 +38,9 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
   }, []);
 
   const handleClose = () => {
+    try {
+      sessionStorage.setItem('farminix_intro_played', 'true');
+    } catch {}
     setIsFadingOut(true);
     setTimeout(() => {
       setIsOpen(false);

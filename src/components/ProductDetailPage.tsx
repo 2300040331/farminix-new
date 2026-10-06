@@ -320,8 +320,23 @@ export const ProductDetailPage: React.FC = () => {
       
       {/* ── BREADCRUMBS & TOP BAR ── */}
       <div className="border-b border-slate-100 bg-slate-50/60 py-3 sm:py-3.5">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center gap-3 sm:gap-4 text-xs">
           
+          {/* Back Button (Left side) */}
+          <button
+            onClick={() => {
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                navigate('/');
+              }
+            }}
+            className="inline-flex items-center gap-1.5 font-bold text-slate-700 hover:text-[#7C3AED] transition-colors cursor-pointer shrink-0 pr-3 border-r border-slate-200"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back</span>
+          </button>
+
           {/* Breadcrumb Path */}
           <nav className="flex items-center gap-1.5 sm:gap-2 text-slate-500 font-medium overflow-x-auto no-scrollbar whitespace-nowrap">
             <button onClick={() => navigate('/')} className="hover:text-[#7C3AED] transition-colors cursor-pointer">Home</button>
@@ -333,17 +348,8 @@ export const ProductDetailPage: React.FC = () => {
               {product.category}
             </button>
             <span>/</span>
-            <span className="text-slate-900 font-bold truncate max-w-[150px] sm:max-w-[200px]">{product.name}</span>
+            <span className="text-slate-900 font-bold truncate max-w-[150px] sm:max-w-[280px]">{product.name}</span>
           </nav>
-
-          {/* Back Button */}
-          <button
-            onClick={() => window.history.back()}
-            className="inline-flex items-center gap-1.5 font-bold text-slate-600 hover:text-[#7C3AED] transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
-          </button>
 
         </div>
       </div>
