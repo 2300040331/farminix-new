@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const ManufacturerPage: React.FC = () => {
@@ -20,10 +20,7 @@ export const ManufacturerPage: React.FC = () => {
 
       <div className="flex items-center justify-center py-8">
         <div className="max-w-lg w-full text-center space-y-6">
-        {/* Icon */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-purple-100 flex items-center justify-center">
-          <Clock className="w-8 h-8 text-[#7C3AED]" />
-        </div>
+
 
         {/* Heading */}
         <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">

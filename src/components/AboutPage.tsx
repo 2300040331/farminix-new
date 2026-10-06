@@ -53,11 +53,7 @@ export const AboutPage: React.FC = () => {
           {/* Left: Open Narrative (NO BOX) */}
           <div className="lg:col-span-7 space-y-6 text-left">
             
-            {/* 3D Floating Badge (No Icons) */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/90 backdrop-blur-md border border-purple-200/80 shadow-md text-xs font-black tracking-wider uppercase text-[#7C3AED] transform transition-transform duration-300 hover:scale-105">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-              <span>Direct From Guntur, Andhra Pradesh</span>
-            </div>
+
 
             {/* Main 3D Title */}
             <div className="space-y-3">

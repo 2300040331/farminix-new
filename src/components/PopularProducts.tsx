@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Zap, Plus, Minus, Heart } from 'lucide-react';
+import { Zap, Plus, Minus, Heart } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import { getProductSlug } from './ProductListingPage';
@@ -36,13 +36,6 @@ export const PopularProducts: React.FC = () => {
           </h2>
           <Zap className="w-5 h-5 text-amber-500 fill-amber-400 animate-bounce" />
         </div>
-        <button
-          onClick={() => navigate(popularConfig.viewAllUrl || '/products')}
-          className="text-xs sm:text-sm font-semibold text-[#7C3AED] hover:text-purple-800 flex items-center gap-1 transition-colors cursor-pointer group"
-        >
-          <span>{popularConfig.viewAllText || 'View All'}</span>
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </button>
       </div>
 
       {/* Grid of Product Cards */}

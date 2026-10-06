@@ -1002,79 +1002,7 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ── YOU MAY ALSO LIKE (Related Products Grid) ── */}
-        <div className="mt-16 pt-10 border-t border-slate-100 text-left">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <span className="text-[11px] font-black text-[#7C3AED] uppercase tracking-widest">Recommended Choices</span>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">You May Also Like</h2>
-            </div>
-            <button
-              onClick={() => navigate('/products', `category=${encodeURIComponent(product.category)}`)}
-              className="text-xs font-bold text-[#7C3AED] hover:text-purple-800 cursor-pointer"
-            >
-              View More in {product.category} &rarr;
-            </button>
-          </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {allProducts
-              .filter((p) => p.category === product.category && p.id !== product.id)
-              .slice(0, 6)
-              .map((rp) => {
-                const rpItem = cart.find((item) => item.product.id === rp.id);
-                const rpQty = rpItem ? rpItem.quantity : 0;
-
-                return (
-                  <div
-                    key={rp.id}
-                    className="bg-white rounded-2xl border border-slate-200/80 flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-all duration-200 shadow-2xs"
-                  >
-                    <div
-                      onClick={() => navigate('/product/' + getProductSlug(rp.name))}
-                      className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0"
-                    >
-                      <img src={rp.image} alt={rp.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" />
-                      <div className="absolute top-2 left-2 bg-white/80 backdrop-blur-md px-1.5 py-0.5 rounded text-[9px] font-black text-slate-800">
-                        ⭐ {rp.rating}
-                      </div>
-                    </div>
-
-                    <div className="p-3 flex flex-col flex-grow justify-between text-left">
-                      <div>
-                        <h3
-                          onClick={() => navigate('/product/' + getProductSlug(rp.name))}
-                          className="text-xs font-bold text-slate-800 line-clamp-2 h-8 cursor-pointer hover:text-[#7C3AED] transition-colors mb-1 leading-snug"
-                        >
-                          {rp.name}
-                        </h3>
-                        <div className="text-[10px] font-semibold text-slate-400 mb-2">{rp.brand} • {rp.weight}</div>
-                        <div className="flex items-baseline gap-1.5 mb-2">
-                          <span className="text-xs font-black text-[#7C3AED]">₹{rp.price}</span>
-                          {rp.oldPrice && <span className="text-[10px] text-slate-400 line-through">₹{rp.oldPrice}</span>}
-                        </div>
-                      </div>
-
-                      {rpQty === 0 ? (
-                        <button
-                          onClick={() => { addToCart(rp); setIsCartOpen(true); }}
-                          className="w-full h-8 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-[11px] font-extrabold rounded-xl flex items-center justify-center gap-1 cursor-pointer transition-all"
-                        >
-                          <span>+ Add</span>
-                        </button>
-                      ) : (
-                        <div className="w-full h-8 bg-[#7C3AED] text-white rounded-xl flex items-center justify-between px-2 font-bold text-xs">
-                          <button onClick={() => updateQuantity(rp.id, -1)} className="w-5 h-5 rounded-full hover:bg-purple-800 flex items-center justify-center cursor-pointer"><Minus className="w-3 h-3 stroke-[3]" /></button>
-                          <span>{rpQty}</span>
-                          <button onClick={() => updateQuantity(rp.id, 1)} className="w-5 h-5 rounded-full hover:bg-purple-800 flex items-center justify-center cursor-pointer"><Plus className="w-3 h-3 stroke-[3]" /></button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
 
         {/* ── RECENTLY VIEWED PRODUCTS ── */}
         {recentlyViewedProducts.length > 0 && (
