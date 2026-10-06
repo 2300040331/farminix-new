@@ -1,10 +1,10 @@
 import React from 'react';
-import { ShoppingCart, ArrowLeft } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
 export const MainHeader: React.FC = () => {
-  const { cart, setIsCartOpen, navigate, goBack, currentRoute } = useApp();
+  const { cart, setIsCartOpen, navigate, currentRoute } = useApp();
   const { publishedConfig } = useAdminConfig();
   const headerCfg = publishedConfig.header;
 
@@ -28,18 +28,8 @@ export const MainHeader: React.FC = () => {
   return (
     <header className="w-full bg-white border-b border-slate-100 sticky top-0 z-30 select-none shadow-xs">
       <div className="max-w-7xl mx-auto h-16 sm:h-20 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 w-full">
-        {/* Left: Farminix Logo & Back Navigation Option */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {!isHomeActive && (
-            <button
-              onClick={goBack}
-              aria-label="Go back"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-100 hover:bg-purple-50 hover:text-[#7C3AED] text-slate-700 text-xs font-bold border border-slate-200/80 transition-all cursor-pointer group"
-            >
-              <ArrowLeft className="w-4 h-4 text-slate-500 group-hover:text-[#7C3AED] group-hover:-translate-x-0.5 transition-transform" />
-              <span className="hidden sm:inline">Back</span>
-            </button>
-          )}
+        {/* Left: Farminix Logo */}
+        <div className="flex items-center shrink-0">
           <div onClick={() => navigate('/')} className="flex items-center cursor-pointer group">
             <img
               src={headerCfg.logoUrl || '/farminix_logo.png'}
