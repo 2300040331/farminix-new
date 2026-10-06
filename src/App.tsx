@@ -14,6 +14,7 @@ import { OffersPage } from './components/OffersPage';
 import { AccountDashboard } from './components/AccountDashboard';
 import { CheckoutPage } from './components/CheckoutPage';
 import { ManufacturerPage } from './components/ManufacturerPage';
+import { AboutPage } from './components/AboutPage';
 
 // Admin CRM Components
 import { AdminLayout } from './admin/AdminLayout';
@@ -87,6 +88,7 @@ export function AppContent() {
     const isAccountPage = currentRoute.pathname === '/account';
     const isCheckoutPage = currentRoute.pathname === '/checkout';
     const isManufacturerPage = currentRoute.pathname === '/manufacturer';
+    const isAboutPage = currentRoute.pathname === '/about';
 
     if (isCheckoutPage) {
       return <CheckoutPage />;
@@ -94,6 +96,10 @@ export function AppContent() {
 
     if (isManufacturerPage) {
       return <ManufacturerPage />;
+    }
+
+    if (isAboutPage) {
+      return <AboutPage />;
     }
 
     if (isAccountPage) {
