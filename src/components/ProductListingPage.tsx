@@ -11,6 +11,7 @@ import {
   clearSavedPriceRange,
 } from './PriceRangeFilter';
 import type { PriceRange } from './PriceRangeFilter';
+import { SUBCATEGORY_KEYWORDS } from '../data/products';
 
 // Normalizer helper: ignores spaces, hyphens, uppercase/lowercase, and simple trailing plurals
 export const normalizeSearchText = (text: string) => {
@@ -56,16 +57,9 @@ export const ProductListingPage: React.FC = () => {
 
   // Build subcategory list from product names within the current category
   const subcategoryMap: Record<string, string[]> = {
-    'Dals & Pulses': ['All', 'Toor Dal', 'Moong Dal', 'Chana Dal', 'Masoor Dal', 'Urad Dal', 'Kabuli Chana'],
-    'Rice & Grains': ['All', 'Basmati Rice', 'Brown Rice', 'Sona Masoori', 'Ponni Rice', 'Quinoa', 'Millets'],
-    'Atta & Flours': ['All', 'Whole Wheat Atta', 'Maida', 'Besan', 'Ragi Flour', 'Multigrain Atta'],
-    'Oils & Ghee': ['All', 'Sunflower Oil', 'Mustard Oil', 'Coconut Oil', 'Groundnut Oil', 'Ghee'],
-    'Masala & Spices': ['All', 'Turmeric', 'Red Chilli', 'Coriander', 'Garam Masala', 'Cumin', 'Pepper'],
-    'Snacks & Beverages': ['All', 'Chips', 'Biscuits', 'Namkeen', 'Juice', 'Tea', 'Coffee', 'Noodles'],
-    'Household Essentials': ['All', 'Detergent', 'Soap', 'Floor Cleaner', 'Dishwash', 'Air Freshener'],
-    'Sugar & Salt': ['All', 'Sugar', 'Salt', 'Jaggery', 'Brown Sugar'],
+    'Rice & Grains': ['All', 'Family Choice Rice', '26 Kg Bags'],
   };
-  const subcategories = subcategoryMap[categoryQuery] || [];
+  const subcategories = subcategoryMap[categoryQuery] || subcategoryMap['Rice & Grains'] || [];
 
   // ── Price range derived from the base product list (before price filter) ──
   const baseList = useMemo(() => {
@@ -97,19 +91,15 @@ export const ProductListingPage: React.FC = () => {
   }, [allProducts, searchQuery, categoryQuery, filterQuery]);
 
   const absoluteMin = useMemo(() => {
-    if (publishedConfig.shopNowConfig?.minPriceLimit !== undefined) {
-      return publishedConfig.shopNowConfig.minPriceLimit;
-    }
-    if (baseList.length === 0) return 0;
-    return Math.floor(Math.min(...baseList.map(p => p.price)));
+    const listMin = baseList.length > 0 ? Math.floor(Math.min(...baseList.map(p => p.price))) : 0;
+    const configMin = publishedConfig.shopNowConfig?.minPriceLimit ?? 0;
+    return Math.min(listMin, configMin);
   }, [baseList, publishedConfig.shopNowConfig?.minPriceLimit]);
 
   const absoluteMax = useMemo(() => {
-    if (publishedConfig.shopNowConfig?.maxPriceLimit !== undefined) {
-      return publishedConfig.shopNowConfig.maxPriceLimit;
-    }
-    if (baseList.length === 0) return 1000;
-    return Math.ceil(Math.max(...baseList.map(p => p.price)));
+    const listMax = baseList.length > 0 ? Math.ceil(Math.max(...baseList.map(p => p.price))) : 2000;
+    const configMax = publishedConfig.shopNowConfig?.maxPriceLimit ?? 3000;
+    return Math.max(listMax, configMax);
   }, [baseList, publishedConfig.shopNowConfig?.maxPriceLimit]);
 
   // Initialise priceRange from sessionStorage or full range
@@ -144,10 +134,15 @@ export const ProductListingPage: React.FC = () => {
   const filteredProducts = useMemo(() => {
     let result = baseList;
 
-    // 3. Subcategory filter (keyword match on product name)
+    // 3. Subcategory filter (keyword match on product name, weight, and keywords)
     if (selectedSubcat && selectedSubcat !== 'All') {
       const normalizedSub = normalizeSearchText(selectedSubcat);
-      result = result.filter((p) => normalizeSearchText(p.name).includes(normalizedSub));
+      const keywords = SUBCATEGORY_KEYWORDS[selectedSubcat] || [];
+      result = result.filter((p) => {
+        const text = normalizeSearchText(`${p.name} ${p.weight || ''} ${p.brand || ''} ${p.category || ''}`);
+        if (text.includes(normalizedSub)) return true;
+        return keywords.some((kw) => text.includes(normalizeSearchText(kw)));
+      });
     }
 
     // 4. Price range filter

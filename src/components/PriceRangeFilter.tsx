@@ -29,7 +29,7 @@ interface PriceRangeFilterProps {
 // ─────────────────────────────────────────────────────────────────────────────
 const fmt = (n: number) => `₹${n.toLocaleString('en-IN')}`;
 
-const SESSION_KEY = 'farminix_priceFilter';
+const SESSION_KEY = 'farminix_priceFilter_v2';
 
 export function loadSavedPriceRange(absMin: number, absMax: number): PriceRange {
   try {

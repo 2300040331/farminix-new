@@ -61,9 +61,9 @@ interface AdminContextType {
   resetToDefaults: () => void;
 }
 
-const DRAFT_KEY = 'farminix_admin_draft_config_v4';
-const PUBLISHED_KEY = 'farminix_admin_published_config_v4';
-const AUTH_KEY = 'farminix_admin_auth_v4';
+const DRAFT_KEY = 'farminix_admin_draft_config_v5';
+const PUBLISHED_KEY = 'farminix_admin_published_config_v5';
+const AUTH_KEY = 'farminix_admin_auth_v5';
 
 const AdminConfigContext = createContext<AdminContextType | undefined>(undefined);
 
