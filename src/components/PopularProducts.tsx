@@ -21,12 +21,10 @@ export const PopularProducts: React.FC = () => {
 
   if (!popularConfig.enabled) return null;
 
-  // Filter products if a category is selected or use featured IDs
-  const featuredList = popularConfig.featuredProductIds
-    .map((id) => publishedConfig.products.find((p) => p.id === id))
-    .filter(Boolean) as typeof publishedConfig.products;
-
-  const baseList = featuredList.length > 0 ? featuredList : products;
+  // Only keep Daawat rice in Popular Today
+  const daawatProducts = (publishedConfig.products && publishedConfig.products.length > 0
+    ? publishedConfig.products
+    : products).filter((p) => p.id === 'r1' || p.name.toLowerCase().includes('daawat'));
 
   const displayedProducts = selectedCategory
     ? publishedConfig.products.filter((p) => {
@@ -40,7 +38,7 @@ export const PopularProducts: React.FC = () => {
         if (selectedCategory === 'sugarSalt') return p.category === 'Sugar & Salt';
         return true;
       })
-    : baseList;
+    : daawatProducts;
 
   return (
     <section className="w-full py-8 border-b border-slate-100">

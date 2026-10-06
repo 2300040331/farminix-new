@@ -158,7 +158,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
     viewAllText: 'View All',
     viewAllUrl: '/products',
     badgeIcon: '⚡',
-    featuredProductIds: ['r1', 'a1', 'o1', 'ss1', 'd1', 'm1'],
+    featuredProductIds: ['r1'],
   },
   epicDeals: {
     enabled: true,

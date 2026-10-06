@@ -374,14 +374,9 @@ export const allProducts: Product[] = [
   },
 ];
 
-// Products shown on home page "Popular Today" — one from each major category
+// Products shown on home page "Popular Today" — only keep Daawat rice
 export const popularProducts: Product[] = [
   allProducts.find(p => p.id === 'r1')!,
-  allProducts.find(p => p.id === 'a1')!,
-  allProducts.find(p => p.id === 'o1')!,
-  allProducts.find(p => p.id === 'ss1')!,
-  allProducts.find(p => p.id === 'd1')!,
-  allProducts.find(p => p.id === 'm1')!,
 ];
 
 export const epicDeals: DealCard[] = [
