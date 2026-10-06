@@ -6,7 +6,9 @@ export const Navbar: React.FC = () => {
   const { categories, selectedCategory, navigate, currentRoute } = useApp();
   const { publishedConfig } = useAdminConfig();
 
-  const activeNavItems = publishedConfig.navItems.filter((i) => i.enabled);
+  const activeNavItems = publishedConfig.navItems.filter(
+    (i) => i.enabled && i.catId !== 'manufacturer' && i.label.toLowerCase() !== 'manufacturer'
+  );
   const activeCategories = categories;
 
   return (

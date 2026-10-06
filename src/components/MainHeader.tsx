@@ -4,11 +4,12 @@ import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
 export const MainHeader: React.FC = () => {
-  const { cart, setIsCartOpen, navigate } = useApp();
+  const { cart, setIsCartOpen, navigate, currentRoute } = useApp();
   const { publishedConfig } = useAdminConfig();
   const headerCfg = publishedConfig.header;
 
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const isManufacturerActive = currentRoute.pathname === '/manufacturer';
 
   return (
     <header className="w-full bg-white border-b border-slate-100 sticky top-0 z-30 select-none shadow-xs">
@@ -24,8 +25,21 @@ export const MainHeader: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Cart Button */}
+        {/* Right: Manufacturer & Cart */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Manufacturer Link */}
+          <button
+            onClick={() => navigate('/manufacturer')}
+            className={`px-3 sm:px-4 py-2 text-xs font-extrabold rounded-xl sm:rounded-[10px] transition-all cursor-pointer ${
+              isManufacturerActive
+                ? 'bg-purple-100 text-[#6D28D9]'
+                : 'text-purple-900 hover:text-[#7C3AED] hover:bg-purple-50'
+            }`}
+          >
+            Manufacturer
+          </button>
+
+          {/* Cart Button */}
           <button
             onClick={() => setIsCartOpen(true)}
             className="relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs font-bold text-white bg-[#7C3AED] hover:bg-[#6D28D9] border border-transparent rounded-xl sm:rounded-[10px] transition-all shadow-2xs cursor-pointer"
