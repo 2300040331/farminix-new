@@ -44,7 +44,7 @@ interface AppContextType {
 
   // Orders
   orders: Order[];
-  createOrder: (address: UserAddress, paymentMethod: string) => Order;
+  createOrder: (address: UserAddress, paymentMethod: string, customItems?: CartItem[], customTotal?: number) => Order;
 
   // Modals
   isCartOpen: boolean;
@@ -304,17 +304,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Order creation
-  const createOrder = (address: UserAddress, paymentMethod: string): Order => {
+  const createOrder = (
+    address: UserAddress,
+    paymentMethod: string,
+    customItems?: CartItem[],
+    customTotal?: number
+  ): Order => {
+    const itemsToUse = customItems && customItems.length > 0 ? customItems : [...cart];
+    const totalToUse = customTotal !== undefined ? customTotal : cartTotal;
     const newOrder: Order = {
       id: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
       date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-      items: [...cart],
-      totalAmount: rawTotal,
+      items: itemsToUse,
+      totalAmount: totalToUse,
       discount: cartDiscount,
       deliveryFee: 0,
-      finalAmount: cartTotal,
+      finalAmount: totalToUse,
       status: 'Order Received',
-      estimatedTime: '10 Mins',
+      estimatedTime: '15-20 Mins',
       deliveryAddress: address,
       paymentMethod,
     };
