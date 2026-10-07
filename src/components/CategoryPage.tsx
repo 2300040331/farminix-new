@@ -57,8 +57,8 @@ export const CategoryPage: React.FC = () => {
     }
   }, [activeCategoryPage]);
 
-  const categoryName = activeCategoryPage ? CATEGORY_MAP[activeCategoryPage] : '';
   const categoryMeta = categories.find(c => c.id === activeCategoryPage);
+  const categoryName = activeCategoryPage ? (CATEGORY_MAP[activeCategoryPage] || categoryMeta?.name || activeCategoryPage) : '';
 
   const categoryProducts = allProducts.filter(p => p.category === categoryName);
 

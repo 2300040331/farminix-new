@@ -12,19 +12,39 @@ import { useAdminConfig } from '../context/AdminConfigContext';
 import type { ThemeTokens } from '../types';
 
 export const SettingsManager: React.FC = () => {
-  const { config, updateTheme, resetToDefaults } = useAdminConfig();
+  const { config, updateTheme, updateAboutPage, resetToDefaults } = useAdminConfig();
 
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [themeTokens, setThemeTokens] = useState<ThemeTokens>(config.theme);
   const [fssaiNum, setFssaiNum] = useState('20126142000933');
   const [address, setAddress] = useState(
-    'Flat No 302, Srinivasa Towers, Gorantla, Guntur – 522034, Andhra Pradesh'
+    config.aboutPage?.companyAddress ||
+      'Flat No 302, Srinivasa Towers, Gorantla, Guntur – 522034, Andhra Pradesh'
   );
-  const [phone, setPhone] = useState('+91 7989743595');
-  const [email, setEmail] = useState('info@farminix.in');
+  const [phone, setPhone] = useState(config.aboutPage?.contactPhone || '+91 7989743595');
+  const [email, setEmail] = useState(config.aboutPage?.contactEmail || 'info@farminix.in');
+
+  React.useEffect(() => {
+    if (config.aboutPage) {
+      if (config.aboutPage.companyAddress) setAddress(config.aboutPage.companyAddress);
+      if (config.aboutPage.contactPhone) setPhone(config.aboutPage.contactPhone);
+      if (config.aboutPage.contactEmail) setEmail(config.aboutPage.contactEmail);
+    }
+    if (config.theme) {
+      setThemeTokens(config.theme);
+    }
+  }, [config.aboutPage, config.theme]);
 
   const handleSave = () => {
     updateTheme(themeTokens);
+    if (config.aboutPage) {
+      updateAboutPage({
+        ...config.aboutPage,
+        companyAddress: address,
+        contactPhone: phone,
+        contactEmail: email,
+      });
+    }
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);
   };

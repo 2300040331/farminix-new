@@ -28,12 +28,12 @@ export const CategorySection: React.FC = () => {
         </div>
 
         {/* Grid of Category Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3.5">
+        <div className="grid grid-cols-4 lg:grid-cols-8 gap-2.5 sm:gap-3.5">
           {categories.map((cat) => (
             <div
               key={cat.id}
               onClick={() => navigate('/products', `category=${encodeURIComponent(cat.name)}`)}
-              className="group bg-white rounded-2xl p-2.5 text-center border border-slate-150 hover:border-purple-300 flex flex-col items-center gap-2 cursor-pointer transform hover:-translate-y-1 transition-all duration-200 shadow-2xs"
+              className="group bg-white rounded-2xl p-2 sm:p-2.5 text-center border border-slate-150 hover:border-purple-300 flex flex-col items-center gap-1.5 sm:gap-2 cursor-pointer transform hover:-translate-y-1 transition-all duration-200 shadow-2xs"
             >
               {/* Square Image */}
               <div className="w-full aspect-square rounded-xl overflow-hidden bg-slate-50 group-hover:ring-2 group-hover:ring-[#7C3AED]/20 transition-all">
@@ -48,7 +48,7 @@ export const CategorySection: React.FC = () => {
               </div>
 
               {/* Title */}
-              <div className="text-xs font-bold text-slate-800 group-hover:text-[#7C3AED] transition-colors leading-snug text-center">
+              <div className="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-[#7C3AED] transition-colors leading-tight text-center line-clamp-2 h-7 sm:h-8 flex items-center justify-center">
                 {cat.name}
               </div>
             </div>
