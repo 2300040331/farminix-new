@@ -22,7 +22,7 @@ export const HomePageManager: React.FC = () => {
       id: 'header',
       label: 'Main Header & Logo',
       icon: <Compass className="w-4 h-4" />,
-      desc: 'Farminix logo, search placeholders & delivery pin',
+      desc: 'Farminix logo, alt description & cart label',
     },
     {
       id: 'hero',
