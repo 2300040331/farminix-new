@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { X, Trash2, Plus, Minus, Tag, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useAdminConfig } from '../admin/context/AdminConfigContext';
+import { defaultCartConfig } from '../admin/defaultConfig';
 
 export const CartDrawer: React.FC = () => {
   const {
@@ -16,6 +18,9 @@ export const CartDrawer: React.FC = () => {
     navigate,
   } = useApp();
 
+  const { publishedConfig } = useAdminConfig();
+  const cartCfg = publishedConfig.cart || defaultCartConfig;
+
   const [couponInput, setCouponInput] = useState('');
   const [couponMsg, setCouponMsg] = useState<{ text: string; isError: boolean } | null>(null);
 
@@ -25,14 +30,22 @@ export const CartDrawer: React.FC = () => {
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!couponInput.trim()) return;
-    const success = applyCoupon(couponInput);
+    const cleanCode = couponInput.trim().toUpperCase();
+    if (!cleanCode) return;
+    const success = applyCoupon(cleanCode);
     if (success) {
-      setCouponMsg({ text: 'Coupon FARM10 applied! 10% discount added.', isError: false });
+      const match = (cartCfg.coupons || []).find((c) => c.enabled && c.code.toUpperCase() === cleanCode);
+      const discount = match ? match.discountPercentage : 10;
+      setCouponMsg({ text: `Coupon ${cleanCode} applied! ${discount}% discount added.`, isError: false });
     } else {
-      setCouponMsg({ text: 'Invalid coupon code. Try FARM10', isError: true });
+      const sampleCodes = (cartCfg.coupons || []).filter(c => c.enabled).map(c => c.code).join(' or ') || 'FARM10';
+      setCouponMsg({ text: `Invalid coupon code. Try ${sampleCodes}`, isError: true });
     }
   };
+
+  const activeCouponObj = (cartCfg.coupons || []).find(
+    (c) => c.enabled && c.code.toUpperCase() === appliedCoupon?.toUpperCase()
+  );
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden select-none">
@@ -70,25 +83,25 @@ export const CartDrawer: React.FC = () => {
                 <div className="w-24 h-24 rounded-3xl bg-purple-50 flex items-center justify-center p-4 mb-4 border border-purple-100 shadow-xs">
                   <img src="/farminix_logo.png" alt="Farminix" className="w-full h-full object-contain" />
                 </div>
-                <h3 className="text-base font-bold text-gray-900">Your cart is empty</h3>
+                <h3 className="text-base font-bold text-gray-900">{cartCfg.emptyCartTitle}</h3>
                 <p className="text-xs text-gray-500 mt-1 max-w-xs">
-                  Explore our wide range of fresh groceries and top brand products.
+                  {cartCfg.emptyCartSubtitle}
                 </p>
                 <button
                   onClick={() => setIsCartOpen(false)}
                   className="mt-6 px-6 py-2.5 bg-[#15803D] text-white text-xs font-bold rounded-xl shadow-md hover:bg-green-800 transition-colors"
                 >
-                  Start Shopping
+                  {cartCfg.emptyCartButtonText}
                 </button>
               </div>
             ) : (
               <>
-                {/* 10 Min Delivery Banner */}
+                {/* Delivery Announcement Banner */}
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-3">
                   <div className="text-lg">⚡</div>
                   <div className="text-xs">
-                    <span className="font-bold text-amber-900">Superfast Delivery! </span>
-                    <span className="text-amber-800">Your order will reach in 10 Mins.</span>
+                    <span className="font-bold text-amber-900">{cartCfg.deliveryBannerText || 'Superfast Delivery!'} </span>
+                    <span className="text-amber-800">Your order will reach in {cartCfg.deliveryTimeText || '10 Mins'}.</span>
                   </div>
                 </div>
 
@@ -153,7 +166,7 @@ export const CartDrawer: React.FC = () => {
                         type="text"
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value)}
-                        placeholder="Try code: FARM10"
+                        placeholder={`Try code: ${(cartCfg.coupons || []).find(c => c.enabled)?.code || 'FARM10'}`}
                         className="w-full h-10 pl-9 pr-3 text-xs bg-slate-50 border border-gray-200 rounded-xl uppercase font-semibold focus:outline-none focus:border-[#7C3AED]"
                       />
                     </div>
@@ -172,7 +185,7 @@ export const CartDrawer: React.FC = () => {
                   {appliedCoupon && !couponMsg && (
                     <div className="text-[11px] font-semibold text-purple-700 mt-1 flex items-center gap-1">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      Coupon FARM10 active (10% OFF)
+                      Coupon {appliedCoupon} active ({activeCouponObj ? `${activeCouponObj.discountPercentage}% OFF` : '10% OFF'})
                     </div>
                   )}
                 </div>
@@ -190,13 +203,15 @@ export const CartDrawer: React.FC = () => {
                 </div>
                 {cartDiscount > 0 && (
                   <div className="flex justify-between items-center text-purple-700 font-semibold">
-                    <span>Coupon Discount (FARM10)</span>
+                    <span>Coupon Discount ({appliedCoupon || 'FARM10'})</span>
                     <span>-₹{cartDiscount}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
                   <span>Delivery Charge</span>
-                  <span className="font-bold text-[#7C3AED]">FREE</span>
+                  <span className="font-bold text-[#7C3AED]">
+                    {cartCfg.deliveryFee === 0 || rawTotal >= (cartCfg.freeDeliveryThreshold || 500) ? 'FREE' : `₹${cartCfg.deliveryFee}`}
+                  </span>
                 </div>
                 <div className="pt-2 border-t border-gray-200 flex justify-between items-center text-sm font-extrabold text-gray-900">
                   <span>Grand Total</span>

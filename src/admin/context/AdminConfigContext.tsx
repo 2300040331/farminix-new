@@ -19,9 +19,19 @@ import type {
   MediaItem,
   ShopNowPageConfig,
   ManufacturerConfig,
+  AboutPageConfig,
+  CartConfig,
+  CheckoutPaymentConfig,
 } from '../types';
 import type { Product, Category, Order, User } from '../../types';
-import { defaultSiteConfig, defaultThemeTokens, defaultManufacturerConfig } from '../defaultConfig';
+import {
+  defaultSiteConfig,
+  defaultThemeTokens,
+  defaultManufacturerConfig,
+  defaultAboutPageConfig,
+  defaultCartConfig,
+  defaultCheckoutPaymentConfig,
+} from '../defaultConfig';
 
 interface AdminContextType {
   config: AdminSiteConfig; // Represents draft config in editor
@@ -51,6 +61,9 @@ interface AdminContextType {
   updateOffersPage: (cfg: Partial<OffersPageConfig>) => void;
   updateShopNowConfig: (cfg: Partial<ShopNowPageConfig>) => void;
   updateManufacturer: (cfg: Partial<ManufacturerConfig>) => void;
+  updateAboutPage: (cfg: Partial<AboutPageConfig>) => void;
+  updateCartConfig: (cfg: Partial<CartConfig>) => void;
+  updateCheckoutPayment: (cfg: Partial<CheckoutPaymentConfig>) => void;
   updateProducts: (products: Product[]) => void;
   addProduct: (product: Product) => void;
   editProduct: (product: Product) => void;
@@ -84,6 +97,9 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: { ...defaultManufacturerConfig, ...(parsed.manufacturer || {}) },
+          aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
+          cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
+          checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
           categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
@@ -115,6 +131,9 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: { ...defaultManufacturerConfig, ...(parsed.manufacturer || {}) },
+          aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
+          cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
+          checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
           categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
@@ -140,6 +159,9 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: { ...defaultManufacturerConfig, ...(parsed.manufacturer || {}) },
+          aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
+          cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
+          checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
           categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
@@ -387,6 +409,21 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     saveConfig({ ...config, manufacturer: { ...current, ...cfg } });
   };
 
+  const updateAboutPage = (cfg: Partial<AboutPageConfig>) => {
+    const current = config.aboutPage || defaultAboutPageConfig;
+    saveConfig({ ...config, aboutPage: { ...current, ...cfg } });
+  };
+
+  const updateCartConfig = (cfg: Partial<CartConfig>) => {
+    const current = config.cart || defaultCartConfig;
+    saveConfig({ ...config, cart: { ...current, ...cfg } });
+  };
+
+  const updateCheckoutPayment = (cfg: Partial<CheckoutPaymentConfig>) => {
+    const current = config.checkoutPayment || defaultCheckoutPaymentConfig;
+    saveConfig({ ...config, checkoutPayment: { ...current, ...cfg } });
+  };
+
   const updateProducts = (products: Product[]) => {
     saveConfig({ ...config, products });
   };
@@ -465,6 +502,9 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         updateOffersPage,
         updateShopNowConfig,
         updateManufacturer,
+        updateAboutPage,
+        updateCartConfig,
+        updateCheckoutPayment,
         updateProducts,
         addProduct,
         editProduct,

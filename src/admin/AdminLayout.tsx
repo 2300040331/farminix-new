@@ -1,32 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import {
-  LayoutDashboard,
-  Image,
-  ShoppingBag,
+  Home,
   Package,
+  Heart,
+  Factory,
+  ShoppingCart,
   Layers,
+  Settings,
   ExternalLink,
   LogOut,
   RefreshCw,
   X,
-  Zap,
-  Grid,
-  Compass,
   Menu as MenuIcon,
-  Factory,
 } from 'lucide-react';
 import { useAdminConfig } from './context/AdminConfigContext';
 
-// Pages present on main web
-import { AdminDashboard } from './pages/AdminDashboard';
-import { HeaderManager } from './pages/HeaderManager';
-import { HeroManager } from './pages/HeroManager';
-import { CategoryManager } from './pages/CategoryManager';
-import { PopularProductsManager } from './pages/PopularProductsManager';
+// The 7 Dedicated Management Pages
+import { HomePageManager } from './pages/HomePageManager';
+import { ProductsPaymentManager } from './pages/ProductsPaymentManager';
+import { AboutFarminixManager } from './pages/AboutFarminixManager';
 import { ManufacturerManager } from './pages/ManufacturerManager';
+import { CartManager } from './pages/CartManager';
 import { FooterManager } from './pages/FooterManager';
-import { ProductManager } from './pages/ProductManager';
-import { OrderManager } from './pages/OrderManager';
+import { SettingsManager } from './pages/SettingsManager';
 
 interface NavSection {
   title: string;
@@ -35,7 +31,7 @@ interface NavSection {
 
 export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onReturnToStore }) => {
   const { adminLogout, resetToDefaults, hasChanges, publishConfig, discardDraft } = useAdminConfig();
-  const [activePage, setActivePage] = useState<string>('dashboard');
+  const [activePage, setActivePage] = useState<string>('home');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -44,53 +40,37 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
 
   const navigationSections: NavSection[] = [
     {
-      title: 'Overview',
+      title: 'Store Sections',
       items: [
-        { id: 'dashboard', label: 'Dashboard Overview', icon: <LayoutDashboard className="w-4 h-4" /> },
-      ],
-    },
-    {
-      title: 'Store Content',
-      items: [
-        { id: 'header', label: 'Main Header & Logo', icon: <Compass className="w-4 h-4" /> },
-        { id: 'hero', label: 'Hero Banner', icon: <Image className="w-4 h-4" /> },
-        { id: 'categories', label: 'Categories Catalog', icon: <Grid className="w-4 h-4" /> },
-        { id: 'popularProducts', label: 'Popular Today', icon: <Zap className="w-4 h-4" /> },
-        { id: 'manufacturer', label: 'Manufacturer Page', icon: <Factory className="w-4 h-4" /> },
+        { id: 'home', label: 'Home Page', icon: <Home className="w-4 h-4" /> },
+        { id: 'products', label: 'Products (Payment to Delivery)', icon: <Package className="w-4 h-4" /> },
+        { id: 'about', label: 'About Farminix', icon: <Heart className="w-4 h-4" /> },
+        { id: 'manufacturer', label: 'Manufacturer', icon: <Factory className="w-4 h-4" /> },
+        { id: 'cart', label: 'Cart', icon: <ShoppingCart className="w-4 h-4" /> },
         { id: 'footer', label: 'Store Footer', icon: <Layers className="w-4 h-4" /> },
-      ],
-    },
-    {
-      title: 'Store Operations',
-      items: [
-        { id: 'products', label: 'Product Inventory', icon: <Package className="w-4 h-4" /> },
-        { id: 'orders', label: 'Orders & Fulfillment', icon: <ShoppingBag className="w-4 h-4" /> },
+        { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
       ],
     },
   ];
 
   const renderCurrentPage = () => {
     switch (activePage) {
-      case 'dashboard':
-        return <AdminDashboard onNavigate={(p) => setActivePage(p)} />;
-      case 'header':
-        return <HeaderManager />;
-      case 'hero':
-        return <HeroManager />;
-      case 'categories':
-        return <CategoryManager />;
-      case 'popularProducts':
-        return <PopularProductsManager />;
+      case 'home':
+        return <HomePageManager />;
+      case 'products':
+        return <ProductsPaymentManager />;
+      case 'about':
+        return <AboutFarminixManager />;
       case 'manufacturer':
         return <ManufacturerManager />;
+      case 'cart':
+        return <CartManager />;
       case 'footer':
         return <FooterManager />;
-      case 'products':
-        return <ProductManager />;
-      case 'orders':
-        return <OrderManager />;
+      case 'settings':
+        return <SettingsManager />;
       default:
-        return <AdminDashboard onNavigate={(p) => setActivePage(p)} />;
+        return <HomePageManager />;
     }
   };
 

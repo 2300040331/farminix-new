@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
+import { useAdminConfig } from '../admin/context/AdminConfigContext';
+import { defaultCheckoutPaymentConfig, defaultCartConfig } from '../admin/defaultConfig';
 import { detectUserLocation, lookupPincode } from '../utils/location';
 import type { UserAddress, Order } from '../types';
 
@@ -44,7 +46,13 @@ export const CheckoutPage: React.FC = () => {
     addresses.find((a) => a.isDefault)?.id || addresses[0]?.id || 'addr-1'
   );
 
-  const [selectedSlot, setSelectedSlot] = useState('10 Min Instant Express');
+  const { publishedConfig } = useAdminConfig();
+  const checkoutCfg = publishedConfig.checkoutPayment || defaultCheckoutPaymentConfig;
+  const cartCfg = publishedConfig.cart || defaultCartConfig;
+
+  const [selectedSlot, setSelectedSlot] = useState(
+    checkoutCfg.expressSlotLabel || '10 Min Instant Express'
+  );
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'CARD' | 'NETBANKING' | 'COD'>('UPI');
   const [upiId, setUpiId] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -266,7 +274,9 @@ export const CheckoutPage: React.FC = () => {
     );
   }
 
-  const grandTotal = cartTotal + 3; // +3 handling/packaging fee
+  const handlingFee = cartCfg.handlingFee ?? 3;
+  const deliveryFee = (cartCfg.deliveryFee === 0 || cartTotal >= (cartCfg.freeDeliveryThreshold ?? 500)) ? 0 : (cartCfg.deliveryFee ?? 0);
+  const grandTotal = cartTotal + handlingFee + deliveryFee;
 
   return (
     <div className="w-full bg-slate-50/50 min-h-screen text-slate-900 font-sans pb-20">
@@ -401,9 +411,9 @@ export const CheckoutPage: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <button
                   type="button"
-                  onClick={() => setSelectedSlot('10 Min Instant Express')}
+                  onClick={() => setSelectedSlot(checkoutCfg.expressSlotLabel)}
                   className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
-                    selectedSlot === '10 Min Instant Express'
+                    selectedSlot === checkoutCfg.expressSlotLabel
                       ? 'border-[#7C3AED] bg-purple-50/80 ring-2 ring-purple-200 shadow-xs'
                       : 'border-slate-200 hover:border-slate-300 bg-white'
                   }`}
@@ -412,16 +422,16 @@ export const CheckoutPage: React.FC = () => {
                     <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-500" />
                   </div>
                   <div>
-                    <div className="text-xs font-black text-slate-900">10-20 Min Express</div>
-                    <div className="text-[11px] font-bold text-emerald-600 mt-0.5">Free Instant Doorstep Delivery</div>
+                    <div className="text-xs font-black text-slate-900">{checkoutCfg.expressSlotLabel}</div>
+                    <div className="text-[11px] font-bold text-emerald-600 mt-0.5">{checkoutCfg.expressSlotSublabel}</div>
                   </div>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setSelectedSlot('Scheduled Evening Slot (6 PM - 8 PM)')}
+                  onClick={() => setSelectedSlot(checkoutCfg.scheduledSlotLabel)}
                   className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
-                    selectedSlot.includes('Scheduled')
+                    selectedSlot === checkoutCfg.scheduledSlotLabel
                       ? 'border-[#7C3AED] bg-purple-50/80 ring-2 ring-purple-200 shadow-xs'
                       : 'border-slate-200 hover:border-slate-300 bg-white'
                   }`}
@@ -430,8 +440,8 @@ export const CheckoutPage: React.FC = () => {
                     <Truck className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <div>
-                    <div className="text-xs font-black text-slate-900">Scheduled Slot</div>
-                    <div className="text-[11px] font-bold text-slate-500 mt-0.5">Today 6:00 PM - 8:00 PM</div>
+                    <div className="text-xs font-black text-slate-900">{checkoutCfg.scheduledSlotLabel}</div>
+                    <div className="text-[11px] font-bold text-slate-500 mt-0.5">{checkoutCfg.scheduledSlotSublabel}</div>
                   </div>
                 </button>
               </div>
@@ -609,7 +619,10 @@ export const CheckoutPage: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {['🚪 Leave at Door', '🔕 Don\'t Ring Bell', '📞 Call Before Delivery', '🛡️ Hand to Security'].map((note) => {
+                {(checkoutCfg.deliveryInstructions && checkoutCfg.deliveryInstructions.some(i => i.enabled)
+                  ? checkoutCfg.deliveryInstructions.filter(i => i.enabled).map(i => `${i.icon} ${i.label}`)
+                  : ['🚪 Leave at Door', '🔕 Don\'t Ring Bell', '📞 Call Before Delivery', '🛡️ Hand to Security']
+                ).map((note) => {
                   const isSelected = deliveryNote.includes(note);
                   return (
                     <button
@@ -667,19 +680,21 @@ export const CheckoutPage: React.FC = () => {
 
                 {cartDiscount > 0 && (
                   <div className="flex justify-between text-purple-700 font-bold">
-                    <span>Coupon Discount (FARM10)</span>
+                    <span>Coupon Discount</span>
                     <span>-₹{cartDiscount}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between">
                   <span>Delivery Fee</span>
-                  <span className="font-extrabold text-emerald-600">FREE</span>
+                  <span className="font-extrabold text-emerald-600">
+                    {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
                   <span>Handling &amp; Packaging Fee</span>
-                  <span>₹3</span>
+                  <span>₹{handlingFee}</span>
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 flex justify-between text-base font-black text-slate-900">

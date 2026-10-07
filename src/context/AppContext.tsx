@@ -308,8 +308,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const applyCoupon = (code: string) => {
+    const configuredCodes = (publishedConfig.cart?.coupons || [])
+      .filter((c) => c.enabled)
+      .map((c) => c.code.toUpperCase());
     const validCodes = [
       'FARM10',
+      ...configuredCodes,
       (publishedConfig.topOfferBar?.promoCode || '').toUpperCase(),
       (publishedConfig.offersPage?.promoCode || '').toUpperCase(),
     ].filter(Boolean);
@@ -323,7 +327,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const rawTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const isCouponApplied = Boolean(appliedCoupon);
-  const cartDiscount = isCouponApplied ? Math.round(rawTotal * 0.10) : 0;
+  const matchedCoupon = (publishedConfig.cart?.coupons || []).find(
+    (c) => c.enabled && c.code.toUpperCase() === appliedCoupon?.toUpperCase()
+  );
+  const discountRate = matchedCoupon ? matchedCoupon.discountPercentage / 100 : (isCouponApplied ? 0.10 : 0);
+  const cartDiscount = isCouponApplied ? Math.round(rawTotal * discountRate) : 0;
   const cartTotal = Math.max(0, rawTotal - cartDiscount);
 
   // Wishlist toggle

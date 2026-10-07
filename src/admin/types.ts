@@ -312,6 +312,68 @@ export interface ManufacturerConfig {
   supportHours: string;
 }
 
+export interface AboutPageConfig {
+  headline: string;
+  subheadline: string;
+  tags: string[];
+  founderTitle: string;
+  founderSubtitle: string;
+  founderLetter: string;
+  founderQuote: string;
+  founderSignoff: string;
+  companyAddress: string;
+  processTitle: string;
+  processSubtitle: string;
+  processSteps: { step: string; title: string; desc: string }[];
+  philosophyTitle: string;
+  philosophySubtitle: string;
+  philosophyPillars: { tag: string; title: string; desc: string; guarantee: string }[];
+  calloutTitle: string;
+  calloutDesc: string;
+  contactPhone: string;
+  contactEmail: string;
+  contactLocation: string;
+}
+
+export interface CartCoupon {
+  code: string;
+  discountPercentage: number;
+  description: string;
+  enabled: boolean;
+}
+
+export interface CartConfig {
+  deliveryBannerText: string;
+  deliveryTimeText: string;
+  handlingFee: number;
+  deliveryFee: number;
+  freeDeliveryThreshold: number;
+  coupons: CartCoupon[];
+  emptyCartTitle: string;
+  emptyCartSubtitle: string;
+  emptyCartButtonText: string;
+}
+
+export interface PaymentMethodItem {
+  id: string;
+  name: string;
+  subtitle: string;
+  icon: string;
+  enabled: boolean;
+  instruction?: string;
+}
+
+export interface CheckoutPaymentConfig {
+  expressSlotLabel: string;
+  expressSlotSublabel: string;
+  scheduledSlotLabel: string;
+  scheduledSlotSublabel: string;
+  paymentMethods: PaymentMethodItem[];
+  upiAutoVerifyText: string;
+  deliveryInstructions: { id: string; label: string; icon: string; enabled: boolean }[];
+  safePaymentsBadgeText: string;
+}
+
 export interface AdminSiteConfig {
   theme: ThemeTokens;
   sectionOrder: SectionOrderItem[];
@@ -331,6 +393,9 @@ export interface AdminSiteConfig {
   offersPage: OffersPageConfig;
   shopNowConfig: ShopNowPageConfig;
   manufacturer?: ManufacturerConfig;
+  aboutPage?: AboutPageConfig;
+  cart?: CartConfig;
+  checkoutPayment?: CheckoutPaymentConfig;
   products: Product[];
   orders: Order[];
   users: User[];
