@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, Plus, Minus, Heart } from 'lucide-react';
+import { Zap, Plus, Minus, Heart, ArrowRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import { getProductSlug } from './ProductListingPage';
@@ -20,23 +20,37 @@ export const PopularProducts: React.FC = () => {
 
   if (!popularConfig.enabled) return null;
 
-  // Catalog contains only Farminix Family Choice Rice
-  const displayedProducts = (publishedConfig.products && publishedConfig.products.length > 0
+  // Catalog items: prioritize published catalog
+  const allAvailable = (publishedConfig.products && publishedConfig.products.length > 0
     ? publishedConfig.products
     : products);
+
+  // If featured product IDs are configured by admin, display those exact products in that order
+  const displayedProducts = (popularConfig.featuredProductIds && popularConfig.featuredProductIds.length > 0)
+    ? popularConfig.featuredProductIds
+        .map((id) => allAvailable.find((p) => p.id === id))
+        .filter((p): p is (typeof allAvailable)[0] => Boolean(p && p.enabled !== false))
+    : allAvailable.filter((p) => p.enabled !== false);
 
   return (
     <section className="w-full py-8 border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-            {popularConfig.title || 'Popular Today'}
-          </h2>
-          <Zap className="w-5 h-5 text-amber-500 fill-amber-400 animate-bounce" />
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+              {popularConfig.title || 'Popular Today'}
+            </h2>
+            <Zap className="w-5 h-5 text-amber-500 fill-amber-400 animate-bounce" />
+          </div>
+          <button
+            onClick={() => navigate('/products')}
+            className="text-xs sm:text-sm font-bold text-[#7C3AED] hover:text-purple-800 flex items-center gap-1 transition-colors cursor-pointer group"
+          >
+            <span>{popularConfig.viewAllText || 'View All'}</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
-      </div>
 
       {/* Grid of Product Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">

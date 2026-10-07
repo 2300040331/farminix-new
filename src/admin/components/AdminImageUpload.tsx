@@ -7,6 +7,7 @@ interface AdminImageUploadProps {
   onChange: (url: string) => void;
   label?: string;
   aspectRatio?: 'square' | 'video' | 'auto';
+  recommendedDimensions?: string;
 }
 
 export const AdminImageUpload: React.FC<AdminImageUploadProps> = ({
@@ -14,6 +15,7 @@ export const AdminImageUpload: React.FC<AdminImageUploadProps> = ({
   onChange,
   label,
   aspectRatio = 'square',
+  recommendedDimensions,
 }) => {
   const { config } = useAdminConfig();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -84,7 +86,15 @@ export const AdminImageUpload: React.FC<AdminImageUploadProps> = ({
 
   return (
     <div className="space-y-2">
-      {label && <label className="block text-xs font-bold text-slate-700">{label}</label>}
+      <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+        {label && <label className="block text-xs font-bold text-slate-700">{label}</label>}
+        {recommendedDimensions && (
+          <span className="text-[11px] font-bold text-purple-700 bg-purple-50 border border-purple-200/80 px-2.5 py-0.5 rounded-md flex items-center gap-1 shadow-2xs">
+            <span>📐 Dimensions:</span>
+            <span className="font-extrabold">{recommendedDimensions}</span>
+          </span>
+        )}
+      </div>
       
       <div 
         onDragOver={handleDragOver}

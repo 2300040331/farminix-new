@@ -5,6 +5,7 @@ import { MainHeader } from './components/MainHeader';
 import { HeroBanner } from './components/HeroBanner';
 import { PopularProducts } from './components/PopularProducts';
 import { Footer } from './components/Footer';
+import { CategorySection } from './components/CategorySection';
 import { CategoryPage } from './components/CategoryPage';
 
 // Pages
@@ -31,7 +32,7 @@ import { IntroVideoOverlay } from './components/IntroVideoOverlay';
 
 export function AppContent() {
   const { currentRoute, navigate } = useApp();
-  const { config, isAdminLoggedIn } = useAdminConfig();
+  const { publishedConfig, isAdminLoggedIn } = useAdminConfig();
 
   // Detect OS: zoom 125% for Windows, 100% for Mac
   React.useEffect(() => {
@@ -64,13 +65,15 @@ export function AppContent() {
   }
 
   const renderDynamicHomepageSections = () => {
-    const sortedSections = [...config.sectionOrder]
+    const sortedSections = [...publishedConfig.sectionOrder]
       .filter((s) => s.enabled)
       .sort((a, b) => a.order - b.order);
 
     const sectionComponentMap: Record<string, React.ReactNode> = {
       hero: <HeroBanner key="hero" />,
       popularProducts: <PopularProducts key="popularProducts" />,
+      categorySection: <CategorySection key="categorySection" />,
+      categories: <CategorySection key="categories" />,
     };
 
     return (

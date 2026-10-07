@@ -76,6 +76,22 @@ export const HeroManager: React.FC = () => {
           Banner Settings &amp; Navigation Targets
         </h2>
 
+        <div className="bg-purple-50/80 border border-purple-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs mb-4">
+          <div className="space-y-1">
+            <div className="font-black text-purple-900 flex items-center gap-1.5 flex-wrap">
+              <span>📐 Recommended Banner Dimensions:</span>
+              <span className="bg-purple-200 text-purple-950 px-2 py-0.5 rounded-md font-black">1920 × 1080 px</span>
+              <span className="text-purple-700 font-bold">(16:9 Widescreen Ratio)</span>
+            </div>
+            <p className="text-purple-700 font-medium">
+              Use a 16:9 ratio image (1920 × 1080px or minimum 1280 × 720px) so the banner occupies the full width and height with zero white margins.
+            </p>
+          </div>
+          <div className="shrink-0 bg-white border border-purple-200 px-3 py-1.5 rounded-xl font-bold text-slate-700 shadow-2xs">
+            JPG / PNG / WebP (Max 2MB)
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
             <AdminImageUpload
@@ -83,6 +99,7 @@ export const HeroManager: React.FC = () => {
               onChange={(val) => handleChange('bannerImage', val)}
               label="Hero Banner Image"
               aspectRatio="video"
+              recommendedDimensions="1920 × 1080 px (16:9 ratio)"
             />
           </div>
 
@@ -106,7 +123,7 @@ export const HeroManager: React.FC = () => {
             />
           </div>
 
-          <div>
+          <div className="md:col-span-2">
             <label className="block text-xs font-bold text-slate-700 mb-1.5">Home Logo Hotspot Destination Link</label>
             <input
               type="text"
@@ -115,6 +132,24 @@ export const HeroManager: React.FC = () => {
               className="w-full h-10 px-3.5 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500"
             />
           </div>
+        </div>
+
+        {/* Save Changes Button */}
+        <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-slate-500 font-medium">
+            Changes saved here are instantly published and visible on the main website.
+          </p>
+          <button
+            onClick={() => {
+              updateHero(formData);
+              setSavedSuccess(true);
+              setTimeout(() => setSavedSuccess(false), 2500);
+            }}
+            className="w-full sm:w-auto px-6 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+          >
+            <Check className="w-4 h-4" />
+            <span>Save &amp; Publish Changes</span>
+          </button>
         </div>
       </div>
     </div>

@@ -9,10 +9,14 @@ export const PopularProductsManager: React.FC = () => {
   const [selectedToAdd, setSelectedToAdd] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  React.useEffect(() => {
+    setFormData(config.popularProducts);
+  }, [config.popularProducts]);
+
   const handleUpdateField = (field: keyof PopularProductsConfig, value: any) => {
     const updated = { ...formData, [field]: value };
     setFormData(updated);
-    updatePopularProducts({ [field]: value });
+    updatePopularProducts(updated);
     notifySaved();
   };
 
@@ -75,14 +79,26 @@ export const PopularProductsManager: React.FC = () => {
             {formData.enabled ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
             <span>{formData.enabled ? 'Section Visible' : 'Section Hidden'}</span>
           </button>
-          {savedSuccess && (
-            <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-              <Check className="w-4 h-4" />
-              <span>Live Saved</span>
-            </span>
-          )}
+          <button
+            onClick={() => {
+              updatePopularProducts(formData);
+              notifySaved();
+            }}
+            className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+          >
+            <Check className="w-4 h-4" />
+            <span>Save &amp; Publish</span>
+          </button>
         </div>
       </div>
+
+      {/* Live Saved Notification Banner */}
+      {savedSuccess && (
+        <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200 shadow-2xs">
+          <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>✓ Popular Products Changes Saved &amp; Live on the Main Storefront!</span>
+        </div>
+      )}
 
       {/* Copy Settings */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
@@ -198,6 +214,23 @@ export const PopularProductsManager: React.FC = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Save Changes Bottom Bar */}
+        <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-slate-500 font-medium">
+            Changes saved here are instantly published and visible on the main website homepage.
+          </p>
+          <button
+            onClick={() => {
+              updatePopularProducts(formData);
+              notifySaved();
+            }}
+            className="w-full sm:w-auto px-6 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+          >
+            <Check className="w-4 h-4" />
+            <span>Save &amp; Publish Popular Products</span>
+          </button>
         </div>
       </div>
     </div>

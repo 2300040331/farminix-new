@@ -56,13 +56,27 @@ export const FooterManager: React.FC = () => {
           </p>
         </div>
 
-        {savedSuccess && (
-          <span className="text-xs font-bold text-emerald-650 flex items-center gap-1">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              updateFooter(formData);
+              notifySaved();
+            }}
+            className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+          >
             <Check className="w-4 h-4" />
-            <span>Live Saved</span>
-          </span>
-        )}
+            <span>Save &amp; Publish</span>
+          </button>
+        </div>
       </div>
+
+      {/* Live Saved Notification Banner */}
+      {savedSuccess && (
+        <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200 shadow-2xs">
+          <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>✓ Footer Changes Saved &amp; Live on the Main Storefront!</span>
+        </div>
+      )}
 
       {/* Brand Bio & Copyright */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
@@ -97,6 +111,7 @@ export const FooterManager: React.FC = () => {
               onChange={(val) => handleUpdateField('logoUrl', val)}
               label="Footer Logo Image"
               aspectRatio="auto"
+              recommendedDimensions="400 × 120 px (Transparent PNG)"
             />
           </div>
         </div>
@@ -199,6 +214,23 @@ export const FooterManager: React.FC = () => {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Save Changes Bottom Bar */}
+      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p className="text-xs text-slate-500 font-medium">
+          Changes saved here are instantly published and visible on the main website footer.
+        </p>
+        <button
+          onClick={() => {
+            updateFooter(formData);
+            notifySaved();
+          }}
+          className="w-full sm:w-auto px-6 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+        >
+          <Check className="w-4 h-4" />
+          <span>Save &amp; Publish Footer Changes</span>
+        </button>
       </div>
     </div>
   );

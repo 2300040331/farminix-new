@@ -10,13 +10,17 @@ import {
   RefreshCw,
   X,
   Zap,
+  Grid,
+  Compass,
   Menu as MenuIcon,
 } from 'lucide-react';
 import { useAdminConfig } from './context/AdminConfigContext';
 
 // Pages present on main web
 import { AdminDashboard } from './pages/AdminDashboard';
+import { HeaderManager } from './pages/HeaderManager';
 import { HeroManager } from './pages/HeroManager';
+import { CategoryManager } from './pages/CategoryManager';
 import { PopularProductsManager } from './pages/PopularProductsManager';
 import { FooterManager } from './pages/FooterManager';
 import { ProductManager } from './pages/ProductManager';
@@ -46,7 +50,9 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
     {
       title: 'Store Content',
       items: [
+        { id: 'header', label: 'Main Header & Logo', icon: <Compass className="w-4 h-4" /> },
         { id: 'hero', label: 'Hero Banner', icon: <Image className="w-4 h-4" /> },
+        { id: 'categories', label: 'Categories Catalog', icon: <Grid className="w-4 h-4" /> },
         { id: 'popularProducts', label: 'Popular Today', icon: <Zap className="w-4 h-4" /> },
         { id: 'footer', label: 'Store Footer', icon: <Layers className="w-4 h-4" /> },
       ],
@@ -64,8 +70,12 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
     switch (activePage) {
       case 'dashboard':
         return <AdminDashboard onNavigate={(p) => setActivePage(p)} />;
+      case 'header':
+        return <HeaderManager />;
       case 'hero':
         return <HeroManager />;
+      case 'categories':
+        return <CategoryManager />;
       case 'popularProducts':
         return <PopularProductsManager />;
       case 'footer':

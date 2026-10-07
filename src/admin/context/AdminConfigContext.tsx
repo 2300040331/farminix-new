@@ -55,6 +55,7 @@ interface AdminContextType {
   deleteProduct: (id: string) => void;
   updateOrders: (orders: Order[]) => void;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
+  deleteOrder: (orderId: string) => void;
   updateUsers: (users: User[]) => void;
   addMedia: (item: MediaItem) => void;
   deleteMedia: (id: string) => void;
@@ -169,6 +170,35 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return draft !== pub;
   });
 
+  // Cross-tab real-time synchronization
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === PUBLISHED_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setPublishedConfig((prev) => ({
+            ...prev,
+            ...parsed,
+          }));
+        } catch (err) {
+          console.error('Error syncing published config across tabs:', err);
+        }
+      }
+      if (e.key === DRAFT_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setConfig((prev) => ({
+            ...prev,
+            ...parsed,
+          }));
+        } catch (err) {}
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Apply theme tokens as CSS custom properties
   useEffect(() => {
     const root = document.documentElement;
@@ -200,19 +230,23 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     root.style.setProperty('--footer-text', t.footerTextColor);
   }, [publishedConfig.theme]);
 
-  // Save changes to draft
+
+  // Save changes to draft & immediately publish to live store
   const saveConfig = (newConfig: AdminSiteConfig) => {
     setConfig(newConfig);
-    setHasChanges(true);
+    setPublishedConfig(newConfig);
+    setHasChanges(false);
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(newConfig));
+      localStorage.setItem(PUBLISHED_KEY, JSON.stringify(newConfig));
     } catch (e) {
-      console.error('Failed to save draft admin config', e);
+      console.error('Failed to save & publish admin config', e);
     }
   };
 
   const publishConfig = () => {
     try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(config));
       localStorage.setItem(PUBLISHED_KEY, JSON.stringify(config));
       setPublishedConfig(config);
       setHasChanges(false);
@@ -278,7 +312,13 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const updateHero = (cfg: Partial<HeroConfig>) => {
-    saveConfig({ ...config, hero: { ...config.hero, ...cfg } });
+    let updatedSectionOrder = config.sectionOrder;
+    if (cfg.enabled !== undefined) {
+      updatedSectionOrder = config.sectionOrder.map((s) =>
+        s.id === 'hero' ? { ...s, enabled: cfg.enabled! } : s
+      );
+    }
+    saveConfig({ ...config, hero: { ...config.hero, ...cfg }, sectionOrder: updatedSectionOrder });
   };
 
   const updateBrandMarquee = (cfg: Partial<BrandMarqueeConfig>) => {
@@ -290,7 +330,13 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const updateCategorySection = (cfg: Partial<CategorySectionConfig>) => {
-    saveConfig({ ...config, categorySection: { ...config.categorySection, ...cfg } });
+    let updatedSectionOrder = config.sectionOrder;
+    if (cfg.enabled !== undefined) {
+      updatedSectionOrder = config.sectionOrder.map((s) =>
+        s.id === 'categorySection' ? { ...s, enabled: cfg.enabled! } : s
+      );
+    }
+    saveConfig({ ...config, categorySection: { ...config.categorySection, ...cfg }, sectionOrder: updatedSectionOrder });
   };
 
   const updateCategories = (cats: Category[]) => {
@@ -298,7 +344,13 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const updatePopularProducts = (cfg: Partial<PopularProductsConfig>) => {
-    saveConfig({ ...config, popularProducts: { ...config.popularProducts, ...cfg } });
+    let updatedSectionOrder = config.sectionOrder;
+    if (cfg.enabled !== undefined) {
+      updatedSectionOrder = config.sectionOrder.map((s) =>
+        s.id === 'popularProducts' ? { ...s, enabled: cfg.enabled! } : s
+      );
+    }
+    saveConfig({ ...config, popularProducts: { ...config.popularProducts, ...cfg }, sectionOrder: updatedSectionOrder });
   };
 
   const updateEpicDeals = (cfg: Partial<EpicDealsConfig>) => {
@@ -349,6 +401,11 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const updateOrderStatus = (orderId: string, status: Order['status']) => {
     const updated = config.orders.map((o) => (o.id === orderId ? { ...o, status } : o));
+    saveConfig({ ...config, orders: updated });
+  };
+
+  const deleteOrder = (orderId: string) => {
+    const updated = config.orders.filter((o) => o.id !== orderId);
     saveConfig({ ...config, orders: updated });
   };
 
@@ -403,6 +460,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         deleteProduct,
         updateOrders,
         updateOrderStatus,
+        deleteOrder,
         updateUsers,
         addMedia,
         deleteMedia,

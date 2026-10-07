@@ -23,7 +23,9 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
   const totalOrdersCount = config.orders.length;
 
   const liveModules = [
+    { id: 'header', name: 'Main Header & Logo', status: 'Active', desc: 'Brand logo & navigation links' },
     { id: 'hero', name: 'Hero Banner', status: 'Active', desc: 'Main Farminix 16:9 banner' },
+    { id: 'categories', name: 'Categories Catalog', status: 'Active', desc: 'Add, hide, edit & delete categories' },
     { id: 'popularProducts', name: 'Popular Today', status: 'Active', desc: 'Featured product cards' },
     { id: 'products', name: 'Product Inventory', status: 'Active', desc: 'Catalog & pricing' },
     { id: 'orders', name: 'Orders & Fulfillment', status: 'Active', desc: 'Real customer orders' },
@@ -44,15 +46,29 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
             Store Performance &amp; Live Control
           </h1>
           <p className="text-xs sm:text-sm text-purple-200/80 leading-relaxed">
-            Manage your live Farminix product inventory, customer orders, hero banner, and store footer in real-time.
+            Manage your live Farminix product inventory, customer orders, categories, header logo, hero banner, and store footer in real-time.
           </p>
           <div className="flex flex-wrap gap-3 mt-5">
+            <button
+              onClick={() => onNavigate('header')}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+            >
+              <Sliders className="w-4 h-4" />
+              <span>Main Header &amp; Logo</span>
+            </button>
             <button
               onClick={() => onNavigate('products')}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
             >
               <PackageCheck className="w-4 h-4" />
               <span>Manage Products</span>
+            </button>
+            <button
+              onClick={() => onNavigate('categories')}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+            >
+              <Layers className="w-4 h-4" />
+              <span>Manage Categories</span>
             </button>
             <button
               onClick={() => onNavigate('orders')}

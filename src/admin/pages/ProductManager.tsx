@@ -133,14 +133,35 @@ export const ProductManager: React.FC = () => {
             <Plus className="w-4 h-4" />
             <span>Add New Product</span>
           </button>
-          {savedSuccess && (
-            <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-              <Check className="w-4 h-4" />
-              <span>Catalog Updated</span>
-            </span>
-          )}
         </div>
       </div>
+
+      {/* Recommended Product Dimensions Notice Box */}
+      <div className="bg-purple-50/80 border border-purple-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+        <div className="space-y-1">
+          <div className="font-black text-purple-900 flex items-center gap-1.5 flex-wrap">
+            <span>📐 Recommended Product Image Dimensions:</span>
+            <span className="bg-purple-200 text-purple-950 px-2.5 py-0.5 rounded-md font-black">
+              800 × 800 px
+            </span>
+            <span className="text-purple-700 font-bold">(1:1 Square Ratio)</span>
+          </div>
+          <p className="text-purple-700 font-medium">
+            Use a square 1:1 ratio image (800 × 800 px or minimum 500 × 500 px) with a clean white or transparent background for high clarity product cards.
+          </p>
+        </div>
+        <div className="shrink-0 bg-white border border-purple-200 px-3 py-1.5 rounded-xl font-bold text-slate-700 shadow-2xs">
+          JPG / PNG / WebP (Max 2MB)
+        </div>
+      </div>
+
+      {/* Live Saved Notification Banner */}
+      {savedSuccess && (
+        <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200 shadow-2xs">
+          <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>✓ Product Catalog Changes Saved &amp; Live on the Main Storefront!</span>
+        </div>
+      )}
 
       {/* Filter & Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -433,6 +454,7 @@ export const ProductManager: React.FC = () => {
                         onChange={(val) => setFormData({ ...formData, image: val })}
                         label="Product Thumbnail Image"
                         aspectRatio="square"
+                        recommendedDimensions="800 × 800 px (1:1 ratio)"
                       />
                     </div>
                   </div>
