@@ -254,6 +254,64 @@ export interface MediaItem {
   size: string;
 }
 
+export interface ManufacturerFacility {
+  id: string;
+  name: string;
+  location: string;
+  type: string;
+  capacity: string;
+  status: string;
+  fssaiNumber: string;
+  image?: string;
+  enabled: boolean;
+}
+
+export interface ManufacturerProcessStep {
+  id: string;
+  step: string;
+  title: string;
+  desc: string;
+  enabled: boolean;
+}
+
+export interface ManufacturerCertification {
+  id: string;
+  title: string;
+  authority: string;
+  number: string;
+  status: string;
+  enabled: boolean;
+}
+
+export interface ManufacturerConfig {
+  enabled: boolean;
+  comingSoonMode: boolean;
+  comingSoonBadge: string;
+  comingSoonTitle: string;
+  comingSoonText: string;
+  companyName: string;
+  pageTitle: string;
+  tagline: string;
+  aboutCorporate: string;
+  cinOrRegNumber: string;
+  fssaiNumber: string;
+  registeredOffice: string;
+  facilityHeadline: string;
+  facilitySubheadline: string;
+  facilities: ManufacturerFacility[];
+  processTitle: string;
+  processSubtitle: string;
+  processSteps: ManufacturerProcessStep[];
+  certificationsTitle: string;
+  certificationsSubtitle: string;
+  certifications: ManufacturerCertification[];
+  b2bTitle: string;
+  b2bSubtitle: string;
+  contactPhone: string;
+  contactEmail: string;
+  supportHours: string;
+}
+
 export interface AdminSiteConfig {
   theme: ThemeTokens;
   sectionOrder: SectionOrderItem[];
@@ -272,6 +330,7 @@ export interface AdminSiteConfig {
   footer: FooterConfig;
   offersPage: OffersPageConfig;
   shopNowConfig: ShopNowPageConfig;
+  manufacturer?: ManufacturerConfig;
   products: Product[];
   orders: Order[];
   users: User[];

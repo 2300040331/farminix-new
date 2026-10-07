@@ -18,9 +18,10 @@ import type {
   SectionOrderItem,
   MediaItem,
   ShopNowPageConfig,
+  ManufacturerConfig,
 } from '../types';
 import type { Product, Category, Order, User } from '../../types';
-import { defaultSiteConfig, defaultThemeTokens } from '../defaultConfig';
+import { defaultSiteConfig, defaultThemeTokens, defaultManufacturerConfig } from '../defaultConfig';
 
 interface AdminContextType {
   config: AdminSiteConfig; // Represents draft config in editor
@@ -49,6 +50,7 @@ interface AdminContextType {
   updateFooter: (cfg: Partial<FooterConfig>) => void;
   updateOffersPage: (cfg: Partial<OffersPageConfig>) => void;
   updateShopNowConfig: (cfg: Partial<ShopNowPageConfig>) => void;
+  updateManufacturer: (cfg: Partial<ManufacturerConfig>) => void;
   updateProducts: (products: Product[]) => void;
   addProduct: (product: Product) => void;
   editProduct: (product: Product) => void;
@@ -81,6 +83,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
+          manufacturer: { ...defaultManufacturerConfig, ...(parsed.manufacturer || {}) },
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
           categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
@@ -111,6 +114,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
+          manufacturer: { ...defaultManufacturerConfig, ...(parsed.manufacturer || {}) },
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
           categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
@@ -135,6 +139,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
+          manufacturer: { ...defaultManufacturerConfig, ...(parsed.manufacturer || {}) },
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
           categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
@@ -377,6 +382,11 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     saveConfig({ ...config, shopNowConfig: { ...config.shopNowConfig, ...cfg } });
   };
 
+  const updateManufacturer = (cfg: Partial<ManufacturerConfig>) => {
+    const current = config.manufacturer || defaultManufacturerConfig;
+    saveConfig({ ...config, manufacturer: { ...current, ...cfg } });
+  };
+
   const updateProducts = (products: Product[]) => {
     saveConfig({ ...config, products });
   };
@@ -454,6 +464,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         updateFooter,
         updateOffersPage,
         updateShopNowConfig,
+        updateManufacturer,
         updateProducts,
         addProduct,
         editProduct,

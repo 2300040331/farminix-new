@@ -9,6 +9,7 @@ import {
   Eye,
   Sliders,
   PackageCheck,
+  Factory,
 } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
 
@@ -27,6 +28,7 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
     { id: 'hero', name: 'Hero Banner', status: 'Active', desc: 'Main Farminix 16:9 banner' },
     { id: 'categories', name: 'Categories Catalog', status: 'Active', desc: 'Add, hide, edit & delete categories' },
     { id: 'popularProducts', name: 'Popular Today', status: 'Active', desc: 'Featured product cards' },
+    { id: 'manufacturer', name: 'Manufacturer Page', status: 'Active', desc: 'Processing mills, Sortex, FSSAI & mode' },
     { id: 'products', name: 'Product Inventory', status: 'Active', desc: 'Catalog & pricing' },
     { id: 'orders', name: 'Orders & Fulfillment', status: 'Active', desc: 'Real customer orders' },
     { id: 'footer', name: 'Store Footer', status: 'Active', desc: 'Bottom links & brand' },
@@ -76,6 +78,13 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
             >
               <ShoppingBag className="w-4 h-4" />
               <span>View Orders ({activeOrdersCount})</span>
+            </button>
+            <button
+              onClick={() => onNavigate('manufacturer')}
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+            >
+              <Factory className="w-4 h-4" />
+              <span>Manufacturer Page</span>
             </button>
             <button
               onClick={() => onNavigate('hero')}

@@ -1,4 +1,4 @@
-import type { AdminSiteConfig, ThemeTokens } from './types';
+import type { AdminSiteConfig, ThemeTokens, ManufacturerConfig } from './types';
 import { categories, allProducts, epicDeals, brandLogosList } from '../data/products';
 
 export const defaultThemeTokens: ThemeTokens = {
@@ -60,8 +60,123 @@ export const defaultThemeTokens: ThemeTokens = {
   statusInfo: '#2563EB',
 };
 
+export const defaultManufacturerConfig: ManufacturerConfig = {
+  enabled: true,
+  comingSoonMode: false,
+  comingSoonBadge: 'Official Launch',
+  comingSoonTitle: 'Manufacturer & Milling Center',
+  comingSoonText:
+    'Farminix bridges generational Andhra paddy farmers and your dining table with optical Sortex milling right at the source.',
+  companyName: 'Farminix Private Limited',
+  pageTitle: 'Official Manufacturing & Processing Hub',
+  tagline: 'Pure Grains. Direct From Soil to Soul.',
+  aboutCorporate:
+    'Farminix bridges generational Andhra paddy farmers and your dining table. Zero middlemen, zero chemical polishing, and zero stale godowns — just honest, farm-fresh rice processed through cutting-edge optical Sortex technology and packed right at the source.',
+  cinOrRegNumber: 'U01100AP2024PTC123456',
+  fssaiNumber: '20126142000933',
+  registeredOffice: 'Flat No 302, Srinivasa Towers, Gorantla, Guntur – 522034, Andhra Pradesh',
+  facilityHeadline: 'Processing & Milling Facilities',
+  facilitySubheadline: 'Clean room optical Sortex cleaning and packaging centers across Andhra Pradesh',
+  facilities: [
+    {
+      id: 'fac-1',
+      name: 'Farminix Central Milling & Sortex Facility',
+      location: 'Gorantla, Guntur District, Andhra Pradesh – 522034',
+      type: 'Multi-Stage Optical Sortex Milling & Sealed Packaging Plant',
+      capacity: '150 Metric Tons / Day',
+      status: 'Active & Operational',
+      fssaiNumber: '20126142000933',
+      enabled: true,
+    },
+    {
+      id: 'fac-2',
+      name: 'Krishna-Godavari Direct Aggregation Hub',
+      location: 'Tenali & Amaravati Basin, Andhra Pradesh',
+      type: 'Direct Grower Paddy Procurement & Moisture Testing Center',
+      capacity: '300 Metric Tons Buffer Storage',
+      status: 'Active & Operational',
+      fssaiNumber: '20126142000933',
+      enabled: true,
+    },
+  ],
+  processTitle: 'From Soil to Dining Table',
+  processSubtitle: 'How Farminix Reinvents What You Eat',
+  processSteps: [
+    {
+      id: 'step-1',
+      step: '01',
+      title: 'Sown in Guntur',
+      desc: 'Cultivated by trusted generational farming families in the nutrient-dense Krishna-Godavari river basin.',
+      enabled: true,
+    },
+    {
+      id: 'step-2',
+      step: '02',
+      title: 'Sortex Cleaned',
+      desc: 'Optical sensor cameras screen each grain, separating dust, stones, and broken pieces without chemical polish.',
+      enabled: true,
+    },
+    {
+      id: 'step-3',
+      step: '03',
+      title: 'Naturally Aged',
+      desc: 'Controlled resting optimizes starch retrogradation for maximum fluffiness and zero stickiness when boiled.',
+      enabled: true,
+    },
+    {
+      id: 'step-4',
+      step: '04',
+      title: 'Delivered Direct',
+      desc: 'Sealed in heavy-duty 26 Kg moisture-lock sacks and delivered directly to your doorstep by express logistics.',
+      enabled: true,
+    },
+  ],
+  certificationsTitle: 'Our Operating Philosophy & Standards',
+  certificationsSubtitle: 'Built on Dignity, Health, Net Weight & Transparency',
+  certifications: [
+    {
+      id: 'cert-1',
+      title: 'Direct Farmer Dignity',
+      authority: 'Ethical Sourcing Guarantee',
+      number: 'Fair Trade Sourcing',
+      status: '100% Verified',
+      enabled: true,
+    },
+    {
+      id: 'cert-2',
+      title: 'Zero Synthetic Polish',
+      authority: 'Pure Health Standard',
+      number: 'Unadulterated Grains',
+      status: 'Chemical-Free',
+      enabled: true,
+    },
+    {
+      id: 'cert-3',
+      title: '26 Kg Moisture-Lock Bags',
+      authority: 'Durable Packaging Standard',
+      number: 'Certified Net Weight',
+      status: 'Heavy-Duty Sealed',
+      enabled: true,
+    },
+    {
+      id: 'cert-4',
+      title: 'Direct-to-Home Pricing',
+      authority: 'Transparent Value',
+      number: '₹1399 for 26 Kg (₹53.8/Kg)',
+      status: 'Wholesale Direct',
+      enabled: true,
+    },
+  ],
+  b2bTitle: 'Corporate, Institutional & Wholesale Inquiries',
+  b2bSubtitle: 'Partner directly with Farminix for bulk grain procurement and institutional supply',
+  contactPhone: '+91 7989743595',
+  contactEmail: 'info@farminix.in',
+  supportHours: 'Monday – Saturday: 8:00 AM – 8:00 PM IST',
+};
+
 export const defaultSiteConfig: AdminSiteConfig = {
   theme: defaultThemeTokens,
+  manufacturer: defaultManufacturerConfig,
   sectionOrder: [
     { id: 'hero', name: 'Hero Banner', enabled: true, order: 1 },
     { id: 'brandMarquee', name: 'Trusted Brands Marquee', enabled: false, order: 2 },

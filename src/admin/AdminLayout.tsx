@@ -13,6 +13,7 @@ import {
   Grid,
   Compass,
   Menu as MenuIcon,
+  Factory,
 } from 'lucide-react';
 import { useAdminConfig } from './context/AdminConfigContext';
 
@@ -22,6 +23,7 @@ import { HeaderManager } from './pages/HeaderManager';
 import { HeroManager } from './pages/HeroManager';
 import { CategoryManager } from './pages/CategoryManager';
 import { PopularProductsManager } from './pages/PopularProductsManager';
+import { ManufacturerManager } from './pages/ManufacturerManager';
 import { FooterManager } from './pages/FooterManager';
 import { ProductManager } from './pages/ProductManager';
 import { OrderManager } from './pages/OrderManager';
@@ -54,6 +56,7 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
         { id: 'hero', label: 'Hero Banner', icon: <Image className="w-4 h-4" /> },
         { id: 'categories', label: 'Categories Catalog', icon: <Grid className="w-4 h-4" /> },
         { id: 'popularProducts', label: 'Popular Today', icon: <Zap className="w-4 h-4" /> },
+        { id: 'manufacturer', label: 'Manufacturer Page', icon: <Factory className="w-4 h-4" /> },
         { id: 'footer', label: 'Store Footer', icon: <Layers className="w-4 h-4" /> },
       ],
     },
@@ -78,6 +81,8 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
         return <CategoryManager />;
       case 'popularProducts':
         return <PopularProductsManager />;
+      case 'manufacturer':
+        return <ManufacturerManager />;
       case 'footer':
         return <FooterManager />;
       case 'products':
