@@ -236,6 +236,7 @@ export const CheckoutPage: React.FC = () => {
           name: selectedAddress.name || user?.name || '',
           email: user?.email || 'care@farminix.in',
           contact: selectedAddress.phone || user?.phone || '9876543210',
+          method: paymentMethod === 'UPI' ? 'upi' : paymentMethod === 'CARD' ? 'card' : paymentMethod === 'NETBANKING' ? 'netbanking' : undefined,
         },
         notes: {
           delivery_address: `${selectedAddress.street}, ${selectedAddress.city} - ${selectedAddress.pincode}`,
