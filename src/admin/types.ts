@@ -372,6 +372,11 @@ export interface CheckoutPaymentConfig {
   upiAutoVerifyText: string;
   deliveryInstructions: { id: string; label: string; icon: string; enabled: boolean }[];
   safePaymentsBadgeText: string;
+  razorpayKeyId?: string;
+  razorpayKeySecret?: string;
+  razorpayEnabled?: boolean;
+  razorpayMerchantName?: string;
+  razorpayThemeColor?: string;
 }
 
 export interface AdminSiteConfig {

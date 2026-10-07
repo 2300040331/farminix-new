@@ -203,6 +203,97 @@ export const ProductsPaymentManager: React.FC = () => {
               </div>
             </div>
 
+            {/* Razorpay Gateway Configuration */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-black">
+                    ₹
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900">Razorpay Payment Gateway Integration</h3>
+                    <p className="text-[11px] text-slate-500 font-medium">Direct live checkout with UPI, Cards, NetBanking, and Wallets</p>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-extrabold rounded-full uppercase tracking-wider">
+                  Test / Live Active
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                    Razorpay Key ID
+                  </label>
+                  <input
+                    type="text"
+                    value={checkoutData.razorpayKeyId || 'rzp_test_TkIMPriA788lqz'}
+                    onChange={(e) =>
+                      setCheckoutData({ ...checkoutData, razorpayKeyId: e.target.value })
+                    }
+                    placeholder="rzp_test_..."
+                    className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold focus:border-[#7C3AED] focus:outline-none"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-1 block">Public key used on frontend checkout</span>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                    Razorpay Key Secret
+                  </label>
+                  <input
+                    type="password"
+                    value={checkoutData.razorpayKeySecret || 'eC5FdAw7dBccrFg0J7qaoO3e'}
+                    onChange={(e) =>
+                      setCheckoutData({ ...checkoutData, razorpayKeySecret: e.target.value })
+                    }
+                    placeholder="••••••••••••••••••••"
+                    className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold focus:border-[#7C3AED] focus:outline-none"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-1 block">Private key secret for verification</span>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                    Merchant / Brand Name on Razorpay Modal
+                  </label>
+                  <input
+                    type="text"
+                    value={checkoutData.razorpayMerchantName || 'Farminix Fresh Groceries'}
+                    onChange={(e) =>
+                      setCheckoutData({ ...checkoutData, razorpayMerchantName: e.target.value })
+                    }
+                    placeholder="Farminix Fresh Groceries"
+                    className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:border-[#7C3AED] focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                    Modal Theme Brand Color
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={checkoutData.razorpayThemeColor || '#7C3AED'}
+                      onChange={(e) =>
+                        setCheckoutData({ ...checkoutData, razorpayThemeColor: e.target.value })
+                      }
+                      className="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer p-0.5 bg-white"
+                    />
+                    <input
+                      type="text"
+                      value={checkoutData.razorpayThemeColor || '#7C3AED'}
+                      onChange={(e) =>
+                        setCheckoutData({ ...checkoutData, razorpayThemeColor: e.target.value })
+                      }
+                      className="flex-1 p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold focus:border-[#7C3AED] focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Payment Gateways Config */}
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
               <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
