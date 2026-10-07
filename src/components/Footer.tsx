@@ -1,5 +1,4 @@
 import React from 'react';
-import { Play, Apple } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
@@ -15,7 +14,7 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           
           {/* Col 1: Brand & Socials (2 cols on lg) */}
           <div className="lg:col-span-2 text-left">
@@ -117,36 +116,6 @@ export const Footer: React.FC = () => {
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* Col 4: Download App Buttons */}
-          <div className="text-left">
-            <h3 className="text-xs font-black text-white uppercase tracking-wider mb-4">
-              Download Our App
-            </h3>
-            <div className="flex flex-col gap-2.5 max-w-[170px]">
-              <button
-                onClick={() => alert("Redirecting to Google Play Store...")}
-                className="w-full bg-slate-800 hover:bg-slate-700 text-white rounded-xl p-2.5 flex items-center gap-2.5 border border-slate-700 transition-colors cursor-pointer"
-              >
-                <Play className="w-5 h-5 fill-white text-white shrink-0" />
-                <div className="text-left">
-                  <div className="text-[9px] uppercase tracking-wider text-slate-300 leading-none">GET IT ON</div>
-                  <div className="text-xs font-bold text-white leading-tight">Google Play</div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => alert("Redirecting to Apple App Store...")}
-                className="w-full bg-slate-800 hover:bg-slate-700 text-white rounded-xl p-2.5 flex items-center gap-2.5 border border-slate-700 transition-colors cursor-pointer"
-              >
-                <Apple className="w-5 h-5 fill-white text-white shrink-0" />
-                <div className="text-left">
-                  <div className="text-[9px] uppercase tracking-wider text-slate-300 leading-none">Download on the</div>
-                  <div className="text-xs font-bold text-white leading-tight">App Store</div>
-                </div>
-              </button>
-            </div>
           </div>
 
         </div>

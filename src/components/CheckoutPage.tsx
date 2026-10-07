@@ -296,13 +296,6 @@ export const CheckoutPage: React.FC = () => {
               Secure Checkout
             </h1>
           </div>
-          <div className="text-right hidden sm:block">
-            <div className="text-xs font-bold text-slate-500">Order Delivery Time</div>
-            <div className="text-sm font-black text-emerald-600 flex items-center gap-1">
-              <Zap className="w-4 h-4 fill-emerald-500 text-emerald-500" />
-              <span>10-20 Mins Express</span>
-            </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -320,22 +313,8 @@ export const CheckoutPage: React.FC = () => {
                   <h2 className="text-sm sm:text-base font-black text-slate-900">Delivery Address</h2>
                 </div>
 
-                {/* GPS Detect & Add Buttons */}
+                {/* Add Address Button */}
                 <div className="flex items-center gap-1.5 sm:gap-2">
-                  <button
-                    onClick={handleDetectGpsForAddress}
-                    disabled={isDetectingGps}
-                    className="px-2.5 sm:px-3 py-1.5 bg-purple-50 border border-purple-200 text-[#7C3AED] hover:bg-purple-100 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1"
-                  >
-                    {isDetectingGps ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Navigation className="w-3.5 h-3.5 fill-[#7C3AED]" />
-                    )}
-                    <span className="hidden sm:inline">🎯 Current Location</span>
-                    <span className="inline sm:hidden">GPS</span>
-                  </button>
-
                   <button
                     onClick={() => setIsAddAddressOpen(true)}
                     className="px-2.5 sm:px-3 py-1.5 bg-[#7C3AED] text-white hover:bg-[#6D28D9] text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1"

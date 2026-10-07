@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   Eye,
   Sliders,
-  Palette,
   PackageCheck,
 } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
@@ -21,8 +20,15 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
     (o) => o.status !== 'Delivered'
   ).length;
   const totalProductsCount = config.products.length;
-  const totalCategoriesCount = config.categories.length;
-  const enabledSectionsCount = config.sectionOrder.filter((s) => s.enabled).length;
+  const totalOrdersCount = config.orders.length;
+
+  const liveModules = [
+    { id: 'hero', name: 'Hero Banner', status: 'Active', desc: 'Main Farminix 16:9 banner' },
+    { id: 'popularProducts', name: 'Popular Today', status: 'Active', desc: 'Featured product cards' },
+    { id: 'products', name: 'Product Inventory', status: 'Active', desc: 'Catalog & pricing' },
+    { id: 'orders', name: 'Orders & Fulfillment', status: 'Active', desc: 'Real customer orders' },
+    { id: 'footer', name: 'Store Footer', status: 'Active', desc: 'Bottom links & brand' },
+  ];
 
   return (
     <div className="space-y-6 text-left">
@@ -32,35 +38,35 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-purple-200 text-xs font-bold uppercase tracking-wider mb-3">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Farminix Real-Time Control Center</span>
+            <span>Farminix Live Control Center</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-2">
             Store Performance &amp; Live Control
           </h1>
           <p className="text-xs sm:text-sm text-purple-200/80 leading-relaxed">
-            Manage all 15+ Farminix website sections, live theme tokens, inventory catalog, customer orders, and promotional banners in real-time.
+            Manage your live Farminix product inventory, customer orders, hero banner, and store footer in real-time.
           </p>
           <div className="flex flex-wrap gap-3 mt-5">
-            <button
-              onClick={() => onNavigate('theme')}
-              className="px-4 py-2 bg-purple-500 hover:bg-purple-400 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-            >
-              <Palette className="w-4 h-4" />
-              <span>Customize Colors</span>
-            </button>
-            <button
-              onClick={() => onNavigate('sections')}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-white/20"
-            >
-              <Sliders className="w-4 h-4" />
-              <span>Section Ordering</span>
-            </button>
             <button
               onClick={() => onNavigate('products')}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
             >
               <PackageCheck className="w-4 h-4" />
               <span>Manage Products</span>
+            </button>
+            <button
+              onClick={() => onNavigate('orders')}
+              className="px-4 py-2 bg-purple-500 hover:bg-purple-400 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span>View Orders ({activeOrdersCount})</span>
+            </button>
+            <button
+              onClick={() => onNavigate('hero')}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-white/20"
+            >
+              <Sliders className="w-4 h-4" />
+              <span>Hero Banner</span>
             </button>
           </div>
         </div>
@@ -79,7 +85,7 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
           <div className="text-2xl font-black text-slate-900">₹{totalRevenue.toLocaleString('en-IN')}</div>
           <div className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1 mt-1">
             <TrendingUp className="w-3.5 h-3.5" />
-            <span>Real store transactions</span>
+            <span>Store transactions</span>
           </div>
         </div>
 
@@ -94,7 +100,7 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
           <div className="text-2xl font-black text-slate-900">{activeOrdersCount}</div>
           <div className="text-[11px] font-semibold text-amber-600 flex items-center gap-1 mt-1">
             <Clock className="w-3.5 h-3.5" />
-            <span>Processing / Out for Delivery</span>
+            <span>Processing / In transit</span>
           </div>
         </div>
 
@@ -108,66 +114,60 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
           </div>
           <div className="text-2xl font-black text-slate-900">{totalProductsCount}</div>
           <div className="text-[11px] font-semibold text-slate-500 mt-1">
-            Across {totalCategoriesCount} grocery categories
+            Live on store catalog
           </div>
         </div>
 
-        {/* Metric 4: Live Sections */}
+        {/* Metric 4: Total Orders Placed */}
         <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Sections</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Orders</span>
             <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
               <Eye className="w-5 h-5" />
             </div>
           </div>
           <div className="text-2xl font-black text-slate-900">
-            {enabledSectionsCount} <span className="text-sm font-semibold text-slate-400">/ {config.sectionOrder.length}</span>
+            {totalOrdersCount}
           </div>
           <div className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1 mt-1">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Live on homepage</span>
+            <span>All completed orders</span>
           </div>
         </div>
       </div>
 
       {/* Grid: Live Homepage Section Status & Recent Orders */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Section Health & Visibility Hub */}
+        {/* Live Store Modules */}
         <div className="lg:col-span-1 bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h2 className="text-sm font-bold text-slate-900">Homepage Sections Status</h2>
-            <button
-              onClick={() => onNavigate('sections')}
-              className="text-xs font-bold text-purple-600 hover:text-purple-700 cursor-pointer"
-            >
-              Reorder All
-            </button>
+            <h2 className="text-sm font-bold text-slate-900">Live Website Modules</h2>
+            <span className="text-xs font-bold text-emerald-600">All Synced</span>
           </div>
 
           <div className="space-y-2.5">
-            {config.sectionOrder.map((section, idx) => (
+            {liveModules.map((mod, idx) => (
               <div
-                key={section.id}
+                key={mod.id}
                 className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-slate-100/80 transition-colors"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-extrabold flex items-center justify-center shrink-0">
                     {idx + 1}
                   </span>
-                  <span className="text-xs font-bold text-slate-800 truncate">{section.name}</span>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-slate-800 truncate">{mod.name}</div>
+                    <div className="text-[10px] text-slate-400 font-medium truncate">{mod.desc}</div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span
-                    className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                      section.enabled ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'
-                    }`}
-                  >
-                    {section.enabled ? 'Active' : 'Hidden'}
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider bg-emerald-100 text-emerald-700">
+                    {mod.status}
                   </span>
                   <button
-                    onClick={() => onNavigate(section.id)}
+                    onClick={() => onNavigate(mod.id)}
                     className="p-1 text-slate-400 hover:text-purple-600 transition-colors cursor-pointer"
-                    title="Edit Section"
+                    title="Manage Module"
                   >
                     <Sliders className="w-3.5 h-3.5" />
                   </button>

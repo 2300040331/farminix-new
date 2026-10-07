@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  ArrowLeft, Star, Heart, CheckCircle2, Truck, Zap,
+  ArrowLeft, Star, Heart, CheckCircle2, Zap,
   Plus, Minus, ChevronDown, ChevronUp, ShoppingBag,
   AlertCircle, ThumbsUp, X, MessageSquarePlus
 } from 'lucide-react';
@@ -420,22 +420,6 @@ export const ProductDetailPage: React.FC = () => {
                   <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-contain" />
                 </button>
               ))}
-            </div>
-
-            {/* Express Delivery Badge Box */}
-            <div className="p-3.5 sm:p-4 bg-purple-50/70 border border-purple-200/80 rounded-2xl flex items-center gap-3 sm:gap-3.5 mt-1 sm:mt-2">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0">
-                <Truck className="w-4 h-4 sm:w-5 sm:h-5" />
-              </div>
-              <div className="text-left">
-                <div className="text-xs font-black text-slate-900 flex items-center gap-1.5">
-                  <span>Instant Delivery in 10-20 Mins</span>
-                  <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
-                </div>
-                <div className="text-[11px] font-semibold text-purple-800/80 mt-0.5">
-                  Delivered fresh from your nearest Farminix Dark Store
-                </div>
-              </div>
             </div>
 
           </div>

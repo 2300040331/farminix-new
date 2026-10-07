@@ -1,53 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
-  Palette,
-  Sliders,
-  Search,
-  Menu as MenuIcon,
   Image,
-  Award,
-  Grid,
   ShoppingBag,
-  Sparkles,
-  Clock,
   Package,
   Layers,
-  Users,
-  Tag,
-  MessageSquare,
   ExternalLink,
   LogOut,
-  ShieldCheck,
   RefreshCw,
   X,
   Zap,
+  Menu as MenuIcon,
 } from 'lucide-react';
 import { useAdminConfig } from './context/AdminConfigContext';
 
-// Pages
+// Pages present on main web
 import { AdminDashboard } from './pages/AdminDashboard';
-import { ThemeManager } from './pages/ThemeManager';
-import { SectionOrderingHub } from './pages/SectionOrderingHub';
-import { TopBarManager } from './pages/TopBarManager';
-import { HeaderManager } from './pages/HeaderManager';
-import { NavbarManager } from './pages/NavbarManager';
 import { HeroManager } from './pages/HeroManager';
-import { BrandMarqueeManager } from './pages/BrandMarqueeManager';
-import { FeatureStripManager } from './pages/FeatureStripManager';
-import { CategoryManager } from './pages/CategoryManager';
 import { PopularProductsManager } from './pages/PopularProductsManager';
-import { EpicDealsManager } from './pages/EpicDealsManager';
-import { FutureArrivalsManager } from './pages/FutureArrivalsManager';
-import { BottomFeatureStripManager } from './pages/BottomFeatureStripManager';
 import { FooterManager } from './pages/FooterManager';
 import { ProductManager } from './pages/ProductManager';
 import { OrderManager } from './pages/OrderManager';
-import { CustomerManager } from './pages/CustomerManager';
-import { OffersManager } from './pages/OffersManager';
-import { SupportManager } from './pages/SupportManager';
-import { MediaLibrary } from './pages/MediaLibrary';
-import { ShopNowConfigManager } from './pages/ShopNowConfigManager';
 
 interface NavSection {
   title: string;
@@ -66,34 +39,15 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
   const navigationSections: NavSection[] = [
     {
       title: 'Overview',
-      items: [{ id: 'dashboard', label: 'Dashboard Overview', icon: <LayoutDashboard className="w-4 h-4" /> }],
-    },
-    {
-      title: 'Design & Appearance',
       items: [
-        { id: 'theme', label: 'Theme & Color Tokens', icon: <Palette className="w-4 h-4" />, badge: 'LIVE' },
-        { id: 'sections', label: 'Section Sequence Hub', icon: <Sliders className="w-4 h-4" /> },
+        { id: 'dashboard', label: 'Dashboard Overview', icon: <LayoutDashboard className="w-4 h-4" /> },
       ],
     },
     {
-      title: 'Header & Navigation',
-      items: [
-        { id: 'topOfferBar', label: 'Top Offer Bar', icon: <Zap className="w-4 h-4" /> },
-        { id: 'header', label: 'Main Header & Search', icon: <Search className="w-4 h-4" /> },
-        { id: 'navbar', label: 'Navigation Bar Links', icon: <MenuIcon className="w-4 h-4" /> },
-      ],
-    },
-    {
-      title: 'Homepage Sections',
+      title: 'Store Content',
       items: [
         { id: 'hero', label: 'Hero Banner', icon: <Image className="w-4 h-4" /> },
-        { id: 'brandMarquee', label: 'Brand Partners Marquee', icon: <Award className="w-4 h-4" /> },
-        { id: 'featureStrip', label: 'Top 5 Feature Strip', icon: <ShieldCheck className="w-4 h-4" /> },
-        { id: 'categorySection', label: 'Shop by Category', icon: <Grid className="w-4 h-4" /> },
-        { id: 'popularProducts', label: 'Popular Today ⚡', icon: <Zap className="w-4 h-4" /> },
-        { id: 'epicDeals', label: 'Epic Deals All Day', icon: <Sparkles className="w-4 h-4" /> },
-        { id: 'futureArrivals', label: 'Future Arrivals', icon: <Clock className="w-4 h-4" /> },
-        { id: 'bottomFeatureStrip', label: 'Bottom Benefits Strip', icon: <Package className="w-4 h-4" /> },
+        { id: 'popularProducts', label: 'Popular Today', icon: <Zap className="w-4 h-4" /> },
         { id: 'footer', label: 'Store Footer', icon: <Layers className="w-4 h-4" /> },
       ],
     },
@@ -101,18 +55,7 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
       title: 'Store Operations',
       items: [
         { id: 'products', label: 'Product Inventory', icon: <Package className="w-4 h-4" /> },
-        { id: 'categoriesCrud', label: 'Category Department CRUD', icon: <Grid className="w-4 h-4" /> },
         { id: 'orders', label: 'Orders & Fulfillment', icon: <ShoppingBag className="w-4 h-4" /> },
-        { id: 'customers', label: 'Customer Directory', icon: <Users className="w-4 h-4" /> },
-        { id: 'shopNowConfig', label: 'Browse Products Page', icon: <Sliders className="w-4 h-4" /> },
-      ],
-    },
-    {
-      title: 'Campaigns & Care',
-      items: [
-        { id: 'offers', label: 'Promotional Offers Page', icon: <Tag className="w-4 h-4" /> },
-        { id: 'support', label: 'Support Desk Tickets', icon: <MessageSquare className="w-4 h-4" /> },
-        { id: 'media', label: 'Digital Media Library', icon: <Image className="w-4 h-4" /> },
       ],
     },
   ];
@@ -121,49 +64,16 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
     switch (activePage) {
       case 'dashboard':
         return <AdminDashboard onNavigate={(p) => setActivePage(p)} />;
-      case 'theme':
-        return <ThemeManager />;
-      case 'sections':
-        return <SectionOrderingHub onNavigateToSection={(id) => setActivePage(id)} />;
-      case 'topOfferBar':
-        return <TopBarManager />;
-      case 'header':
-        return <HeaderManager />;
-      case 'navbar':
-        return <NavbarManager />;
       case 'hero':
         return <HeroManager />;
-      case 'brandMarquee':
-        return <BrandMarqueeManager />;
-      case 'featureStrip':
-        return <FeatureStripManager />;
-      case 'categorySection':
-      case 'categoriesCrud':
-        return <CategoryManager />;
       case 'popularProducts':
         return <PopularProductsManager />;
-      case 'epicDeals':
-        return <EpicDealsManager />;
-      case 'futureArrivals':
-        return <FutureArrivalsManager />;
-      case 'bottomFeatureStrip':
-        return <BottomFeatureStripManager />;
       case 'footer':
         return <FooterManager />;
       case 'products':
         return <ProductManager />;
       case 'orders':
         return <OrderManager />;
-      case 'customers':
-        return <CustomerManager />;
-      case 'shopNowConfig':
-        return <ShopNowConfigManager />;
-      case 'offers':
-        return <OffersManager />;
-      case 'support':
-        return <SupportManager />;
-      case 'media':
-        return <MediaLibrary />;
       default:
         return <AdminDashboard onNavigate={(p) => setActivePage(p)} />;
     }

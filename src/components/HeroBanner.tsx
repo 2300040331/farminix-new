@@ -14,7 +14,7 @@ export const HeroBanner: React.FC = () => {
       {/* ── Full-Width Hero Image Container ── */}
       <div className="relative w-full overflow-hidden group">
         <img 
-          src={hero.bannerImage ? (hero.bannerImage.includes('?') ? hero.bannerImage : `${hero.bannerImage}?v=4`) : '/hero_banner_original.jpg?v=4'} 
+          src={hero.bannerImage ? (hero.bannerImage.includes('?') ? hero.bannerImage : `${hero.bannerImage}?v=6`) : '/hero_banner_original.jpg?v=6'} 
           alt={hero.altText || 'Farminix Fresh Groceries'} 
           className="w-full h-auto block" 
           draggable="false"
@@ -25,9 +25,9 @@ export const HeroBanner: React.FC = () => {
           className="absolute flex items-center justify-center z-10"
           style={{
             left: '4.1%',
-            top: '75.5%',
+            top: '54.2%',
             width: '15.8%',
-            height: '8.6%',
+            height: '6.4%',
           }}
         >
           <button
@@ -45,7 +45,7 @@ export const HeroBanner: React.FC = () => {
         {/* Transparent absolute overlay for logo home navigation */}
         <button
           onClick={() => navigate(hero.homeUrl || '/')}
-          className="absolute left-[4.5%] top-[5%] w-[13.5%] h-[10%] cursor-pointer bg-transparent border-0 focus:outline-hidden"
+          className="absolute left-[4.5%] top-[3.5%] w-[13.5%] h-[7.5%] cursor-pointer bg-transparent border-0 focus:outline-hidden"
           title="Home"
         />
       </div>
