@@ -83,10 +83,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [activeCategoryPage, setActiveCategoryPage] = useState<string | null>(null);
 
-  const [currentRoute, setCurrentRoute] = useState<{ pathname: string; searchParams: URLSearchParams }>(() => ({
-    pathname: window.location.pathname,
-    searchParams: new URLSearchParams(window.location.search),
-  }));
+  const [currentRoute, setCurrentRoute] = useState<{ pathname: string; searchParams: URLSearchParams }>(() => {
+    const path = window.location.pathname;
+    if (path === '/admin') {
+      return {
+        pathname: '/admin',
+        searchParams: new URLSearchParams(window.location.search),
+      };
+    }
+    // On refresh or initial visit, always open Home page ('/') per user requirement
+    if (path !== '/') {
+      try {
+        window.history.replaceState(null, '', '/');
+      } catch {}
+    }
+    return {
+      pathname: '/',
+      searchParams: new URLSearchParams(),
+    };
+  });
 
   const [cart, setCart] = useState<CartItem[]>([
     // Default sample item in cart for demonstration

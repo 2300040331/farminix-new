@@ -5,54 +5,27 @@ interface IntroVideoOverlayProps {
   onFinish?: () => void;
 }
 
+// In-memory session tracker: resets on page refresh/reload, but prevents replaying during internal page navigation
 let hasIntroPlayedInSession = false;
 
 export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }) => {
-  const [isDesktop, setIsDesktop] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth >= 768;
-  });
   const [isOpen, setIsOpen] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
-    if (hasIntroPlayedInSession) return false;
+    // Clear any obsolete localStorage/sessionStorage blocks so refresh always plays logo entry
     try {
-      if (sessionStorage.getItem('farminix_intro_played') || localStorage.getItem('farminix_intro_played')) {
-        hasIntroPlayedInSession = true;
-        return false;
-      }
-    } catch {
-      return false;
-    }
-    hasIntroPlayedInSession = true;
-    try {
-      sessionStorage.setItem('farminix_intro_played', 'true');
-      localStorage.setItem('farminix_intro_played', 'true');
+      localStorage.removeItem('farminix_intro_played');
+      sessionStorage.removeItem('farminix_intro_played');
     } catch {}
+
+    if (hasIntroPlayedInSession) return false;
     return true;
   });
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [isPlayBlocked, setIsPlayBlocked] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  useEffect(() => {
-    try {
-      sessionStorage.setItem('farminix_intro_played', 'true');
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   const handleClose = () => {
-    try {
-      sessionStorage.setItem('farminix_intro_played', 'true');
-    } catch {}
+    hasIntroPlayedInSession = true;
     setIsFadingOut(true);
     setTimeout(() => {
       setIsOpen(false);
@@ -86,7 +59,7 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
     };
   }, []);
 
-  if (!isDesktop || !isOpen) return null;
+  if (!isOpen) return null;
 
   return (
     <div
@@ -136,4 +109,3 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
     </div>
   );
 };
-
