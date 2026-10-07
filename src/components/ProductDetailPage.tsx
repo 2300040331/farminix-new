@@ -2,10 +2,12 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   ArrowLeft, Star, Heart, CheckCircle2, Zap,
   Plus, Minus, ChevronDown, ChevronUp, ShoppingBag,
-  AlertCircle, ThumbsUp, X, MessageSquarePlus
+  AlertCircle, ThumbsUp, X, MessageSquarePlus,
+  Leaf, ShieldCheck, MapPin, Phone, Mail, Quote
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getProductSlug } from './ProductListingPage';
+import { farminixRiceProduct } from '../data/products';
 import type { Product, Review } from '../types';
 
 export const ProductDetailPage: React.FC = () => {
@@ -278,6 +280,9 @@ export const ProductDetailPage: React.FC = () => {
   }, [allProducts, product]);
 
   const bundleTotal = currentPrice + bundleProducts.reduce((sum, p) => sum + p.price, 0);
+
+  // Story & Soil-to-Soul narrative (per product or default Farminix Rice narrative)
+  const story = product.storySection || farminixRiceProduct.storySection;
 
   const handleAddBundleToCart = () => {
     addToCart(product, currentWeight);
@@ -688,6 +693,190 @@ export const ProductDetailPage: React.FC = () => {
           </div>
 
         </div>
+
+        {/* ── SOIL TO SOUL: AUTHENTIC FARM-TO-TABLE STORY ── */}
+        {story && (
+          <div className="mt-14 pt-10 border-t border-slate-100 text-left space-y-10">
+            {/* Main Headline Banner */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-900 text-white p-6 sm:p-10 shadow-xl border border-emerald-800/40">
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10 max-w-3xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black uppercase tracking-wider mb-4 border border-emerald-400/30">
+                  <Leaf className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Farm to Dining Table Promise</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight mb-3">
+                  {story.headline}
+                </h2>
+                <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed font-medium">
+                  {story.subheadline}
+                </p>
+
+                {story.tags && story.tags.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-emerald-800/60">
+                    {story.tags.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1 bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-full text-xs font-bold text-white border border-white/20 flex items-center gap-1.5"
+                      >
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Founder's Reflection Letter Card */}
+            <div className="bg-amber-50/60 border border-amber-200/80 rounded-3xl p-6 sm:p-10 text-slate-800 shadow-sm relative overflow-hidden">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-black shadow-md">
+                  <Quote className="w-5 h-5 fill-white text-white" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest block">
+                    {story.founderTitle}
+                  </span>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900">
+                    {story.founderSubtitle}
+                  </h3>
+                </div>
+              </div>
+
+              <div className="space-y-4 text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                {story.founderLetter && story.founderLetter.split('\n\n').map((paragraph, idx) => (
+                  <p key={idx}>{paragraph}</p>
+                ))}
+
+                {story.founderQuote && (
+                  <div className="my-6 p-5 sm:p-6 bg-white border-l-4 border-amber-600 rounded-2xl shadow-sm text-slate-900 font-extrabold italic text-sm sm:text-base leading-relaxed">
+                    {story.founderQuote}
+                  </div>
+                )}
+
+                {story.founderSignoff && (
+                  <div className="space-y-3 pt-2">
+                    {story.founderSignoff.split('\n\n').map((p, idx) => (
+                      <p key={idx}>{p}</p>
+                    ))}
+                  </div>
+                )}
+
+                {story.companyAddress && (
+                  <div className="mt-6 pt-4 border-t border-amber-200/80 text-[11px] font-bold text-slate-600 flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-amber-700 shrink-0" />
+                    <span>{story.companyAddress}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* From Soil to Dining Table (4 Steps) */}
+            {story.processSteps && story.processSteps.length > 0 && (
+              <div>
+                <div className="mb-6">
+                  <span className="text-[11px] font-black text-[#7C3AED] uppercase tracking-widest">
+                    {story.processTitle}
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">
+                    {story.processSubtitle}
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-1">
+                    We eliminated long godown delays and middle-agent cartels to build a seamless farm-to-table path.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {story.processSteps.map((step, idx) => (
+                    <div
+                      key={idx}
+                      className="p-5 bg-white border border-slate-200/80 rounded-2xl hover:border-purple-300 hover:shadow-sm transition-all duration-200 relative group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-purple-50 text-[#7C3AED] border border-purple-100 font-black text-sm flex items-center justify-center mb-3 group-hover:bg-[#7C3AED] group-hover:text-white transition-colors">
+                        {step.step}
+                      </div>
+                      <h3 className="text-sm font-black text-slate-900 mb-1.5">{step.title}</h3>
+                      <p className="text-xs text-slate-600 leading-relaxed font-medium">{step.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Operating Philosophy (4 Pillars) */}
+            {story.philosophyPillars && story.philosophyPillars.length > 0 && (
+              <div>
+                <div className="mb-6">
+                  <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">
+                    {story.philosophyTitle}
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">
+                    {story.philosophySubtitle}
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {story.philosophyPillars.map((pillar, idx) => (
+                    <div
+                      key={idx}
+                      className="p-5 bg-emerald-50/40 border border-emerald-100 rounded-2xl flex flex-col justify-between"
+                    >
+                      <div>
+                        <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest bg-emerald-100/60 px-2 py-0.5 rounded-md">
+                          {pillar.tag}
+                        </span>
+                        <h3 className="text-sm font-black text-slate-900 mt-2 mb-1.5">{pillar.title}</h3>
+                        <p className="text-xs text-slate-600 leading-relaxed font-medium">{pillar.desc}</p>
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-emerald-100 text-[11px] font-extrabold text-emerald-800 flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>{pillar.guarantee}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Bottom Callout & Support Info */}
+            {(story.calloutTitle || story.contactPhone) && (
+              <div className="p-6 sm:p-8 bg-slate-900 text-white rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+                <div className="text-left space-y-1">
+                  <h3 className="text-lg sm:text-xl font-black text-white">{story.calloutTitle}</h3>
+                  <p className="text-xs text-slate-300 max-w-xl">{story.calloutDesc}</p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 text-xs font-bold shrink-0">
+                  {story.contactPhone && (
+                    <a
+                      href={`tel:${story.contactPhone}`}
+                      className="px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl flex items-center gap-2 border border-white/20 transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>{story.contactPhone}</span>
+                    </a>
+                  )}
+                  {story.contactEmail && (
+                    <a
+                      href={`mailto:${story.contactEmail}`}
+                      className="px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl flex items-center gap-2 border border-white/20 transition-colors"
+                    >
+                      <Mail className="w-3.5 h-3.5 text-blue-400" />
+                      <span>{story.contactEmail}</span>
+                    </a>
+                  )}
+                  {story.contactLocation && (
+                    <div className="px-4 py-2.5 bg-white/10 rounded-xl flex items-center gap-2 border border-white/20 text-slate-300">
+                      <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{story.contactLocation}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ── FREQUENTLY BOUGHT TOGETHER ── */}
         {bundleProducts.length > 0 && (

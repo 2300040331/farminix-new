@@ -24,6 +24,42 @@ export interface ProductFAQ {
   answer: string;
 }
 
+export interface FarmToTableStep {
+  step: string;
+  title: string;
+  desc: string;
+}
+
+export interface PhilosophyPillar {
+  tag: string;
+  title: string;
+  desc: string;
+  guarantee: string;
+}
+
+export interface ProductStorySection {
+  headline?: string;
+  subheadline?: string;
+  tags?: string[];
+  founderTitle?: string;
+  founderSubtitle?: string;
+  founderLetter?: string;
+  founderQuote?: string;
+  founderSignoff?: string;
+  companyAddress?: string;
+  processTitle?: string;
+  processSubtitle?: string;
+  processSteps?: FarmToTableStep[];
+  philosophyTitle?: string;
+  philosophySubtitle?: string;
+  philosophyPillars?: PhilosophyPillar[];
+  calloutTitle?: string;
+  calloutDesc?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  contactLocation?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -64,6 +100,7 @@ export interface Product {
   faqs?: ProductFAQ[];
   reviewsList?: Review[];
   frequentlyBoughtTogetherIds?: string[];
+  storySection?: ProductStorySection;
 }
 
 export interface CartItem {
