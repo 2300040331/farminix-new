@@ -3,14 +3,14 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const ManufacturerPage: React.FC = () => {
-  const { navigate, goBack } = useApp();
+  const { navigate } = useApp();
 
   return (
     <div className="w-full min-h-[70vh] px-4 py-8 bg-gradient-to-b from-purple-50/40 to-white">
       {/* Top Back Navigation Bar (Left side) */}
       <div className="max-w-7xl mx-auto pb-6">
         <button
-          onClick={goBack}
+          onClick={() => navigate('/')}
           className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white shadow-2xs border border-gray-200/80 hover:bg-purple-50 text-slate-700 hover:text-[#7C3AED] text-xs font-bold transition-all cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />

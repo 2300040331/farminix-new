@@ -24,7 +24,6 @@ export const ProductListingPage: React.FC = () => {
   const {
     currentRoute,
     navigate,
-    goBack,
     allProducts,
     cart,
     addToCart,
@@ -108,7 +107,7 @@ export const ProductListingPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <button
-            onClick={goBack}
+            onClick={() => navigate('/')}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white shadow-2xs border border-gray-200/80 hover:bg-emerald-50 text-slate-700 hover:text-[#16A34A] text-xs font-bold transition-all cursor-pointer"
             title="Go Back"
           >

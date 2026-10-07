@@ -16,7 +16,7 @@ interface AppContextType {
   setActiveCategoryPage: (cat: string | null) => void;
   allProducts: Product[];
   currentRoute: { pathname: string; searchParams: URLSearchParams };
-  navigate: (pathname: string, searchString?: string) => void;
+  navigate: (pathname: string, searchString?: string, options?: { replace?: boolean }) => void;
   goBack: () => void;
   
   // Cart
@@ -88,23 +88,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     searchParams: new URLSearchParams(window.location.search),
   }));
 
+  const [cart, setCart] = useState<CartItem[]>([
+    // Default sample item in cart for demonstration
+    { product: allProducts[0] || popularProducts[0], quantity: 1, selectedWeight: (allProducts[0] || popularProducts[0]).weight }
+  ]);
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>('FARM10');
+
   useEffect(() => {
     const handlePopState = () => {
-      setCurrentRoute({
-        pathname: window.location.pathname,
-        searchParams: new URLSearchParams(window.location.search),
-      });
+      const currentPath = window.location.pathname;
+      if (currentPath === '/checkout' && cart.length === 0) {
+        window.history.replaceState(null, '', '/');
+        setCurrentRoute({
+          pathname: '/',
+          searchParams: new URLSearchParams(),
+        });
+      } else {
+        setCurrentRoute({
+          pathname: window.location.pathname,
+          searchParams: new URLSearchParams(window.location.search),
+        });
+      }
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [cart.length]);
 
-  const navigate = (pathname: string, searchString?: string) => {
+  const navigate = (pathname: string, searchString?: string, options?: { replace?: boolean }) => {
     const search = searchString ? `?${searchString}` : '';
-    window.history.pushState(null, '', `${pathname}${search}`);
+    const fullUrl = `${pathname}${search}`;
+    if (options?.replace) {
+      window.history.replaceState(null, '', fullUrl);
+    } else {
+      window.history.pushState(null, '', fullUrl);
+    }
     setCurrentRoute({
       pathname,
       searchParams: new URLSearchParams(search),
@@ -115,18 +135,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const goBack = () => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      navigate('/');
-    }
+    navigate('/');
   };
-
-  const [cart, setCart] = useState<CartItem[]>([
-    // Default sample item in cart for demonstration
-    { product: allProducts[0] || popularProducts[0], quantity: 1, selectedWeight: (allProducts[0] || popularProducts[0]).weight }
-  ]);
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>('FARM10');
 
 
   const [wishlist, setWishlist] = useState<string[]>(() => {

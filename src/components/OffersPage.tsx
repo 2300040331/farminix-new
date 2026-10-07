@@ -244,7 +244,7 @@ const FilterSidebar: React.FC<FilterProps> = ({
 // ─────────────────────────────────────────────────────────────────────────────
 export const OffersPage: React.FC = () => {
   const {
-    allProducts, navigate, goBack,
+    allProducts, navigate,
     cart, addToCart, updateQuantity,
     wishlist, toggleWishlist,
     setSelectedProduct, setIsCartOpen,
@@ -383,7 +383,7 @@ export const OffersPage: React.FC = () => {
       {/* Top Back Navigation Bar (Left side) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
         <button
-          onClick={goBack}
+          onClick={() => navigate('/')}
           className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white shadow-2xs border border-gray-200/80 hover:bg-purple-50 text-slate-700 hover:text-[#7C3AED] text-xs font-bold transition-all cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />

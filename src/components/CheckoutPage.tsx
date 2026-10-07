@@ -11,7 +11,6 @@ import type { UserAddress, Order } from '../types';
 export const CheckoutPage: React.FC = () => {
   const {
     navigate,
-    goBack,
     cart,
     cartTotal,
     cartDiscount,
@@ -55,6 +54,13 @@ export const CheckoutPage: React.FC = () => {
   const [deliveryNote, setDeliveryNote] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
+
+  // If cart is empty and no order was placed in this session, redirect back to Home immediately
+  useEffect(() => {
+    if (cart.length === 0 && !placedOrder) {
+      navigate('/', undefined, { replace: true });
+    }
+  }, [cart.length, placedOrder]);
 
   // Address Modal / Form state
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
@@ -160,6 +166,11 @@ export const CheckoutPage: React.FC = () => {
       setIsProcessing(false);
       setPlacedOrder(newOrd);
 
+      // Clean browser history so browser back button won't step through checkout or intermediate pages
+      try {
+        window.history.replaceState(null, '', '/');
+      } catch {}
+
       // Trigger Celebration Confetti!
       try {
         confetti({
@@ -223,7 +234,7 @@ export const CheckoutPage: React.FC = () => {
           </div>
 
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/', undefined, { replace: true })}
             className="w-full py-3.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-black rounded-xl shadow-md transition-all cursor-pointer"
           >
             Continue Shopping
@@ -245,14 +256,8 @@ export const CheckoutPage: React.FC = () => {
         </p>
         <div className="flex items-center gap-3 mt-6">
           <button
-            onClick={() => navigate('/products')}
-            className="px-6 py-3 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
-          >
-            Explore Fresh Groceries
-          </button>
-          <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
+            className="px-6 py-3 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
           >
             Back to Home
           </button>
@@ -271,7 +276,7 @@ export const CheckoutPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-3">
             <button
-              onClick={goBack}
+              onClick={() => navigate('/')}
               className="inline-flex items-center gap-1.5 font-bold text-slate-700 hover:text-[#7C3AED] transition-colors cursor-pointer shrink-0 pr-3 border-r border-slate-200"
             >
               <ArrowLeft className="w-4 h-4" />

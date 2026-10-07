@@ -331,13 +331,7 @@ export const ProductDetailPage: React.FC = () => {
           
           {/* Back Button (Left side) */}
           <button
-            onClick={() => {
-              if (window.history.length > 1) {
-                window.history.back();
-              } else {
-                navigate('/');
-              }
-            }}
+            onClick={() => navigate('/')}
             className="inline-flex items-center gap-1.5 font-bold text-slate-700 hover:text-[#7C3AED] transition-colors cursor-pointer shrink-0 pr-3 border-r border-slate-200"
           >
             <ArrowLeft className="w-4 h-4" />

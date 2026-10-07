@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const AboutPage: React.FC = () => {
-  const { goBack } = useApp();
+  const { navigate } = useApp();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   // 3D Parallax tilt handler for the interactive hero section
@@ -31,7 +31,7 @@ export const AboutPage: React.FC = () => {
       {/* ── TOP BACK NAVIGATION BAR (LEFT SIDE) ── */}
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
         <button
-          onClick={goBack}
+          onClick={() => navigate('/')}
           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white shadow-2xs border border-gray-200/80 hover:bg-purple-50 text-slate-700 hover:text-[#7C3AED] text-xs font-bold transition-all cursor-pointer group"
           title="Go Back"
         >
