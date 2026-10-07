@@ -69,11 +69,11 @@ export const defaultThemeTokens: ThemeTokens = {
 
 export const defaultManufacturerConfig: ManufacturerConfig = {
   enabled: true,
-  comingSoonMode: false,
-  comingSoonBadge: 'Official Launch',
-  comingSoonTitle: 'Manufacturer & Milling Center',
+  comingSoonMode: true,
+  comingSoonBadge: 'Coming Soon',
+  comingSoonTitle: 'Manufacturer',
   comingSoonText:
-    'Farminix bridges generational Andhra paddy farmers and your dining table with optical Sortex milling right at the source.',
+    "We're working on something exciting. This page will be available soon with all the details you need.",
   companyName: 'Farminix Private Limited',
   pageTitle: 'Official Manufacturing & Processing Hub',
   tagline: 'Pure Grains. Direct From Soil to Soul.',

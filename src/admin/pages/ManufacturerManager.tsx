@@ -14,7 +14,13 @@ import type { ManufacturerConfig } from '../types';
 
 export const ManufacturerManager: React.FC = () => {
   const { config, updateManufacturer } = useAdminConfig();
-  const initialData: ManufacturerConfig = config.manufacturer || defaultManufacturerConfig;
+  const rawData: ManufacturerConfig = config.manufacturer || defaultManufacturerConfig;
+  const initialData: ManufacturerConfig =
+    rawData.comingSoonBadge === 'Official Launch' ||
+    rawData.comingSoonTitle === 'Manufacturer & Milling Center' ||
+    rawData.comingSoonText?.includes('Farminix bridges generational')
+      ? defaultManufacturerConfig
+      : rawData;
 
   const [formData, setFormData] = useState<ManufacturerConfig>({
     ...initialData,

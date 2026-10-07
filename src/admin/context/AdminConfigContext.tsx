@@ -81,6 +81,25 @@ const DRAFT_KEY = 'farminix_admin_draft_config_v5';
 const PUBLISHED_KEY = 'farminix_admin_published_config_v5';
 const AUTH_KEY = 'farminix_admin_auth_v5';
 
+const sanitizeManufacturer = (raw: any): ManufacturerConfig => {
+  const merged = { ...defaultManufacturerConfig, ...(raw || {}) };
+  if (
+    merged.comingSoonBadge === 'Official Launch' ||
+    merged.comingSoonTitle === 'Manufacturer & Milling Center' ||
+    merged.comingSoonText?.includes('Farminix bridges generational')
+  ) {
+    return {
+      ...merged,
+      comingSoonMode: true,
+      comingSoonBadge: 'Coming Soon',
+      comingSoonTitle: 'Manufacturer',
+      comingSoonText:
+        "We're working on something exciting. This page will be available soon with all the details you need.",
+    };
+  }
+  return { ...merged, comingSoonMode: true };
+};
+
 const AdminConfigContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -96,7 +115,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
-          manufacturer: { ...defaultManufacturerConfig, ...(parsed.manufacturer || {}) },
+          manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
           checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
@@ -130,7 +149,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
-          manufacturer: { ...defaultManufacturerConfig, ...(parsed.manufacturer || {}) },
+          manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
           checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
@@ -158,7 +177,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
-          manufacturer: { ...defaultManufacturerConfig, ...(parsed.manufacturer || {}) },
+          manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
           checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
