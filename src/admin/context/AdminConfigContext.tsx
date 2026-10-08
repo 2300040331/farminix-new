@@ -100,6 +100,17 @@ const sanitizeManufacturer = (raw: any): ManufacturerConfig => {
   return { ...merged, comingSoonMode: true };
 };
 
+const sanitizePaymentConfig = (raw: any): CheckoutPaymentConfig => {
+  const merged = { ...defaultCheckoutPaymentConfig, ...(raw || {}) };
+  if (merged.razorpayKeyId === 'rzp_test_TkIMPriA788lqz') {
+    merged.razorpayKeyId = (import.meta as any).env?.VITE_RAZORPAY_KEY_ID || '';
+  }
+  if (merged.razorpayKeySecret === 'eC5FdAw7dBccrFg0J7qaoO3e') {
+    merged.razorpayKeySecret = '';
+  }
+  return merged;
+};
+
 const AdminConfigContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -118,7 +129,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
-          checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
+          checkoutPayment: sanitizePaymentConfig(parsed.checkoutPayment),
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
           categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
@@ -152,7 +163,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
-          checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
+          checkoutPayment: sanitizePaymentConfig(parsed.checkoutPayment),
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
           categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
           featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },

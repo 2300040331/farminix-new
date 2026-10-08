@@ -227,14 +227,14 @@ export const ProductsPaymentManager: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={checkoutData.razorpayKeyId || 'rzp_test_TkIMPriA788lqz'}
+                    value={checkoutData.razorpayKeyId || ''}
                     onChange={(e) =>
                       setCheckoutData({ ...checkoutData, razorpayKeyId: e.target.value })
                     }
-                    placeholder="rzp_test_..."
+                    placeholder="rzp_live_xxxxxxxxxxxxxxxx"
                     className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold focus:border-[#7C3AED] focus:outline-none"
                   />
-                  <span className="text-[10px] text-slate-400 mt-1 block">Public key used on frontend checkout</span>
+                  <span className="text-[10px] text-slate-400 mt-1 block">Public key used on frontend checkout (e.g. rzp_live_...)</span>
                 </div>
 
                 <div>
@@ -243,14 +243,14 @@ export const ProductsPaymentManager: React.FC = () => {
                   </label>
                   <input
                     type="password"
-                    value={checkoutData.razorpayKeySecret || 'eC5FdAw7dBccrFg0J7qaoO3e'}
+                    value={checkoutData.razorpayKeySecret || ''}
                     onChange={(e) =>
                       setCheckoutData({ ...checkoutData, razorpayKeySecret: e.target.value })
                     }
                     placeholder="••••••••••••••••••••"
                     className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold focus:border-[#7C3AED] focus:outline-none"
                   />
-                  <span className="text-[10px] text-slate-400 mt-1 block">Private key secret for verification</span>
+                  <span className="text-[10px] text-slate-400 mt-1 block">Configured securely in backend .env / Vercel</span>
                 </div>
 
                 <div>
