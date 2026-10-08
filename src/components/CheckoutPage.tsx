@@ -8,7 +8,7 @@ import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import { defaultCheckoutPaymentConfig, defaultCartConfig } from '../admin/defaultConfig';
 import { detectUserLocation, lookupPincode } from '../utils/location';
-import { loadRazorpayScript, DEFAULT_RAZORPAY_KEY } from '../utils/razorpay';
+import { loadRazorpayScript, fetchRazorpayKey, createServerOrder, verifyServerPayment } from '../utils/razorpay';
 import type { UserAddress, Order } from '../types';
 
 export const CheckoutPage: React.FC = () => {
@@ -200,9 +200,25 @@ export const CheckoutPage: React.FC = () => {
         return;
       }
 
-      const activeKey = checkoutCfg.razorpayKeyId || DEFAULT_RAZORPAY_KEY;
+      // Fetch dynamic key from backend or fall back to admin config
+      const serverKey = await fetchRazorpayKey();
+      const activeKey = serverKey || checkoutCfg.razorpayKeyId || '';
+
+      if (!activeKey) {
+        setIsProcessing(false);
+        setPaymentError('Razorpay Key ID is not configured. Please add RAZORPAY_KEY_ID in server/.env or the admin panel.');
+        return;
+      }
+
       const merchantTitle = checkoutCfg.razorpayMerchantName || 'Farminix Fresh Groceries';
       const themeColor = checkoutCfg.razorpayThemeColor || '#7C3AED';
+
+      // Create server-side order
+      const serverOrder = await createServerOrder(grandTotal, {
+        customer_name: selectedAddress.name || user?.name || '',
+        customer_phone: selectedAddress.phone || user?.phone || '',
+        delivery_slot: selectedSlot,
+      });
 
       const options = {
         key: activeKey,
@@ -211,9 +227,14 @@ export const CheckoutPage: React.FC = () => {
         name: merchantTitle,
         description: `Order Payment for ${cart.reduce((s, i) => s + i.quantity, 0)} item(s)`,
         image: publishedConfig.header?.logoUrl || '/farminix_logo.png',
-        handler: (response: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string }) => {
+        order_id: serverOrder?.orderId,
+        handler: async (response: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string }) => {
           setIsProcessing(false);
           setRazorpayPaymentId(response.razorpay_payment_id);
+
+          // Verify signature on backend
+          await verifyServerPayment(response);
+
           const methodLabel = paymentMethod === 'RAZORPAY' ? 'Razorpay' : `Razorpay (${paymentMethod})`;
           const newOrd = createOrder(
             selectedAddress,

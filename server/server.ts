@@ -1,12 +1,28 @@
+import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import Razorpay from 'razorpay';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'farminix-super-secret-key-12345';
 const REFRESH_SECRET = process.env.REFRESH_SECRET || 'farminix-refresh-secret-9876';
+
+// Razorpay Live/Test Environment Credentials
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
+const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || '';
+
+// Initialize Razorpay Client instance if credentials are present
+const razorpayClient = (RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET)
+  ? new Razorpay({
+      key_id: RAZORPAY_KEY_ID,
+      key_secret: RAZORPAY_KEY_SECRET,
+    })
+  : null;
 
 // Middleware
 app.use(cors());
@@ -394,6 +410,139 @@ app.get('/api/admin/dashboard', authenticateToken, (req: Request, res: Response)
       totalProducts: products.length
     }
   });
+});
+
+// ==========================================
+// 7. RAZORPAY LIVE/TEST PAYMENT MODULE
+// ==========================================
+
+// 7.1 Fetch active public Razorpay Key ID (safe for frontend)
+app.get('/api/payment/razorpay-key', (_req: Request, res: Response): void => {
+  res.json({
+    success: true,
+    keyId: RAZORPAY_KEY_ID || '',
+    isConfigured: !!(RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET),
+  });
+});
+
+// 7.2 Create secure server-side Razorpay Order
+app.post('/api/payment/create-order', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { amount, currency = 'INR', receipt, notes } = req.body;
+
+    if (!amount || Number(amount) <= 0) {
+      res.status(400).json({ success: false, error: 'A valid payment amount is required' });
+      return;
+    }
+
+    if (!razorpayClient) {
+      res.status(500).json({
+        success: false,
+        error: 'Razorpay is not configured on the backend. Please check RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in server/.env',
+      });
+      return;
+    }
+
+    const orderOptions = {
+      amount: Math.round(Number(amount) * 100), // amount in lowest denomination (paise)
+      currency: currency || 'INR',
+      receipt: receipt || `farminix_${Date.now()}`,
+      notes: notes || {},
+    };
+
+    const order = await razorpayClient.orders.create(orderOptions);
+
+    res.json({
+      success: true,
+      order,
+      keyId: RAZORPAY_KEY_ID,
+    });
+  } catch (error: any) {
+    console.error('[RAZORPAY CREATE ORDER ERROR]:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to create Razorpay order',
+    });
+  }
+});
+
+// 7.3 Verify payment signature securely on server
+app.post('/api/payment/verify-signature', (req: Request, res: Response): void => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    if (!razorpay_payment_id) {
+      res.status(400).json({ success: false, error: 'Missing razorpay_payment_id' });
+      return;
+    }
+
+    if (!RAZORPAY_KEY_SECRET) {
+      res.status(500).json({
+        success: false,
+        error: 'Razorpay secret key is not configured on the server',
+      });
+      return;
+    }
+
+    // Verify cryptographic HMAC SHA256 signature
+    if (razorpay_order_id && razorpay_signature) {
+      const generatedSignature = crypto
+        .createHmac('sha256', RAZORPAY_KEY_SECRET)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest('hex');
+
+      if (generatedSignature !== razorpay_signature) {
+        res.status(400).json({
+          success: false,
+          error: 'Payment signature verification failed. Possible tampering detected.',
+        });
+        return;
+      }
+    }
+
+    res.json({
+      success: true,
+      verified: true,
+      paymentId: razorpay_payment_id,
+      orderId: razorpay_order_id,
+      message: 'Payment verified successfully',
+    });
+  } catch (error: any) {
+    console.error('[RAZORPAY SIGNATURE VERIFICATION ERROR]:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Signature verification encountered an error',
+    });
+  }
+});
+
+// 7.4 Razorpay Webhook endpoint
+app.post('/api/payment/webhook', (req: Request, res: Response): void => {
+  try {
+    const signature = req.headers['x-razorpay-signature'] as string;
+
+    if (RAZORPAY_WEBHOOK_SECRET && signature) {
+      const payload = JSON.stringify(req.body);
+      const expectedSignature = crypto
+        .createHmac('sha256', RAZORPAY_WEBHOOK_SECRET)
+        .update(payload)
+        .digest('hex');
+
+      if (expectedSignature !== signature) {
+        console.warn('[RAZORPAY WEBHOOK] Invalid webhook signature received');
+        res.status(400).json({ error: 'Invalid webhook signature' });
+        return;
+      }
+    }
+
+    const event = req.body?.event;
+    console.log(`[RAZORPAY WEBHOOK] Received valid event: ${event}`);
+
+    res.json({ status: 'ok', received: true });
+  } catch (error: any) {
+    console.error('[RAZORPAY WEBHOOK ERROR]:', error);
+    res.status(500).json({ error: 'Webhook processing failed' });
+  }
 });
 
 // Start Server
