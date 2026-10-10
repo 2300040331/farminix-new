@@ -111,6 +111,20 @@ const sanitizePaymentConfig = (raw: any): CheckoutPaymentConfig => {
   return merged;
 };
 
+const sanitizeAboutPage = (raw: any): AboutPageConfig => {
+  const merged = { ...defaultAboutPageConfig, ...(raw || {}) };
+  if (
+    !merged.headline ||
+    merged.headline.includes('Soil to Soul') ||
+    merged.subheadline?.includes('bridges generational')
+  ) {
+    merged.headline = defaultAboutPageConfig.headline;
+    merged.subheadline = defaultAboutPageConfig.subheadline;
+    merged.tags = defaultAboutPageConfig.tags;
+  }
+  return merged;
+};
+
 const sanitizeProducts = (products: any[]): Product[] => {
   if (!Array.isArray(products) || products.length === 0) {
     return defaultSiteConfig.products;
@@ -144,7 +158,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
-          aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
+          aboutPage: sanitizeAboutPage(parsed.aboutPage),
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
           checkoutPayment: sanitizePaymentConfig(parsed.checkoutPayment),
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
@@ -179,7 +193,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
-          aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
+          aboutPage: sanitizeAboutPage(parsed.aboutPage),
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
           checkoutPayment: sanitizePaymentConfig(parsed.checkoutPayment),
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
@@ -208,7 +222,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
-          aboutPage: { ...defaultAboutPageConfig, ...(parsed.aboutPage || {}) },
+          aboutPage: sanitizeAboutPage(parsed.aboutPage),
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
           checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },

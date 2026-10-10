@@ -76,9 +76,9 @@ export const defaultManufacturerConfig: ManufacturerConfig = {
     "We're working on something exciting. This page will be available soon with all the details you need.",
   companyName: 'Farminix Private Limited',
   pageTitle: 'Official Manufacturing & Processing Hub',
-  tagline: 'Pure Grains. Direct From Soil to Soul.',
+  tagline: 'Authentic Groceries Delivered Direct',
   aboutCorporate:
-    'Farminix bridges generational Andhra paddy farmers and your dining table. Zero middlemen, zero chemical polishing, and zero stale godowns — just honest, farm-fresh rice processed through cutting-edge optical Sortex technology and packed right at the source.',
+    'Farminix delivers honest, quality staples processed with care and packed right at the source.',
   cinOrRegNumber: 'U01100AP2024PTC123456',
   fssaiNumber: '20126142000933',
   registeredOffice: 'Flat No 302, Srinivasa Towers, Gorantla, Guntur – 522034, Andhra Pradesh',
@@ -182,13 +182,13 @@ export const defaultManufacturerConfig: ManufacturerConfig = {
 };
 
 export const defaultAboutPageConfig: AboutPageConfig = {
-  headline: 'Pure Grains. Direct From Soil to Soul.',
+  headline: 'About Farminix. Authentic Everyday Staples.',
   subheadline:
-    'Farminix bridges generational Andhra paddy farmers and your dining table. Zero middlemen, zero chemical polishing, and zero stale godowns — just honest, farm-fresh rice delivered in minutes.',
+    'Farminix delivers honest, farm-fresh staples directly to your dining table in minutes with complete transparency and care.',
   tags: [
-    '100% Single-Origin Paddy',
-    'Naturally Aged for Fluffy Cook',
-    'FSSAI Lic. 20126142000933',
+    'Direct Quality Sourcing',
+    'Natural & Unadulterated',
+    'Express Doorstep Delivery',
   ],
   founderTitle: "Founder's Reflection",
   founderSubtitle: 'A Note from the Heart of Farminix • With Love to Every Household',

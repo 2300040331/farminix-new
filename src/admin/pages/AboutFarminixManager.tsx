@@ -126,7 +126,7 @@ export const AboutFarminixManager: React.FC = () => {
               value={formData.headline}
               onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
               className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-extrabold focus:border-[#7C3AED] focus:bg-white focus:outline-none"
-              placeholder="Pure Grains. Direct From Soil to Soul."
+              placeholder="About Farminix. Authentic Everyday Staples."
             />
           </div>
 
