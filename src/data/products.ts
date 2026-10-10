@@ -105,7 +105,7 @@ export const farminixRiceProduct: Product = {
   reviewsList: [
     {
       id: 'rev-1',
-      userName: 'Hitaishi Devarapalli',
+      userName: 'Priya S.',
       rating: 5,
       date: 'Yesterday',
       verified: true,

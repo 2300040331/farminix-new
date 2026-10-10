@@ -16,15 +16,15 @@ export const SupportManager: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([
     {
       id: 'TCK-1092',
-      userName: 'Hitaishi Devarapalli',
-      userPhone: '+91 98765 43210',
+      userName: 'Customer',
+      userPhone: '+91 98000 00000',
       subject: 'Order Tracking Query for ORD-89241',
-      message: 'When will the 10 min express delivery arrive at Brodipet?',
+      message: 'When will the 10 min express delivery arrive?',
       status: 'OPEN',
       createdAt: 'Today, 2:15 PM',
       replies: [
-        { sender: 'user', text: 'When will the 10 min express delivery arrive at Brodipet?', time: '2:15 PM' },
-        { sender: 'agent', text: 'Your delivery executive is 4 minutes away and heading to Brodipet 4th Line.', time: '2:16 PM' },
+        { sender: 'user', text: 'When will the 10 min express delivery arrive?', time: '2:15 PM' },
+        { sender: 'agent', text: 'Your delivery executive is 4 minutes away from your location.', time: '2:16 PM' },
       ],
     },
     {

@@ -71,14 +71,26 @@ export const CheckoutPage: React.FC = () => {
   const [isDetectingGps, setIsDetectingGps] = useState(false);
   const [gpsStatus, setGpsStatus] = useState<string | null>(null);
 
-  // New Address Form fields
-  const [formName, setFormName] = useState(user?.name || '');
-  const [formPhone, setFormPhone] = useState(user?.phone || '');
+  // New Address Form fields - clean and empty by default
+  const [formName, setFormName] = useState('');
+  const [formPhone, setFormPhone] = useState('');
   const [formStreet, setFormStreet] = useState('');
-  const [formCity, setFormCity] = useState('Guntur');
-  const [formState, setFormState] = useState('Andhra Pradesh');
-  const [formPincode, setFormPincode] = useState('522034');
+  const [formCity, setFormCity] = useState('');
+  const [formState, setFormState] = useState('');
+  const [formPincode, setFormPincode] = useState('');
   const [formTag, setFormTag] = useState<'Home' | 'Work' | 'Other'>('Home');
+
+  const openAddAddressModal = () => {
+    setFormName('');
+    setFormPhone('');
+    setFormStreet('');
+    setFormCity('');
+    setFormState('');
+    setFormPincode('');
+    setFormTag('Home');
+    setFormIsDefault(addresses.length === 0);
+    setIsAddAddressOpen(true);
+  };
 
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId) || addresses[0];
 
@@ -157,7 +169,12 @@ export const CheckoutPage: React.FC = () => {
     setSelectedAddressId(newAddr.id);
     setLocation(`${newAddr.city}, ${newAddr.state} - ${newAddr.pincode}`);
     setIsAddAddressOpen(false);
+    setFormName('');
+    setFormPhone('');
     setFormStreet('');
+    setFormCity('');
+    setFormState('');
+    setFormPincode('');
   };
 
   const handleDeleteAddress = (idToDelete: string, e: React.MouseEvent) => {
@@ -198,7 +215,7 @@ export const CheckoutPage: React.FC = () => {
   // Place Order Handler with Razorpay Integration
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
-      setIsAddAddressOpen(true);
+      openAddAddressModal();
       return;
     }
     setPaymentError(null);
@@ -460,7 +477,7 @@ export const CheckoutPage: React.FC = () => {
                 {/* Add Address Button */}
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   <button
-                    onClick={() => setIsAddAddressOpen(true)}
+                    onClick={openAddAddressModal}
                     className="px-2.5 sm:px-3 py-1.5 bg-[#7C3AED] text-white hover:bg-[#6D28D9] text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -488,7 +505,7 @@ export const CheckoutPage: React.FC = () => {
                   </p>
                   <button
                     type="button"
-                    onClick={() => setIsAddAddressOpen(true)}
+                    onClick={openAddAddressModal}
                     className="mt-4 px-5 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-black rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
                   >
                     <Plus className="w-4 h-4" />
@@ -987,7 +1004,7 @@ export const CheckoutPage: React.FC = () => {
                     required
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    placeholder="Recipient Name"
+                    placeholder="Enter Full Name"
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold focus:outline-none focus:border-[#7C3AED]"
                   />
                 </div>
@@ -996,9 +1013,10 @@ export const CheckoutPage: React.FC = () => {
                   <input
                     type="tel"
                     required
+                    maxLength={10}
                     value={formPhone}
-                    onChange={(e) => setFormPhone(e.target.value)}
-                    placeholder="+91 98765 43210"
+                    onChange={(e) => setFormPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    placeholder="10-digit Mobile Number"
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold focus:outline-none focus:border-[#7C3AED]"
                   />
                 </div>
@@ -1011,7 +1029,7 @@ export const CheckoutPage: React.FC = () => {
                   required
                   value={formStreet}
                   onChange={(e) => setFormStreet(e.target.value)}
-                  placeholder="Plot No. 42, Brodipet 4th Line"
+                  placeholder="House / Flat No., Apartment, Street, Landmark"
                   className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold focus:outline-none focus:border-[#7C3AED]"
                 />
               </div>
@@ -1025,7 +1043,7 @@ export const CheckoutPage: React.FC = () => {
                     required
                     value={formPincode}
                     onChange={(e) => handlePincodeChange(e.target.value)}
-                    placeholder="522034"
+                    placeholder="6-digit Pincode"
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold focus:outline-none focus:border-[#7C3AED]"
                   />
                 </div>
@@ -1036,7 +1054,7 @@ export const CheckoutPage: React.FC = () => {
                     required
                     value={formCity}
                     onChange={(e) => setFormCity(e.target.value)}
-                    placeholder="Guntur"
+                    placeholder="City / District"
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold focus:outline-none focus:border-[#7C3AED]"
                   />
                 </div>
@@ -1047,7 +1065,7 @@ export const CheckoutPage: React.FC = () => {
                     required
                     value={formState}
                     onChange={(e) => setFormState(e.target.value)}
-                    placeholder="Andhra Pradesh"
+                    placeholder="State"
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold focus:outline-none focus:border-[#7C3AED]"
                   />
                 </div>

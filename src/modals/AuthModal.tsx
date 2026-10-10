@@ -21,23 +21,12 @@ export const AuthModal: React.FC = () => {
     e.preventDefault();
     setUser({
       id: 'usr-1',
-      name: 'Hitaishi Devarapalli',
+      name: 'Customer',
       phone: `+91 ${phone}`,
-      email: 'hitaishi@example.com',
-      rewardPoints: 350,
-      walletBalance: 250,
-      addresses: [
-        {
-          id: 'addr-1',
-          name: 'Hitaishi Devarapalli',
-          street: 'Plot No. 42, Brodipet 4th Line',
-          city: 'Guntur',
-          state: 'Andhra Pradesh',
-          pincode: '522034',
-          phone: `+91 ${phone}`,
-          isDefault: true,
-        },
-      ],
+      email: '',
+      rewardPoints: 100,
+      walletBalance: 0,
+      addresses: [],
     });
     setIsAuthOpen(false);
   };

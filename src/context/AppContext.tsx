@@ -217,12 +217,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [user, setUser] = useState<User | null>(() => {
     try {
-      const savedUser = localStorage.getItem('farminix_user_profile_v2');
-      if (savedUser) return JSON.parse(savedUser);
+      localStorage.removeItem('farminix_user_profile');
+      localStorage.removeItem('farminix_user_profile_v2');
+
+      const savedUser = localStorage.getItem('farminix_user_profile_v3');
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        if (parsed && !parsed.name?.includes('Hitaishi')) {
+          return parsed;
+        }
+      }
     } catch {}
 
     const defaultUser = (publishedConfig.users || []).find((u) => u.id === 'usr-1');
-    if (defaultUser) {
+    if (defaultUser && !defaultUser.name?.includes('Hitaishi')) {
       return {
         ...defaultUser,
         addresses: defaultUser.addresses || [],
@@ -243,7 +251,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     if (user) {
       try {
-        localStorage.setItem('farminix_user_profile_v2', JSON.stringify(user));
+        localStorage.setItem('farminix_user_profile_v3', JSON.stringify(user));
       } catch {}
     }
   }, [user]);
@@ -260,13 +268,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       status: 'Out for Delivery',
       estimatedTime: '8 Mins',
       deliveryAddress: {
-        id: 'addr-1',
-        name: 'Hitaishi Devarapalli',
-        street: 'Plot No. 42, Brodipet 4th Line',
+        id: 'addr-sample',
+        name: 'Customer',
+        street: 'Express Delivery Hub',
         city: 'Guntur',
         state: 'Andhra Pradesh',
-        pincode: '522034',
-        phone: '+91 98765 43210',
+        pincode: '522002',
+        phone: '+91 98000 00000',
         isDefault: true
       },
       paymentMethod: 'UPI'
