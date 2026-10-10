@@ -699,15 +699,6 @@ export const CheckoutPage: React.FC = () => {
                       className="w-4 h-4 text-[#7C3AED] focus:ring-purple-500 shrink-0 ml-2"
                     />
                   </label>
-
-                  {paymentMethod === 'RAZORPAY' && (
-                    <div className="mt-3 pt-2.5 border-t border-purple-200/60 flex items-center justify-between text-[11px] text-purple-800 font-bold">
-                      <span className="flex items-center gap-1">
-                        🔒 Razorpay 256-bit Encrypted Modal Checkout
-                      </span>
-                      <span className="text-[10px] text-purple-600 font-mono">Test Key Active</span>
-                    </div>
-                  )}
                 </div>
 
                 {/* 2. UPI / QR */}
