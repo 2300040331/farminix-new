@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   ArrowLeft, CheckCircle2, Truck, Zap,
-  Plus, Navigation, Loader2, Check, Phone, ShieldCheck, AlertCircle
+  Plus, Navigation, Loader2, Check, Phone, ShieldCheck, AlertCircle, Trash2, MapPin
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
@@ -29,23 +29,21 @@ export const CheckoutPage: React.FC = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // State management
-  const addresses: UserAddress[] = user?.addresses || [
-    {
-      id: 'addr-1',
-      name: 'Hitaishi Devarapalli',
-      street: 'Plot No. 42, Brodipet 4th Line',
-      city: 'Guntur',
-      state: 'Andhra Pradesh',
-      pincode: '522034',
-      phone: '+91 98765 43210',
-      isDefault: true,
-    },
-  ];
+  // State management - no hardcoded default addresses
+  const addresses: UserAddress[] = user?.addresses || [];
 
-  const [selectedAddressId, setSelectedAddressId] = useState<string>(
-    addresses.find((a) => a.isDefault)?.id || addresses[0]?.id || 'addr-1'
-  );
+  const [selectedAddressId, setSelectedAddressId] = useState<string>(() => {
+    return addresses.find((a) => a.isDefault)?.id || addresses[0]?.id || '';
+  });
+
+  useEffect(() => {
+    if (addresses.length > 0 && (!selectedAddressId || !addresses.some((a) => a.id === selectedAddressId))) {
+      const def = addresses.find((a) => a.isDefault) || addresses[0];
+      setSelectedAddressId(def.id);
+    }
+  }, [addresses, selectedAddressId]);
+
+  const [formIsDefault, setFormIsDefault] = useState<boolean>(true);
 
   const { publishedConfig } = useAdminConfig();
   const checkoutCfg = publishedConfig.checkoutPayment || defaultCheckoutPaymentConfig;
@@ -134,18 +132,25 @@ export const CheckoutPage: React.FC = () => {
     e.preventDefault();
     if (!formName.trim() || !formStreet.trim() || formPincode.length !== 6) return;
 
+    const isFirst = addresses.length === 0;
+    const shouldBeDefault = formIsDefault || isFirst;
+
+    const tagPrefix = formTag === 'Home' ? '🏠 Home' : formTag === 'Work' ? '🏢 Work' : '📍 Other';
     const newAddr: UserAddress = {
       id: `addr-${Date.now()}`,
-      name: formName.trim(),
+      name: `${tagPrefix} • ${formName.trim()}`,
       street: formStreet.trim(),
       city: formCity.trim(),
       state: formState.trim(),
       pincode: formPincode.trim(),
       phone: formPhone.trim(),
-      isDefault: addresses.length === 0,
+      isDefault: shouldBeDefault,
     };
 
-    const updatedAddresses = [...addresses, newAddr];
+    const updatedAddresses = shouldBeDefault
+      ? addresses.map((a) => ({ ...a, isDefault: false })).concat(newAddr)
+      : [...addresses, newAddr];
+
     if (user) {
       setUser({ ...user, addresses: updatedAddresses });
     }
@@ -153,6 +158,30 @@ export const CheckoutPage: React.FC = () => {
     setLocation(`${newAddr.city}, ${newAddr.state} - ${newAddr.pincode}`);
     setIsAddAddressOpen(false);
     setFormStreet('');
+  };
+
+  const handleDeleteAddress = (idToDelete: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const updated = addresses.filter((a) => a.id !== idToDelete);
+    if (user) {
+      setUser({ ...user, addresses: updated });
+    }
+    if (selectedAddressId === idToDelete) {
+      const remainingDef = updated.find((a) => a.isDefault) || updated[0];
+      setSelectedAddressId(remainingDef?.id || '');
+    }
+  };
+
+  const handleSetDefaultAddress = (idToDefault: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const updated = addresses.map((a) => ({
+      ...a,
+      isDefault: a.id === idToDefault,
+    }));
+    if (user) {
+      setUser({ ...user, addresses: updated });
+    }
+    setSelectedAddressId(idToDefault);
   };
 
   // Toggle delivery note tag
@@ -168,7 +197,10 @@ export const CheckoutPage: React.FC = () => {
 
   // Place Order Handler with Razorpay Integration
   const handlePlaceOrder = async () => {
-    if (!selectedAddress) return;
+    if (!selectedAddress) {
+      setIsAddAddressOpen(true);
+      return;
+    }
     setPaymentError(null);
     setIsProcessing(true);
 
@@ -444,56 +476,94 @@ export const CheckoutPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Saved Addresses List */}
-              <div className="space-y-2.5 sm:space-y-3">
-                {addresses.map((addr) => {
-                  const isSelected = selectedAddressId === addr.id;
-                  return (
-                    <div
-                      key={addr.id}
-                      onClick={() => {
-                        setSelectedAddressId(addr.id);
-                        setLocation(`${addr.city}, ${addr.state} - ${addr.pincode}`);
-                      }}
-                      className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left flex items-start justify-between gap-2.5 sm:gap-3 cursor-pointer transition-all ${
-                        isSelected
-                          ? 'border-[#7C3AED] bg-purple-50/70 ring-2 ring-purple-200 shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300 bg-white'
-                      }`}
-                    >
-                      <div className="flex items-start gap-2.5 sm:gap-3 min-w-0">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
-                          isSelected ? 'border-[#7C3AED] bg-[#7C3AED]' : 'border-slate-300'
-                        }`}>
-                          {isSelected && <Check className="w-3 h-3 text-white stroke-[3]" />}
+              {/* Saved Addresses List or Empty State */}
+              {addresses.length === 0 ? (
+                <div className="p-6 border-2 border-dashed border-purple-200 bg-purple-50/40 rounded-2xl text-center flex flex-col items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-purple-100 text-[#7C3AED] flex items-center justify-center mb-2.5">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-sm font-black text-slate-900">No Delivery Address Added Yet</h3>
+                  <p className="text-xs text-slate-500 max-w-sm mt-1">
+                    Please add your delivery address (Home, Work, or Other) to proceed with your order.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddAddressOpen(true)}
+                    className="mt-4 px-5 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-black rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>+ Add Delivery Address</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2.5 sm:space-y-3">
+                  {addresses.map((addr) => {
+                    const isSelected = selectedAddressId === addr.id;
+                    return (
+                      <div
+                        key={addr.id}
+                        onClick={() => {
+                          setSelectedAddressId(addr.id);
+                          setLocation(`${addr.city}, ${addr.state} - ${addr.pincode}`);
+                        }}
+                        className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left flex items-start justify-between gap-2.5 sm:gap-3 cursor-pointer transition-all ${
+                          isSelected
+                            ? 'border-[#7C3AED] bg-purple-50/70 ring-2 ring-purple-200 shadow-xs'
+                            : 'border-slate-200 hover:border-slate-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2.5 sm:gap-3 min-w-0">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
+                            isSelected ? 'border-[#7C3AED] bg-[#7C3AED]' : 'border-slate-300'
+                          }`}>
+                            {isSelected && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                          </div>
+
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs font-black text-slate-900">{addr.name}</span>
+                              {addr.isDefault ? (
+                                <span className="text-[9px] font-black text-[#7C3AED] bg-white px-1.5 py-0.5 rounded-md border border-purple-200">
+                                  DEFAULT
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={(e) => handleSetDefaultAddress(addr.id, e)}
+                                  className="text-[9px] font-bold text-slate-500 hover:text-[#7C3AED] hover:underline"
+                                >
+                                  Set as default
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-600 mt-1 leading-normal font-medium break-words">
+                              {addr.street}, {addr.city}, {addr.state} - {addr.pincode}
+                            </p>
+                            <div className="text-[11px] font-bold text-slate-500 mt-1 flex items-center gap-1">
+                              <Phone className="w-3 h-3 text-slate-400 shrink-0" />
+                              <span>Phone: {addr.phone}</span>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-black text-slate-900">{addr.name}</span>
-                            {addr.isDefault && (
-                              <span className="text-[9px] font-black text-[#7C3AED] bg-white px-1.5 py-0.5 rounded-md border border-purple-200">
-                                DEFAULT
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-slate-600 mt-1 leading-normal font-medium break-words">
-                            {addr.street}, {addr.city}, {addr.state} - {addr.pincode}
-                          </p>
-                          <div className="text-[11px] font-bold text-slate-500 mt-1 flex items-center gap-1">
-                            <Phone className="w-3 h-3 text-slate-400 shrink-0" />
-                            <span>Phone: {addr.phone}</span>
-                          </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-[11px] font-bold text-[#7C3AED]">
+                            {isSelected ? 'Selected' : 'Select'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDeleteAddress(addr.id, e)}
+                            className="p-1 text-slate-400 hover:text-red-500 rounded-md transition-colors"
+                            title="Delete address"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </div>
-
-                      <div className="text-[11px] font-bold text-[#7C3AED] shrink-0">
-                        {isSelected ? 'Selected' : 'Select'}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* STEP 2: DELIVERY SLOT SELECTION */}
@@ -834,7 +904,12 @@ export const CheckoutPage: React.FC = () => {
                 disabled={isProcessing}
                 className="w-full h-14 bg-[#7C3AED] hover:bg-[#6D28D9] disabled:bg-slate-300 text-white text-base font-black rounded-2xl shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-98"
               >
-                {isProcessing ? (
+                {!selectedAddress ? (
+                  <>
+                    <MapPin className="w-5 h-5" />
+                    <span>Add Delivery Address to Proceed</span>
+                  </>
+                ) : isProcessing ? (
                   <div className="flex items-center gap-2">
                     <Loader2 className="w-5 h-5 animate-spin" />
                     <span>Opening Razorpay Gateway...</span>
@@ -996,6 +1071,18 @@ export const CheckoutPage: React.FC = () => {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div className="pt-1">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={formIsDefault}
+                    onChange={(e) => setFormIsDefault(e.target.checked)}
+                    className="w-4 h-4 rounded text-[#7C3AED] focus:ring-[#7C3AED] border-slate-300 accent-[#7C3AED]"
+                  />
+                  <span className="font-bold text-slate-700">Set as my default delivery address</span>
+                </label>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3">

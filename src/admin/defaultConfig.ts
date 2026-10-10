@@ -579,18 +579,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
       email: 'hitaishi@example.com',
       rewardPoints: 350,
       walletBalance: 250,
-      addresses: [
-        {
-          id: 'addr-1',
-          name: 'Hitaishi Devarapalli',
-          street: 'Plot No. 42, Brodipet 4th Line',
-          city: 'Guntur',
-          state: 'Andhra Pradesh',
-          pincode: '522034',
-          phone: '+91 98765 43210',
-          isDefault: true,
-        },
-      ],
+      addresses: [],
     },
   ],
   mediaLibrary: [

@@ -103,10 +103,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   });
 
-  const [cart, setCart] = useState<CartItem[]>([
-    // Default sample item in cart for demonstration
-    { product: allProducts[0] || popularProducts[0], quantity: 1, selectedWeight: (allProducts[0] || popularProducts[0]).weight }
-  ]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('farminix_cart_v3');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {}
+    return [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('farminix_cart_v3', JSON.stringify(cart));
+    } catch {}
+  }, [cart]);
+
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>('FARM10');
 
   useEffect(() => {
@@ -203,37 +216,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const [user, setUser] = useState<User | null>(() => {
+    try {
+      const savedUser = localStorage.getItem('farminix_user_profile_v2');
+      if (savedUser) return JSON.parse(savedUser);
+    } catch {}
+
     const defaultUser = (publishedConfig.users || []).find((u) => u.id === 'usr-1');
-    if (defaultUser) return defaultUser;
+    if (defaultUser) {
+      return {
+        ...defaultUser,
+        addresses: defaultUser.addresses || [],
+      };
+    }
 
     return {
       id: 'usr-1',
-      name: 'Hitaishi Devarapalli',
-      phone: '+91 98765 43210',
-      email: 'hitaishi@example.com',
-      rewardPoints: 350,
-      walletBalance: 250,
-      addresses: [
-        {
-          id: 'addr-1',
-          name: 'Hitaishi Devarapalli',
-          street: 'Plot No. 42, Brodipet 4th Line',
-          city: 'Guntur',
-          state: 'Andhra Pradesh',
-          pincode: '522034',
-          phone: '+91 98765 43210',
-          isDefault: true
-        }
-      ]
+      name: '',
+      phone: '',
+      email: '',
+      rewardPoints: 0,
+      walletBalance: 0,
+      addresses: [],
     };
   });
 
   useEffect(() => {
-    const updatedUser = (publishedConfig.users || []).find((u) => u.id === 'usr-1');
-    if (updatedUser) {
-      setUser(updatedUser);
+    if (user) {
+      try {
+        localStorage.setItem('farminix_user_profile_v2', JSON.stringify(user));
+      } catch {}
     }
-  }, [publishedConfig.users]);
+  }, [user]);
 
   const [orders, setOrders] = useState<Order[]>([
     {
