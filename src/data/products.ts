@@ -78,9 +78,9 @@ export const farminixRiceProduct: Product = {
     { label: 'Country of Origin', value: 'India' },
   ],
   howToUse: [
-    '1. Open Pan: Bring a large pan of water to a rolling boil. Add measured rice, return to a medium boil and cook uncovered for 10 min. Drain and rinse with fresh boiling water.',
-    '2. Covered Pan: Put measured rice and cold water into a heavy-based pan. Bring to boil, stir, cover and turn down to a gentle simmer for 10 min. Turn off heat and leave covered for 5 min.',
-    '3. Microwave: Put measured amount of rice and cold water into a deep microwaveable bowl. Cover with cling film pierced 3 times. Cook on high for 8 min. Uncover, stir, and cook for another 8 min.',
+    'Open Pan: Bring a large pan of water to a rolling boil. Add measured rice, return to a medium boil and cook uncovered for 10 min. Drain and rinse with fresh boiling water.',
+    'Covered Pan: Put measured rice and cold water into a heavy-based pan. Bring to boil, stir, cover and turn down to a gentle simmer for 10 min. Turn off heat and leave covered for 5 min.',
+    'Microwave: Put measured amount of rice and cold water into a deep microwaveable bowl. Cover with cling film pierced 3 times. Cook on high for 8 min. Uncover, stir, and cook for another 8 min.',
   ],
   storageInstructions:
     'Always store bags off the ground in a hygienic, cool, dry place, away from sunlight and moisture. Once opened, store in an airtight container.',

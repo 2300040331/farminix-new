@@ -9,6 +9,23 @@ import { getProductSlug } from './ProductListingPage';
 import { farminixRiceProduct } from '../data/products';
 import type { Product, Review } from '../types';
 
+const parsePreparationStep = (stepText: string, index: number) => {
+  const cleaned = stepText.replace(/^(\d+[\.\)]\s*)+/, '').trim();
+  const colonIndex = cleaned.indexOf(':');
+  if (colonIndex > 0 && colonIndex < 35) {
+    return {
+      stepNum: index + 1,
+      title: cleaned.slice(0, colonIndex).trim(),
+      desc: cleaned.slice(colonIndex + 1).trim(),
+    };
+  }
+  return {
+    stepNum: index + 1,
+    title: `Method ${index + 1}`,
+    desc: cleaned,
+  };
+};
+
 export const ProductDetailPage: React.FC = () => {
   const {
     currentRoute,
@@ -662,37 +679,65 @@ export const ProductDetailPage: React.FC = () => {
             )}
           </div>
 
-          {/* Product Specifications & Usage */}
-          <div className="space-y-6">
-            <div className="p-6 sm:p-8 bg-white border border-slate-200/90 rounded-3xl text-left shadow-xs">
-              <h3 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
-                <span>📋 PRODUCT SPECIFICATIONS</span>
-              </h3>
-              <div className="divide-y divide-slate-100 text-xs sm:text-sm">
-                {specifications.map((s, idx) => (
-                  <div key={idx} className="py-3 sm:py-3.5 flex justify-between items-start gap-4">
-                    <span className="font-bold text-slate-500 shrink-0">{s.label}</span>
-                    <span className="font-extrabold text-slate-900 text-right leading-relaxed">{s.value}</span>
-                  </div>
-                ))}
-              </div>
+          {/* Right Column: Product Specifications Table */}
+          <div className="p-6 sm:p-8 bg-white border border-slate-200/90 rounded-3xl text-left shadow-xs">
+            <h3 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
+              <span>📋 PRODUCT SPECIFICATIONS</span>
+            </h3>
+            <div className="divide-y divide-slate-100 text-xs sm:text-sm">
+              {specifications.map((s, idx) => (
+                <div key={idx} className="py-3 sm:py-3.5 flex justify-between items-start gap-4">
+                  <span className="font-bold text-slate-500 shrink-0">{s.label}</span>
+                  <span className="font-extrabold text-slate-900 text-right leading-relaxed">{s.value}</span>
+                </div>
+              ))}
             </div>
-
-            {howToUse && (
-              <div className="p-6 bg-white border border-slate-200/80 rounded-3xl text-left shadow-2xs">
-                <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider mb-3">
-                  🍳 How to Use / Preparation
-                </h3>
-                <ol className="list-decimal list-inside space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
-                  {howToUse.map((step, idx) => (
-                    <li key={idx} className="leading-snug">{step}</li>
-                  ))}
-                </ol>
-              </div>
-            )}
           </div>
 
         </div>
+
+        {/* ── HOW TO USE / PREPARATION (Full Space Horizontal Layout) ── */}
+        {howToUse && howToUse.length > 0 && (
+          <div className="mt-12 p-6 sm:p-8 bg-white border border-slate-200/90 rounded-3xl text-left shadow-2xs">
+            <div className="flex items-center gap-2.5 mb-6 pb-4 border-b border-slate-100">
+              <span className="text-xl">🍳</span>
+              <h3 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider">
+                How to Use / Preparation
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+              {howToUse.map((step, idx) => {
+                const parsed = parsePreparationStep(step, idx);
+                const icons = ['🍲', '🥘', '♨️'];
+                const icon = icons[idx % icons.length];
+
+                return (
+                  <div
+                    key={idx}
+                    className="p-5 sm:p-6 bg-slate-50/70 hover:bg-purple-50/30 border border-slate-200/80 hover:border-purple-200 rounded-2xl transition-all duration-200 flex flex-col justify-start space-y-3 group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-1 rounded-lg bg-purple-100 text-[#7C3AED] font-black text-xs tracking-wider">
+                        Method 0{parsed.stepNum}
+                      </span>
+                      <span className="text-xl">{icon}</span>
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900 group-hover:text-[#7C3AED] transition-colors">
+                        {parsed.title}
+                      </h4>
+                      <p className="text-xs text-slate-600 font-medium leading-relaxed mt-2">
+                        {parsed.desc}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* ── FREQUENTLY BOUGHT TOGETHER ── */}
         {bundleProducts.length > 0 && (
