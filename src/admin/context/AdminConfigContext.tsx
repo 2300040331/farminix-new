@@ -111,6 +111,22 @@ const sanitizePaymentConfig = (raw: any): CheckoutPaymentConfig => {
   return merged;
 };
 
+const sanitizeProducts = (products: any[]): Product[] => {
+  if (!Array.isArray(products) || products.length === 0) {
+    return defaultSiteConfig.products;
+  }
+  return products.map((prod) => {
+    const cleanProd = { ...prod };
+    delete cleanProd.storySection;
+    if (cleanProd.id === 'r1' || cleanProd.name?.toLowerCase().includes('farminix')) {
+      if (!cleanProd.specifications || cleanProd.specifications.length < 5) {
+        cleanProd.specifications = defaultSiteConfig.products[0]?.specifications || cleanProd.specifications;
+      }
+    }
+    return cleanProd;
+  });
+};
+
 const AdminConfigContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -123,6 +139,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         return {
           ...defaultSiteConfig,
           ...parsed,
+          products: sanitizeProducts(parsed.products),
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
@@ -157,6 +174,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         return {
           ...defaultSiteConfig,
           ...parsed,
+          products: sanitizeProducts(parsed.products),
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
@@ -185,6 +203,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         return {
           ...defaultSiteConfig,
           ...parsed,
+          products: sanitizeProducts(parsed.products),
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
@@ -290,22 +309,31 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Save changes to draft & immediately publish to live store
   const saveConfig = (newConfig: AdminSiteConfig) => {
-    setConfig(newConfig);
-    setPublishedConfig(newConfig);
+    const sanitized = {
+      ...newConfig,
+      products: sanitizeProducts(newConfig.products),
+    };
+    setConfig(sanitized);
+    setPublishedConfig(sanitized);
     setHasChanges(false);
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(newConfig));
-      localStorage.setItem(PUBLISHED_KEY, JSON.stringify(newConfig));
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(sanitized));
+      localStorage.setItem(PUBLISHED_KEY, JSON.stringify(sanitized));
     } catch (e) {
       console.error('Failed to save & publish admin config', e);
     }
   };
 
   const publishConfig = () => {
+    const sanitized = {
+      ...config,
+      products: sanitizeProducts(config.products),
+    };
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(config));
-      localStorage.setItem(PUBLISHED_KEY, JSON.stringify(config));
-      setPublishedConfig(config);
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(sanitized));
+      localStorage.setItem(PUBLISHED_KEY, JSON.stringify(sanitized));
+      setConfig(sanitized);
+      setPublishedConfig(sanitized);
       setHasChanges(false);
     } catch (e) {
       console.error('Failed to publish admin config', e);

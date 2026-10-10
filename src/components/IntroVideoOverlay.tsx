@@ -22,6 +22,15 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
   });
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [isPlayBlocked, setIsPlayBlocked] = useState(false);
+  const [videoSrc, setVideoSrc] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 768 || /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+      if (isMobile) {
+        return '/farminix_intro_mobile.mp4';
+      }
+    }
+    return '/farminix_intro.mp4';
+  });
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleClose = () => {
@@ -57,7 +66,7 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
     return () => {
       video.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [videoSrc]);
 
   if (!isOpen) return null;
 
@@ -70,12 +79,18 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
       {/* ── Background Video Player (Edge-to-Edge) ── */}
       <video
         ref={videoRef}
-        src="/farminix_intro.mp4"
+        src={videoSrc}
         className="w-full h-full object-cover bg-[#EAEAEA] border-0 outline-hidden"
         autoPlay
         playsInline
         muted
         preload="auto"
+        onError={() => {
+          // If mobile video is not yet placed in public or fails to load, gracefully fallback to default
+          if (videoSrc !== '/farminix_intro.mp4') {
+            setVideoSrc('/farminix_intro.mp4');
+          }
+        }}
       />
 
       {/* ── Bottom Right Minimal Purple Skip Intro Button ── */}

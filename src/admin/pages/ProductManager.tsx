@@ -20,7 +20,7 @@ export const ProductManager: React.FC = () => {
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'basic' | 'nutrition' | 'highlights' | 'faqs' | 'story'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'specifications' | 'nutrition' | 'highlights' | 'faqs'>('basic');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   // Form State
@@ -38,9 +38,9 @@ export const ProductManager: React.FC = () => {
     reviewsCount: 100,
     inStock: true,
     stockCount: 50,
-    brand: 'Farminix Fresh',
+    brand: 'Farminix',
     description: '',
-    ingredients: ['100% Pure Natural'],
+    ingredients: ['100% Quality Harvest Milled Rice (Premium Select Grains)'],
     nutritionalInfo: {
       energy: '350 kcal',
       protein: '8 g',
@@ -54,7 +54,18 @@ export const ProductManager: React.FC = () => {
     ],
     benefits: ['Rich in essential natural nutrients', 'Zero artificial chemicals or polish'],
     specifications: [
-      { label: 'Dietary Preference', value: 'Vegetarian 🟢' },
+      { label: 'Brand', value: 'Farminix' },
+      { label: 'Product Name', value: 'Farminix Family Choice Rice' },
+      { label: 'Net Quantity', value: '26 Kg' },
+      { label: 'Dietary Preference', value: '100% Vegetarian 🟢' },
+      { label: 'FSSAI License No.', value: '20126142000933' },
+      { label: 'Manufactured & Marketed By', value: 'Farminix Private Limited' },
+      { label: 'Registered Address', value: 'Flat No 302, Srinivasa Towers, Gorantla, Guntur - 522034, Andhra Pradesh' },
+      { label: 'Customer Contact', value: '+91 7989743595' },
+      { label: 'Customer Support Email', value: 'info@farminix.in' },
+      { label: 'Official Website', value: 'www.farminix.in' },
+      { label: 'Shelf Life', value: '24 Months from Packaging Date' },
+      { label: 'Barcode', value: '8908032796002' },
       { label: 'Country of Origin', value: 'India' },
     ],
     howToUse: ['Use as desired in traditional Indian cooking.'],
@@ -62,84 +73,6 @@ export const ProductManager: React.FC = () => {
     faqs: [
       { question: 'Is this product 100% authentic?', answer: 'Yes, all Farminix staples are 100% genuine and verified.' },
     ],
-    storySection: {
-      headline: 'Pure Grains. Direct From Soil to Soul.',
-      subheadline:
-        'Farminix bridges generational Andhra paddy farmers and your dining table. Zero middlemen, zero chemical polishing, and zero stale godowns — just honest, farm-fresh rice delivered in minutes.',
-      tags: [
-        '100% Single-Origin Paddy',
-        'Naturally Aged for Fluffy Cook',
-        'FSSAI Lic. 20126142000933',
-      ],
-      founderTitle: "Founder's Reflection",
-      founderSubtitle: 'A Note from the Heart of Farminix • With Love to Every Household',
-      founderLetter:
-        'Dear Farminix Family,\n\nWhen you gather around the dinner table after a long day, a steaming bowl of rice is never just food. It is the comforting center of every family celebration, your grandmother’s timeless recipes, and the very feeling of coming home.\n\nWe started Farminix right here in Gorantla, Guntur with a deeply personal calling. We looked at standard grocery stores and saw rice that had spent 6 to 9 months inside dusty godowns, traded through five layers of commission middlemen, and subjected to harsh chemical polishes just to appear artificially white. Meanwhile, the generational farmers who woke up at dawn to tend the fertile Andhra soils were paid fractions of what families were charged.',
-      founderQuote:
-        '“Why should Indian families settle for chemically polished, stale grains when our villages harvest the most fragrant, wholesome paddy in the world?”',
-      founderSignoff:
-        'Farminix is our answer. We partner directly with verified grower families across Andhra Pradesh, mill through cutting-edge optical Sortex technology, and pack our hallmark 26 Kg Family Choice bags right at the source. No middlemen inflating prices. No artificial bleaching. Just pure, whole, naturally aged grains that cook fluffy, fragrant, and healthy.\n\nEvery sack that reaches your doorstep carries the blessing of our soil, the dignity of our farmers, and our sacred promise of purity to your family.\n\nWith endless gratitude & love,\nThe Farminix Team',
-      companyAddress:
-        'Farminix Private Limited • Flat No 302, Srinivasa Towers, Gorantla, Guntur – 522034, AP',
-      processTitle: 'From Soil to Dining Table',
-      processSubtitle: 'How Farminix Reinvents What You Eat',
-      processSteps: [
-        {
-          step: '01',
-          title: 'Sown in Guntur',
-          desc: 'Cultivated by trusted generational farming families in the nutrient-dense Krishna-Godavari river basin.',
-        },
-        {
-          step: '02',
-          title: 'Sortex Cleaned',
-          desc: 'Optical sensor cameras screen each grain, separating dust, stones, and broken pieces without chemical polish.',
-        },
-        {
-          step: '03',
-          title: 'Naturally Aged',
-          desc: 'Controlled resting optimizes starch retrogradation for maximum fluffiness and zero stickiness when boiled.',
-        },
-        {
-          step: '04',
-          title: 'Delivered Direct',
-          desc: 'Sealed in heavy-duty 26 Kg moisture-lock sacks and delivered directly to your doorstep by express logistics.',
-        },
-      ],
-      philosophyTitle: 'Our Operating Philosophy',
-      philosophySubtitle: 'Built on Dignity, Health & Transparency',
-      philosophyPillars: [
-        {
-          tag: 'Ethical Sourcing',
-          title: 'Direct Farmer Dignity',
-          desc: 'By cutting out commission agents, we pay farmers fair, upfront prices for their harvest, strengthening rural livelihoods.',
-          guarantee: 'Fair Trade Guarantee',
-        },
-        {
-          tag: 'Pure Health',
-          title: 'Zero Synthetic Polish',
-          desc: 'We refuse chemical bleaches, powders, and adulterants. You receive the honest, natural nutrient richness of each grain.',
-          guarantee: '100% Unadulterated',
-        },
-        {
-          tag: 'Durable Packaging',
-          title: '26 Kg Moisture-Lock Bags',
-          desc: 'Heavy-duty multi-layer sacks engineered to seal in farm freshness and resist external humidity, pests, and transit damage.',
-          guarantee: 'Certified Net Weight',
-        },
-        {
-          tag: 'Transparent Value',
-          title: 'Direct-to-Home Pricing',
-          desc: 'Premium quality at ₹1399 for 26 Kg (₹53.8/Kg) — passing wholesale supply-chain efficiencies straight to your household.',
-          guarantee: 'Honest Value',
-        },
-      ],
-      calloutTitle: 'Taste True Purity in Every Single Grain.',
-      calloutDesc:
-        'Upgrade your family’s daily meals with the authentic taste and aroma of Farminix Family Choice Rice. Delivered directly to your door.',
-      contactPhone: '+91 7989743595',
-      contactEmail: 'info@farminix.in',
-      contactLocation: 'Gorantla, Guntur – 522034, AP',
-    },
   };
 
   const [formData, setFormData] = useState<Product>(initialProductState);
@@ -403,9 +336,9 @@ export const ProductManager: React.FC = () => {
             <div className="flex gap-2 border-b border-slate-100 py-3 overflow-x-auto">
               {[
                 { id: 'basic', label: 'Basic Info' },
+                { id: 'specifications', label: '📋 Specifications' },
                 { id: 'nutrition', label: 'Nutritional Info' },
                 { id: 'highlights', label: 'Highlights & Benefits' },
-                { id: 'story', label: '🌾 Soil to Soul & Story' },
                 { id: 'faqs', label: 'FAQs & Storage' },
               ].map((tab) => (
                 <button
@@ -687,299 +620,122 @@ export const ProductManager: React.FC = () => {
                 </div>
               )}
 
-              {activeTab === 'story' && (
-                <div className="space-y-6">
-                  {/* Headline & Badges */}
-                  <div className="space-y-3 bg-purple-50/50 p-4 rounded-2xl border border-purple-150">
-                    <h3 className="text-xs font-black text-purple-950 uppercase tracking-wider">
-                      1. Brand Headline &amp; Tagline
-                    </h3>
+              {activeTab === 'specifications' && (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-purple-50/70 p-3.5 rounded-2xl border border-purple-150">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Headline</label>
-                      <input
-                        type="text"
-                        value={formData.storySection?.headline || 'Pure Grains. Direct From Soil to Soul.'}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            storySection: { ...(formData.storySection || {}), headline: e.target.value },
-                          })
-                        }
-                        className="w-full h-9 px-3 text-xs font-bold bg-white border border-slate-200 rounded-xl"
-                      />
+                      <h4 className="text-xs font-black text-purple-950 uppercase tracking-wider">
+                        Product Specifications Table
+                      </h4>
+                      <p className="text-[11px] text-purple-700 font-medium">
+                        Visible on the live product detail page under "📋 PRODUCT SPECIFICATIONS".
+                      </p>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Subheadline / Narrative</label>
-                      <textarea
-                        rows={2}
-                        value={formData.storySection?.subheadline || 'Farminix bridges generational Andhra paddy farmers and your dining table...'}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            storySection: { ...(formData.storySection || {}), subheadline: e.target.value },
-                          })
-                        }
-                        className="w-full p-2.5 text-xs bg-white border border-slate-200 rounded-xl font-medium"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Highlight Tags (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={(formData.storySection?.tags || ['100% Single-Origin Paddy', 'Naturally Aged for Fluffy Cook', 'FSSAI Lic. 20126142000933']).join(', ')}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            storySection: {
-                              ...(formData.storySection || {}),
-                              tags: e.target.value.split(',').map((t) => t.trim()).filter(Boolean),
-                            },
-                          })
-                        }
-                        className="w-full h-9 px-3 text-xs bg-white border border-slate-200 rounded-xl"
-                      />
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          specifications: [
+                            { label: 'Brand', value: formData.brand || 'Farminix' },
+                            { label: 'Product Name', value: formData.name || 'Farminix Family Choice Rice' },
+                            { label: 'Net Quantity', value: formData.weight || '26 Kg' },
+                            { label: 'Dietary Preference', value: '100% Vegetarian 🟢' },
+                            { label: 'FSSAI License No.', value: '20126142000933' },
+                            { label: 'Manufactured & Marketed By', value: 'Farminix Private Limited' },
+                            { label: 'Registered Address', value: 'Flat No 302, Srinivasa Towers, Gorantla, Guntur - 522034, Andhra Pradesh' },
+                            { label: 'Customer Contact', value: '+91 7989743595' },
+                            { label: 'Customer Support Email', value: 'info@farminix.in' },
+                            { label: 'Official Website', value: 'www.farminix.in' },
+                            { label: 'Shelf Life', value: '24 Months from Packaging Date' },
+                            { label: 'Barcode', value: '8908032796002' },
+                            { label: 'Country of Origin', value: 'India' },
+                          ],
+                        });
+                      }}
+                      className="px-3 py-1.5 text-[11px] font-bold text-purple-800 bg-white hover:bg-purple-100 rounded-xl border border-purple-200 transition-colors shadow-2xs self-start sm:self-auto cursor-pointer"
+                    >
+                      Load Farminix Specs Template
+                    </button>
                   </div>
 
-                  {/* Founder's Reflection */}
-                  <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                      2. Founder's Reflection &amp; Letter
-                    </h3>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Note Header / Subtitle</label>
-                      <input
-                        type="text"
-                        value={formData.storySection?.founderSubtitle || 'A Note from the Heart of Farminix • With Love to Every Household'}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            storySection: { ...(formData.storySection || {}), founderSubtitle: e.target.value },
-                          })
-                        }
-                        className="w-full h-9 px-3 text-xs bg-white border border-slate-200 rounded-xl font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Founder's Letter (Body)</label>
-                      <textarea
-                        rows={4}
-                        value={formData.storySection?.founderLetter || ''}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            storySection: { ...(formData.storySection || {}), founderLetter: e.target.value },
-                          })
-                        }
-                        className="w-full p-2.5 text-xs bg-white border border-slate-200 rounded-xl font-medium"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Central Calling Quote</label>
-                      <textarea
-                        rows={2}
-                        value={formData.storySection?.founderQuote || ''}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            storySection: { ...(formData.storySection || {}), founderQuote: e.target.value },
-                          })
-                        }
-                        className="w-full p-2.5 text-xs bg-white border border-slate-200 rounded-xl font-medium text-purple-900 italic"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Sign-off &amp; Team Promise</label>
-                      <textarea
-                        rows={3}
-                        value={formData.storySection?.founderSignoff || ''}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            storySection: { ...(formData.storySection || {}), founderSignoff: e.target.value },
-                          })
-                        }
-                        className="w-full p-2.5 text-xs bg-white border border-slate-200 rounded-xl font-medium"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Corporate / Registered Address</label>
-                      <input
-                        type="text"
-                        value={formData.storySection?.companyAddress || 'Farminix Private Limited • Flat No 302, Srinivasa Towers, Gorantla, Guntur – 522034, AP'}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            storySection: { ...(formData.storySection || {}), companyAddress: e.target.value },
-                          })
-                        }
-                        className="w-full h-9 px-3 text-xs bg-white border border-slate-200 rounded-xl"
-                      />
-                    </div>
-                  </div>
-
-                  {/* 4 Process Steps */}
-                  <div className="space-y-3 bg-purple-50/50 p-4 rounded-2xl border border-purple-150">
-                    <h3 className="text-xs font-black text-purple-950 uppercase tracking-wider">
-                      3. From Soil to Dining Table (4 Journey Steps)
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {(formData.storySection?.processSteps || [
-                        { step: '01', title: 'Sown in Guntur', desc: 'Cultivated by trusted generational farming families in the Krishna-Godavari basin.' },
-                        { step: '02', title: 'Sortex Cleaned', desc: 'Optical sensor cameras screen each grain, separating dust and stones without polish.' },
-                        { step: '03', title: 'Naturally Aged', desc: 'Controlled resting optimizes starch retrogradation for maximum fluffiness.' },
-                        { step: '04', title: 'Delivered Direct', desc: 'Sealed in heavy-duty 26 Kg moisture-lock sacks and delivered directly by express logistics.' },
-                      ]).map((proc, idx) => (
-                        <div key={idx} className="p-3 bg-white rounded-xl border border-purple-200/70 space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-black flex items-center justify-center">
-                              {proc.step}
-                            </span>
+                  <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                    {(!formData.specifications || formData.specifications.length === 0) ? (
+                      <div className="p-8 text-center border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-medium">
+                        No specifications added. Click "Load Farminix Specs Template" or "Add Specification Row" below.
+                      </div>
+                    ) : (
+                      formData.specifications.map((spec, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3 bg-slate-50/80 rounded-2xl border border-slate-200 flex items-start gap-2.5 hover:border-purple-300 transition-colors"
+                        >
+                          <div className="w-2/5">
+                            <label className="block text-[10px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">
+                              Specification Label
+                            </label>
                             <input
                               type="text"
-                              value={proc.title}
+                              value={spec.label}
                               onChange={(e) => {
-                                const steps = [...(formData.storySection?.processSteps || [])];
-                                steps[idx] = { ...steps[idx], title: e.target.value };
-                                setFormData({
-                                  ...formData,
-                                  storySection: { ...(formData.storySection || {}), processSteps: steps },
-                                });
+                                const list = [...(formData.specifications || [])];
+                                list[idx] = { ...list[idx], label: e.target.value };
+                                setFormData({ ...formData, specifications: list });
                               }}
-                              className="flex-1 h-7 px-2 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg"
+                              placeholder="e.g. Brand, FSSAI Lic."
+                              className="w-full h-8 px-2.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500"
                             />
                           </div>
-                          <textarea
-                            rows={2}
-                            value={proc.desc}
-                            onChange={(e) => {
-                              const steps = [...(formData.storySection?.processSteps || [])];
-                              steps[idx] = { ...steps[idx], desc: e.target.value };
-                              setFormData({
-                                ...formData,
-                                storySection: { ...(formData.storySection || {}), processSteps: steps },
-                              });
-                            }}
-                            className="w-full p-2 text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
 
-                  {/* 4 Philosophy Pillars */}
-                  <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                      4. Our Operating Philosophy (4 Core Pillars)
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {(formData.storySection?.philosophyPillars || [
-                        { tag: 'Ethical Sourcing', title: 'Direct Farmer Dignity', desc: 'Cutting out commission agents to pay farmers fair, upfront prices.', guarantee: 'Fair Trade Guarantee' },
-                        { tag: 'Pure Health', title: 'Zero Synthetic Polish', desc: 'Zero chemical bleaches, powders, or adulterants.', guarantee: '100% Unadulterated' },
-                        { tag: 'Durable Packaging', title: '26 Kg Moisture-Lock Bags', desc: 'Heavy-duty multi-layer sacks engineered to seal in farm freshness.', guarantee: 'Certified Net Weight' },
-                        { tag: 'Transparent Value', title: 'Direct-to-Home Pricing', desc: 'Premium quality at ₹1399 for 26 Kg — passing wholesale savings to families.', guarantee: 'Honest Value' },
-                      ]).map((pil, idx) => (
-                        <div key={idx} className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
-                          <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1">
+                            <label className="block text-[10px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">
+                              Specification Value
+                            </label>
                             <input
                               type="text"
-                              value={pil.title}
+                              value={spec.value}
                               onChange={(e) => {
-                                const pillars = [...(formData.storySection?.philosophyPillars || [])];
-                                pillars[idx] = { ...pillars[idx], title: e.target.value };
-                                setFormData({
-                                  ...formData,
-                                  storySection: { ...(formData.storySection || {}), philosophyPillars: pillars },
-                                });
+                                const list = [...(formData.specifications || [])];
+                                list[idx] = { ...list[idx], value: e.target.value };
+                                setFormData({ ...formData, specifications: list });
                               }}
-                              className="w-1/2 h-7 px-2 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg"
-                            />
-                            <input
-                              type="text"
-                              value={pil.guarantee}
-                              onChange={(e) => {
-                                const pillars = [...(formData.storySection?.philosophyPillars || [])];
-                                pillars[idx] = { ...pillars[idx], guarantee: e.target.value };
-                                setFormData({
-                                  ...formData,
-                                  storySection: { ...(formData.storySection || {}), philosophyPillars: pillars },
-                                });
-                              }}
-                              className="w-1/2 h-7 px-2 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg text-right"
+                              placeholder="e.g. Farminix, 26 Kg..."
+                              className="w-full h-8 px-2.5 text-xs font-extrabold text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500"
                             />
                           </div>
-                          <textarea
-                            rows={2}
-                            value={pil.desc}
-                            onChange={(e) => {
-                              const pillars = [...(formData.storySection?.philosophyPillars || [])];
-                              pillars[idx] = { ...pillars[idx], desc: e.target.value };
-                              setFormData({
-                                ...formData,
-                                storySection: { ...(formData.storySection || {}), philosophyPillars: pillars },
-                              });
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const list = (formData.specifications || []).filter((_, i) => i !== idx);
+                              setFormData({ ...formData, specifications: list });
                             }}
-                            className="w-full p-2 text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg"
-                          />
+                            className="mt-5 p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                            title="Delete row"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
-                      ))}
-                    </div>
+                      ))
+                    )}
                   </div>
 
-                  {/* Customer Contact */}
-                  <div className="space-y-3 bg-purple-50/50 p-4 rounded-2xl border border-purple-150">
-                    <h3 className="text-xs font-black text-purple-950 uppercase tracking-wider">
-                      5. Direct Customer Support &amp; Origin
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-600 mb-1">Phone</label>
-                        <input
-                          type="text"
-                          value={formData.storySection?.contactPhone || '+91 7989743595'}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              storySection: { ...(formData.storySection || {}), contactPhone: e.target.value },
-                            })
-                          }
-                          className="w-full h-8 px-2.5 text-xs bg-white border border-slate-200 rounded-xl"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-600 mb-1">Email</label>
-                        <input
-                          type="text"
-                          value={formData.storySection?.contactEmail || 'info@farminix.in'}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              storySection: { ...(formData.storySection || {}), contactEmail: e.target.value },
-                            })
-                          }
-                          className="w-full h-8 px-2.5 text-xs bg-white border border-slate-200 rounded-xl"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-600 mb-1">Location</label>
-                        <input
-                          type="text"
-                          value={formData.storySection?.contactLocation || 'Gorantla, Guntur – 522034, AP'}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              storySection: { ...(formData.storySection || {}), contactLocation: e.target.value },
-                            })
-                          }
-                          className="w-full h-8 px-2.5 text-xs bg-white border border-slate-200 rounded-xl"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const list = [...(formData.specifications || [])];
+                      list.push({ label: '', value: '' });
+                      setFormData({ ...formData, specifications: list });
+                    }}
+                    className="w-full py-2.5 border-2 border-dashed border-purple-300 hover:border-purple-500 hover:bg-purple-50/50 text-purple-700 text-xs font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add Specification Row</span>
+                  </button>
                 </div>
               )}
 
-              {/* Modal Footer */}
+"              {/* Modal Footer */}
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                 <button
                   type="button"
