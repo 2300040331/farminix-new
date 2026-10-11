@@ -39,7 +39,7 @@ export const MainHeader: React.FC = () => {
         <div className="flex items-center shrink-0">
           <div onClick={() => { setIsMobileMenuOpen(false); navigate('/'); }} className="flex items-center cursor-pointer group">
             <img
-              src={headerCfg.logoUrl || '/farminix_logo.png'}
+              src={headerCfg.logoUrl ? headerCfg.logoUrl : '/farminix_logo.png?v=2'}
               alt={headerCfg.logoAlt || 'Farminix Logo'}
               className="h-12 sm:h-12 md:h-14 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
             />
