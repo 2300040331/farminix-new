@@ -34,14 +34,14 @@ export const MainHeader: React.FC = () => {
 
   return (
     <header className="w-full bg-white border-b border-slate-100 sticky top-0 z-30 select-none shadow-xs">
-      <div className="max-w-7xl mx-auto h-16 sm:h-20 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4 w-full">
+      <div className="max-w-7xl mx-auto h-20 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-4 w-full">
         {/* Left: Farminix Logo */}
         <div className="flex items-center shrink-0">
           <div onClick={() => { setIsMobileMenuOpen(false); navigate('/'); }} className="flex items-center cursor-pointer group">
             <img
               src={headerCfg.logoUrl || '/farminix_logo.png'}
               alt={headerCfg.logoAlt || 'Farminix Logo'}
-              className="h-9 sm:h-12 md:h-14 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+              className="h-12 sm:h-12 md:h-14 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
             />
           </div>
         </div>
@@ -67,13 +67,13 @@ export const MainHeader: React.FC = () => {
         </nav>
 
         {/* Right: Cart Button & Mobile Menu Toggle */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs font-bold text-white bg-[#7C3AED] hover:bg-[#6D28D9] border border-transparent rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95"
+            className="relative flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2.5 sm:py-2 text-xs font-bold text-white bg-[#7C3AED] hover:bg-[#6D28D9] border border-transparent rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95"
             title="Open Shopping Cart"
           >
-            <ShoppingCart className="w-4 h-4 text-white shrink-0" />
+            <ShoppingCart className="w-5 h-5 sm:w-4 sm:h-4 text-white shrink-0" />
             <span className="hidden sm:inline">
               {headerCfg.cartButtonText || 'Cart'}{totalCartItems > 0 ? ` (${totalCartItems})` : ''}
             </span>
@@ -90,14 +90,14 @@ export const MainHeader: React.FC = () => {
           {/* Three-lines Hamburger Menu button (mobile only) */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-slate-700 hover:text-[#7C3AED] hover:bg-purple-50 rounded-xl transition-colors cursor-pointer border border-slate-200/80 active:scale-95 flex items-center justify-center"
+            className="md:hidden p-2.5 text-slate-700 hover:text-[#7C3AED] hover:bg-purple-50 rounded-xl transition-colors cursor-pointer border border-slate-200/80 active:scale-95 flex items-center justify-center"
             aria-label="Toggle Navigation Menu"
             title="Toggle Menu"
           >
             {isMobileMenuOpen ? (
-              <X className="w-5 h-5 stroke-[2.5]" />
+              <X className="w-6 h-6 stroke-[2.5]" />
             ) : (
-              <Menu className="w-5 h-5 stroke-[2.5]" />
+              <Menu className="w-6 h-6 stroke-[2.5]" />
             )}
           </button>
         </div>

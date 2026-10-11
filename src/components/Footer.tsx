@@ -10,11 +10,11 @@ export const Footer: React.FC = () => {
   if (!footerConfig.enabled) return null;
 
   return (
-    <footer className="w-full bg-slate-900 text-slate-300 border-t border-slate-800 pt-12 pb-8 select-none">
+    <footer className="w-full bg-slate-900 text-slate-300 border-t border-slate-800 pt-12 pb-12 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
           {/* Col 1: Brand & Socials (2 cols on lg) */}
           <div className="lg:col-span-2 text-left">
@@ -118,24 +118,6 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <div className="flex items-center gap-4 flex-wrap justify-center">
-            {footerConfig.legalLinks.map((l, i) => (
-              <React.Fragment key={l.id}>
-                <a href={l.url} className="hover:text-white transition-colors">
-                  {l.label}
-                </a>
-                {i < footerConfig.legalLinks.length - 1 && <span>•</span>}
-              </React.Fragment>
-            ))}
-          </div>
-
-          <div className="text-center sm:text-right font-medium">
-            {footerConfig.copyrightText}
-          </div>
         </div>
 
       </div>
