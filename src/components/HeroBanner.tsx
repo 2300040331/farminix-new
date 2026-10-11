@@ -17,9 +17,9 @@ export const HeroBanner: React.FC = () => {
         <img 
           src={(() => {
             const img = hero.bannerImage;
-            if (!img) return '/hero_banner_original.jpg?v=6';
+            if (!img) return '/hero_banner_original.jpg?v=7';
             if (img.startsWith('data:') || img.startsWith('blob:') || img.includes('?')) return img;
-            return `${img}?v=6`;
+            return `${img}?v=7`;
           })()} 
           alt={hero.altText || 'Farminix Fresh Groceries'} 
           className="w-full h-auto block" 
