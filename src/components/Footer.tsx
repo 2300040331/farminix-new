@@ -1,6 +1,6 @@
-import React from 'react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
+import { WHATSAPP_URL, WhatsAppIcon } from './WhatsAppButton';
 
 export const Footer: React.FC = () => {
   const { navigate, setIsSupportOpen } = useApp();
@@ -98,6 +98,17 @@ export const Footer: React.FC = () => {
 
             {/* Social Icons */}
             <div className="flex items-center gap-3">
+              {/* WhatsApp */}
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700/80 hover:bg-[#25D366] text-slate-350 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+                aria-label="WhatsApp"
+                title="Chat with Farminix on WhatsApp"
+              >
+                <WhatsAppIcon className="w-4 h-4" />
+              </a>
               {/* Instagram */}
               <a
                 href={footerConfig.socialLinks?.instagram && footerConfig.socialLinks.instagram !== '#' ? footerConfig.socialLinks.instagram : 'https://www.instagram.com'}

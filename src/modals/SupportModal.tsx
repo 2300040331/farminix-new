@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, MessageSquare, Phone, Send } from 'lucide-react';
+import { X, Phone, Send } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { WHATSAPP_URL, WhatsAppIcon } from '../components/WhatsAppButton';
 
 export const SupportModal: React.FC = () => {
   const { isSupportOpen, setIsSupportOpen } = useApp();
@@ -62,10 +63,10 @@ export const SupportModal: React.FC = () => {
         {/* Quick Contact Buttons */}
         <div className="grid grid-cols-2 gap-3 mt-4">
           <button
-            onClick={() => alert("Opening Farminix WhatsApp Support (+91 98765 43210)...")}
-            className="p-2.5 bg-emerald-50 hover:bg-emerald-100 text-[#15803D] rounded-xl border border-emerald-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+            onClick={() => window.open(WHATSAPP_URL, '_blank')}
+            className="p-2.5 bg-emerald-50 hover:bg-emerald-100 text-[#15803D] rounded-xl border border-emerald-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
-            <MessageSquare className="w-4 h-4" />
+            <WhatsAppIcon className="w-4 h-4 text-[#15803D]" />
             <span>WhatsApp Support</span>
           </button>
 

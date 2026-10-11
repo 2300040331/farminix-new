@@ -29,6 +29,7 @@ import { ProductModal } from './modals/ProductModal';
 import { TrackOrderModal } from './modals/TrackOrderModal';
 import { SupportModal } from './modals/SupportModal';
 import { IntroVideoOverlay } from './components/IntroVideoOverlay';
+import { WhatsAppFloatingButton } from './components/WhatsAppButton';
 
 export function AppContent() {
   const { currentRoute, navigate } = useApp();
@@ -143,6 +144,9 @@ export function AppContent() {
 
       {/* INTRO VIDEO OVERLAY ON SITE OPEN */}
       {currentRoute.pathname === '/' && <IntroVideoOverlay />}
+
+      {/* FLOATING WHATSAPP BUTTON */}
+      <WhatsAppFloatingButton />
     </div>
   );
 }
