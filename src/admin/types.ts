@@ -198,7 +198,7 @@ export interface FooterLink {
   id: string;
   label: string;
   url: string;
-  actionType?: 'support' | 'url';
+  actionType?: 'support' | 'url' | 'track' | 'cart';
 }
 
 export interface FooterConfig {
