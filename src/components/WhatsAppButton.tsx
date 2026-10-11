@@ -22,17 +22,9 @@ export const WhatsAppFloatingButton: React.FC = () => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with Farminix on WhatsApp"
-      className="group fixed bottom-6 right-5 sm:right-6 z-40 flex items-center gap-2.5 bg-[#25D366] hover:bg-[#20BD5A] text-white p-3.5 sm:pl-3.5 sm:pr-4 sm:py-2.5 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+      className="fixed bottom-6 right-5 sm:right-6 z-40 w-14 h-14 bg-[#25D366] hover:bg-[#20BD5A] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
     >
-      <div className="relative flex items-center justify-center">
-        <WhatsAppIcon className="w-6 h-6 text-white" />
-        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-200 border-2 border-[#25D366] rounded-full animate-ping" />
-        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white border-2 border-[#25D366] rounded-full" />
-      </div>
-      <div className="hidden sm:flex flex-col text-left leading-tight">
-        <span className="text-[10px] font-semibold text-emerald-100 uppercase tracking-wider">Chat with us</span>
-        <span className="text-xs font-black text-white">WhatsApp</span>
-      </div>
+      <WhatsAppIcon className="w-7 h-7 text-white" />
     </a>
   );
 };
