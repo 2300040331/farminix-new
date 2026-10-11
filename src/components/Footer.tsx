@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
 export const Footer: React.FC = () => {
-  const { navigate, setIsSupportOpen, setIsTrackOrderOpen, setIsCartOpen } = useApp();
+  const { navigate, setIsSupportOpen } = useApp();
   const { publishedConfig } = useAdminConfig();
   const footerConfig = publishedConfig.footer;
 
@@ -17,27 +17,12 @@ export const Footer: React.FC = () => {
     { id: 'c5', label: 'Special Offers', url: '/offers' },
   ];
 
-  const defaultHelpLinks = [
-    { id: 'h1', label: '24/7 Live Support', actionType: 'support' },
-    { id: 'h2', label: 'Track Order', actionType: 'track' },
-    { id: 'h3', label: 'Shopping Cart', actionType: 'cart' },
-    { id: 'h4', label: 'FAQs & Help', actionType: 'support' },
-    { id: 'h5', label: 'Contact Us', actionType: 'support' },
-  ];
-
   const companyLinks =
     footerConfig.companyLinks &&
     footerConfig.companyLinks.length > 0 &&
     !footerConfig.companyLinks.some((l) => l.label === 'Career' || l.label === 'Blog')
       ? footerConfig.companyLinks
       : defaultCompanyLinks;
-
-  const helpLinks =
-    footerConfig.helpLinks &&
-    footerConfig.helpLinks.length > 0 &&
-    !footerConfig.helpLinks.some((l) => l.label === 'Shipping & Delivery' || l.label === 'Returns & Refunds')
-      ? footerConfig.helpLinks
-      : defaultHelpLinks;
 
   const handleLinkClick = (item: { label: string; url?: string; actionType?: string }) => {
     const label = item.label.toLowerCase();
@@ -50,16 +35,6 @@ export const Footer: React.FC = () => {
       label.includes('contact')
     ) {
       setIsSupportOpen(true);
-      return;
-    }
-
-    if (item.actionType === 'track' || label.includes('track')) {
-      setIsTrackOrderOpen(true);
-      return;
-    }
-
-    if (item.actionType === 'cart' || label.includes('cart') || label.includes('bag')) {
-      setIsCartOpen(true);
       return;
     }
 
@@ -103,11 +78,11 @@ export const Footer: React.FC = () => {
     <footer className="w-full bg-slate-900 text-slate-300 border-t border-slate-800 pt-12 pb-12 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Main Footer Layout */}
+        <div className="flex flex-col md:flex-row items-start justify-between gap-10">
           
-          {/* Col 1: Brand & Socials (2 cols on lg) */}
-          <div className="lg:col-span-2 text-left">
+          {/* Brand & Socials */}
+          <div className="text-left max-w-md">
             <div onClick={() => navigate('/')} className="inline-block mb-3.5 group select-none cursor-pointer">
               <div className="inline-flex items-center bg-white px-3.5 py-1.5 rounded-xl shadow-xs transition-transform duration-200 group-hover:scale-105">
                 <img
@@ -166,32 +141,13 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Col 2: Company */}
-          <div className="text-left">
+          {/* Company Links */}
+          <div className="text-left min-w-[160px]">
             <h3 className="text-xs font-black text-white uppercase tracking-wider mb-4">
               Company
             </h3>
             <ul className="space-y-2.5 text-xs text-slate-300 font-medium">
               {companyLinks.map((link) => (
-                <li key={link.id}>
-                  <button
-                    onClick={() => handleLinkClick(link)}
-                    className="hover:text-purple-300 transition-colors cursor-pointer text-left block"
-                  >
-                    {link.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 3: Help */}
-          <div className="text-left">
-            <h3 className="text-xs font-black text-white uppercase tracking-wider mb-4">
-              Help &amp; Support
-            </h3>
-            <ul className="space-y-2.5 text-xs text-slate-300 font-medium">
-              {helpLinks.map((link) => (
                 <li key={link.id}>
                   <button
                     onClick={() => handleLinkClick(link)}
@@ -210,4 +166,3 @@ export const Footer: React.FC = () => {
     </footer>
   );
 };
-
