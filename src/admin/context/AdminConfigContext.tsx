@@ -141,6 +141,25 @@ const sanitizeProducts = (products: any[]): Product[] => {
   });
 };
 
+const sanitizeFooter = (raw: any): FooterConfig => {
+  const merged = { ...defaultSiteConfig.footer, ...(raw || {}) };
+  if (
+    !merged.companyLinks ||
+    merged.companyLinks.length === 0 ||
+    merged.companyLinks.some((l: any) => l.label === 'Career' || l.label === 'Blog' || l.url === '#')
+  ) {
+    merged.companyLinks = defaultSiteConfig.footer.companyLinks;
+  }
+  if (
+    !merged.helpLinks ||
+    merged.helpLinks.length === 0 ||
+    merged.helpLinks.some((l: any) => l.label === 'Shipping & Delivery' || l.label === 'Returns & Refunds')
+  ) {
+    merged.helpLinks = defaultSiteConfig.footer.helpLinks;
+  }
+  return merged;
+};
+
 const AdminConfigContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -155,7 +174,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           ...parsed,
           products: sanitizeProducts(parsed.products),
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
-          footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
+          footer: sanitizeFooter(parsed.footer),
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: sanitizeAboutPage(parsed.aboutPage),
@@ -190,7 +209,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           ...parsed,
           products: sanitizeProducts(parsed.products),
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
-          footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
+          footer: sanitizeFooter(parsed.footer),
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: sanitizeAboutPage(parsed.aboutPage),

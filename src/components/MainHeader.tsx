@@ -41,7 +41,7 @@ export const MainHeader: React.FC = () => {
             <img
               src={headerCfg.logoUrl ? headerCfg.logoUrl : '/farminix_logo.png?v=2'}
               alt={headerCfg.logoAlt || 'Farminix Logo'}
-              className="h-12 sm:h-12 md:h-14 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
             />
           </div>
         </div>

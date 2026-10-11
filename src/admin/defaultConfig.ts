@@ -477,8 +477,8 @@ export const defaultSiteConfig: AdminSiteConfig = {
   },
   footer: {
     enabled: true,
-    logoUrl: '/farminix_logo.png',
-    bioText: 'Your trusted partner for quality groceries. Fresh produce, authentic staples, and instant 10-minute home delivery.',
+    logoUrl: '/farminix_logo.png?v=2',
+    bioText: 'Your trusted partner for premium staples and authentic grains. Pure quality, farm-direct freshness, and reliable doorstep delivery.',
     socialLinks: {
       instagram: 'https://www.instagram.com',
       facebook: 'https://www.facebook.com',
@@ -486,16 +486,18 @@ export const defaultSiteConfig: AdminSiteConfig = {
       youtube: 'https://www.youtube.com',
     },
     companyLinks: [
-      { id: 'c1', label: 'About Us', url: '#' },
-      { id: 'c2', label: 'Career', url: '#' },
-      { id: 'c3', label: 'Blog', url: '#' },
-      { id: 'c4', label: 'Contact Us', url: '#', actionType: 'support' },
+      { id: 'c1', label: 'Home', url: '/' },
+      { id: 'c2', label: 'Products', url: '/products' },
+      { id: 'c3', label: 'About Farminix', url: '/about' },
+      { id: 'c4', label: 'Manufacturer', url: '/manufacturer' },
+      { id: 'c5', label: 'Special Offers', url: '/offers' },
     ],
     helpLinks: [
-      { id: 'h1', label: 'FAQs', url: '#', actionType: 'support' },
-      { id: 'h2', label: 'Shipping & Delivery', url: '#' },
-      { id: 'h3', label: 'Returns & Refunds', url: '#' },
-      { id: 'h4', label: 'Terms & Conditions', url: '#' },
+      { id: 'h1', label: '24/7 Live Support', url: '#', actionType: 'support' },
+      { id: 'h2', label: 'Track Order', url: '#', actionType: 'track' },
+      { id: 'h3', label: 'Shopping Cart', url: '#', actionType: 'cart' },
+      { id: 'h4', label: 'FAQs & Help', url: '#', actionType: 'support' },
+      { id: 'h5', label: 'Contact Us', url: '#', actionType: 'support' },
     ],
     downloadApp: {
       googlePlayUrl: '#',
@@ -507,7 +509,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
       { id: 'l3', label: 'Refund Policy', url: '#' },
       { id: 'l4', label: 'Disclaimer', url: '#' },
     ],
-    copyrightText: '© 2025 Farminix. All rights reserved.',
+    copyrightText: '',
   },
   offersPage: {
     enabled: true,

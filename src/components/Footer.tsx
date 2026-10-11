@@ -3,11 +3,101 @@ import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
 export const Footer: React.FC = () => {
-  const { setIsSupportOpen } = useApp();
+  const { navigate, setIsSupportOpen, setIsTrackOrderOpen, setIsCartOpen } = useApp();
   const { publishedConfig } = useAdminConfig();
   const footerConfig = publishedConfig.footer;
 
   if (!footerConfig.enabled) return null;
+
+  const defaultCompanyLinks = [
+    { id: 'c1', label: 'Home', url: '/' },
+    { id: 'c2', label: 'Products', url: '/products' },
+    { id: 'c3', label: 'About Farminix', url: '/about' },
+    { id: 'c4', label: 'Manufacturer', url: '/manufacturer' },
+    { id: 'c5', label: 'Special Offers', url: '/offers' },
+  ];
+
+  const defaultHelpLinks = [
+    { id: 'h1', label: '24/7 Live Support', actionType: 'support' },
+    { id: 'h2', label: 'Track Order', actionType: 'track' },
+    { id: 'h3', label: 'Shopping Cart', actionType: 'cart' },
+    { id: 'h4', label: 'FAQs & Help', actionType: 'support' },
+    { id: 'h5', label: 'Contact Us', actionType: 'support' },
+  ];
+
+  const companyLinks =
+    footerConfig.companyLinks &&
+    footerConfig.companyLinks.length > 0 &&
+    !footerConfig.companyLinks.some((l) => l.label === 'Career' || l.label === 'Blog')
+      ? footerConfig.companyLinks
+      : defaultCompanyLinks;
+
+  const helpLinks =
+    footerConfig.helpLinks &&
+    footerConfig.helpLinks.length > 0 &&
+    !footerConfig.helpLinks.some((l) => l.label === 'Shipping & Delivery' || l.label === 'Returns & Refunds')
+      ? footerConfig.helpLinks
+      : defaultHelpLinks;
+
+  const handleLinkClick = (item: { label: string; url?: string; actionType?: string }) => {
+    const label = item.label.toLowerCase();
+    const url = item.url || '';
+
+    if (
+      item.actionType === 'support' ||
+      label.includes('support') ||
+      label.includes('faq') ||
+      label.includes('contact')
+    ) {
+      setIsSupportOpen(true);
+      return;
+    }
+
+    if (item.actionType === 'track' || label.includes('track')) {
+      setIsTrackOrderOpen(true);
+      return;
+    }
+
+    if (item.actionType === 'cart' || label.includes('cart') || label.includes('bag')) {
+      setIsCartOpen(true);
+      return;
+    }
+
+    if (url === '/' || label === 'home') {
+      navigate('/');
+      return;
+    }
+
+    if (url === '/products' || label.includes('product') || label.includes('shop')) {
+      navigate('/products');
+      return;
+    }
+
+    if (url === '/about' || label.includes('about')) {
+      navigate('/about');
+      return;
+    }
+
+    if (url === '/manufacturer' || label.includes('manufacturer')) {
+      navigate('/manufacturer');
+      return;
+    }
+
+    if (url === '/offers' || label.includes('offer') || label.includes('deal')) {
+      navigate('/offers');
+      return;
+    }
+
+    if (url && url !== '#' && !url.startsWith('#')) {
+      if (url.startsWith('/')) {
+        navigate(url);
+      } else {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    } else {
+      setIsSupportOpen(true);
+    }
+  };
 
   return (
     <footer className="w-full bg-slate-900 text-slate-300 border-t border-slate-800 pt-12 pb-12 select-none">
@@ -18,15 +108,17 @@ export const Footer: React.FC = () => {
           
           {/* Col 1: Brand & Socials (2 cols on lg) */}
           <div className="lg:col-span-2 text-left">
-            <a href="/" className="inline-block mb-3 group select-none">
-              <img
-                src={footerConfig.logoUrl || '/farminix_logo.png'}
-                alt="Farminix Logo"
-                className="h-10 sm:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105 brightness-110"
-              />
-            </a>
+            <div onClick={() => navigate('/')} className="inline-block mb-3.5 group select-none cursor-pointer">
+              <div className="inline-flex items-center bg-white px-3.5 py-1.5 rounded-xl shadow-xs transition-transform duration-200 group-hover:scale-105">
+                <img
+                  src={footerConfig.logoUrl ? footerConfig.logoUrl : '/farminix_logo.png?v=2'}
+                  alt="Farminix Logo"
+                  className="h-7 sm:h-8 w-auto object-contain"
+                />
+              </div>
+            </div>
             <p className="text-xs text-slate-400 font-normal max-w-sm mb-5 leading-relaxed">
-              {footerConfig.bioText}
+              {footerConfig.bioText || 'Your trusted partner for premium staples and authentic grains. Pure quality, farm-direct freshness, and reliable doorstep delivery.'}
             </p>
 
             {/* Social Icons */}
@@ -80,17 +172,14 @@ export const Footer: React.FC = () => {
               Company
             </h3>
             <ul className="space-y-2.5 text-xs text-slate-300 font-medium">
-              {footerConfig.companyLinks.map((link) => (
+              {companyLinks.map((link) => (
                 <li key={link.id}>
-                  {link.actionType === 'support' ? (
-                    <button onClick={() => setIsSupportOpen(true)} className="hover:text-purple-300 transition-colors cursor-pointer">
-                      {link.label}
-                    </button>
-                  ) : (
-                    <a href={link.url} className="hover:text-purple-300 transition-colors">
-                      {link.label}
-                    </a>
-                  )}
+                  <button
+                    onClick={() => handleLinkClick(link)}
+                    className="hover:text-purple-300 transition-colors cursor-pointer text-left block"
+                  >
+                    {link.label}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -99,20 +188,17 @@ export const Footer: React.FC = () => {
           {/* Col 3: Help */}
           <div className="text-left">
             <h3 className="text-xs font-black text-white uppercase tracking-wider mb-4">
-              Help
+              Help &amp; Support
             </h3>
             <ul className="space-y-2.5 text-xs text-slate-300 font-medium">
-              {footerConfig.helpLinks.map((link) => (
+              {helpLinks.map((link) => (
                 <li key={link.id}>
-                  {link.actionType === 'support' ? (
-                    <button onClick={() => setIsSupportOpen(true)} className="hover:text-purple-300 transition-colors cursor-pointer">
-                      {link.label}
-                    </button>
-                  ) : (
-                    <a href={link.url} className="hover:text-purple-300 transition-colors">
-                      {link.label}
-                    </a>
-                  )}
+                  <button
+                    onClick={() => handleLinkClick(link)}
+                    className="hover:text-purple-300 transition-colors cursor-pointer text-left block"
+                  >
+                    {link.label}
+                  </button>
                 </li>
               ))}
             </ul>
