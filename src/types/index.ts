@@ -71,8 +71,8 @@ export interface Product {
   image: string;
   galleryImages?: string[];
   deliveryTime: string;
-  rating: number;
-  reviewsCount: number;
+  rating?: number;
+  reviewsCount?: number;
   inStock: boolean;
   stockCount: number;
   brand: string;

@@ -39,7 +39,7 @@ export const CategoryPage: React.FC = () => {
     navigate,
   } = useApp();
 
-  const [sortBy, setSortBy] = useState<'popular' | 'price_asc' | 'price_desc' | 'rating'>('popular');
+  const [sortBy, setSortBy] = useState<'popular' | 'price_asc' | 'price_desc'>('popular');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
@@ -121,8 +121,7 @@ export const CategoryPage: React.FC = () => {
   filtered = [...filtered].sort((a, b) => {
     if (sortBy === 'price_asc') return a.price - b.price;
     if (sortBy === 'price_desc') return b.price - a.price;
-    if (sortBy === 'rating') return b.rating - a.rating;
-    return b.reviewsCount - a.reviewsCount; // popular
+    return (b.stockCount || 0) - (a.stockCount || 0); // popular
   });
 
   const isPriceFiltered = priceRange.min > absoluteMin || priceRange.max < absoluteMax;
@@ -215,7 +214,7 @@ export const CategoryPage: React.FC = () => {
             {/* Sort */}
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-gray-500">Sort:</span>
-              {(['popular', 'price_asc', 'price_desc', 'rating'] as const).map(s => (
+              {(['popular', 'price_asc', 'price_desc'] as const).map(s => (
                 <button
                   key={s}
                   onClick={() => setSortBy(s)}
@@ -225,7 +224,7 @@ export const CategoryPage: React.FC = () => {
                       : 'bg-white text-gray-600 border-gray-200 hover:border-[#7C3AED] hover:text-[#7C3AED]'
                   }`}
                 >
-                  {s === 'popular' ? 'Popular' : s === 'price_asc' ? 'Price ↑' : s === 'price_desc' ? 'Price ↓' : 'Rating'}
+                  {s === 'popular' ? 'Popular' : s === 'price_asc' ? 'Price ↑' : 'Price ↓'}
                 </button>
               ))}
             </div>
@@ -315,12 +314,6 @@ export const CategoryPage: React.FC = () => {
                         alt={product.name}
                         className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                       />
-
-                      {/* Rating Badge (top-left) */}
-                      <div className="absolute top-3 left-3 bg-white/70 backdrop-blur-md px-2 py-0.75 rounded-md text-[10px] font-extrabold text-slate-800 flex items-center gap-0.5 shadow-2xs border border-white/40">
-                        <span>⭐</span>
-                        <span>{product.rating}</span>
-                      </div>
 
                       {/* Wishlist Heart Overlay */}
                       <button
@@ -435,7 +428,6 @@ export const CategoryPage: React.FC = () => {
                     <div key={product.id} className="bg-white rounded-[16px] border border-gray-100 shadow-[0_4px_18px_rgba(0,0,0,0.06)] flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-all duration-200">
                       <div className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0" onClick={() => { setActiveCategoryPage(null); navigate('/product/' + getProductSlug(product.name)); }}>
                         <img src={product.image} alt={product.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" />
-                        <div className="absolute top-3 left-3 bg-white/70 backdrop-blur-md px-2 py-0.75 rounded-md text-[10px] font-extrabold text-slate-800 flex items-center gap-0.5 shadow-2xs border border-white/40"><span>⭐</span><span>{product.rating}</span></div>
                         <button onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }} className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/75 backdrop-blur-md shadow-xs border border-white/50 flex items-center justify-center text-slate-400 hover:text-red-500 hover:scale-110 active:scale-95 transition-all cursor-pointer z-10">
                           <Heart className={`w-4 h-4 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
                         </button>

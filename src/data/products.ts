@@ -16,8 +16,6 @@ export const farminixRiceProduct: Product = {
   image: '/farminix_rice_front.png',
   galleryImages: ['/farminix_rice_back.png'],
   deliveryTime: 'Express Delivery (10-30 Mins)',
-  rating: 4.9,
-  reviewsCount: 2840,
   inStock: true,
   stockCount: 150,
   brand: 'Farminix',
@@ -100,38 +98,6 @@ export const farminixRiceProduct: Product = {
     {
       question: 'How many servings are in a 26 Kg bag?',
       answer: 'Based on the standard 45g (1/4 cup) serving size, each 26 Kg pack provides over 260+ wholesome servings.',
-    },
-  ],
-  reviewsList: [
-    {
-      id: 'rev-1',
-      userName: 'Priya S.',
-      rating: 5,
-      date: 'Yesterday',
-      verified: true,
-      comment:
-        'Farminix Family Choice Rice has truly surpassed our expectations. Grains are spotless, aroma is delightful, and it cooks fluffy without getting mushy. The 26 Kg bag arrived in pristine condition!',
-      helpfulCount: 54,
-    },
-    {
-      id: 'rev-2',
-      userName: 'Venkatesh Rao',
-      rating: 5,
-      date: '3 days ago',
-      verified: true,
-      comment:
-        'Best everyday rice in Guntur. Having the genuine Farminix 26kg bag delivered straight home saves a lot of supermarket hassle. Taste and texture are 10/10.',
-      helpfulCount: 38,
-    },
-    {
-      id: 'rev-3',
-      userName: 'Lakshmi Narayana',
-      rating: 5,
-      date: '1 week ago',
-      verified: true,
-      comment:
-        'Clean, long grains with great cooking consistency. Perfectly packed bag. Very happy with the quality from Farminix.',
-      helpfulCount: 22,
     },
   ],
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
-  Heart, Minus, Plus, SlidersHorizontal, Star,
+  Heart, Minus, Plus, SlidersHorizontal,
   ShoppingBag, Tag, Truck, Shield,
   Eye, RotateCcw, ChevronDown, ChevronUp, Clock, Zap, Gift, ArrowLeft,
 } from 'lucide-react';
@@ -57,7 +57,6 @@ const SORT_OPTIONS = [
   { id: 'popular',  label: 'Popular' },
   { id: 'price_asc', label: 'Price ↑' },
   { id: 'price_desc', label: 'Price ↓' },
-  { id: 'rating',   label: '⭐ Rating' },
 ] as const;
 type SortId = typeof SORT_OPTIONS[number]['id'];
 
@@ -103,8 +102,6 @@ interface FilterProps {
   availableBrands: string[];
   selectedBrands: string[];
   onBrandToggle: (b: string) => void;
-  minRating: number | null;
-  onRatingChange: (r: number | null) => void;
   anyActive: boolean;
   onClearAll: () => void;
 }
@@ -113,10 +110,9 @@ const FilterSidebar: React.FC<FilterProps> = ({
   absoluteMin, absoluteMax, priceRange, onPriceChange,
   availableCategories, selectedCategories, onCategoryToggle,
   availableBrands, selectedBrands, onBrandToggle,
-  minRating, onRatingChange,
   anyActive, onClearAll,
 }) => {
-  const [open, setOpen] = useState({ price: true, category: true, brand: false, rating: true });
+  const [open, setOpen] = useState({ price: true, category: true, brand: false });
   const toggle = (k: keyof typeof open) => setOpen(o => ({ ...o, [k]: !o[k] }));
 
   return (
@@ -206,35 +202,6 @@ const FilterSidebar: React.FC<FilterProps> = ({
         )}
       </div>
 
-      {/* Rating */}
-      <div className="offers-filter-section">
-        <button onClick={() => toggle('rating')} className="flex items-center justify-between w-full mb-3 cursor-pointer">
-          <span className="text-xs font-extrabold text-slate-700">Rating</span>
-          {open.rating ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
-        </button>
-        {open.rating && (
-          <div className="flex flex-col gap-1">
-            {[4.5, 4, 3.5].map(r => (
-              <button
-                key={r}
-                onClick={() => onRatingChange(minRating === r ? null : r)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  minRating === r
-                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                    : 'text-slate-600 hover:bg-slate-50 border border-transparent'
-                }`}
-              >
-                <div className="flex gap-0.5">
-                  {[1,2,3,4,5].map(s => (
-                    <Star key={s} className={`w-3 h-3 ${s <= Math.floor(r) ? 'fill-amber-400 text-amber-400' : s === Math.ceil(r) && r % 1 !== 0 ? 'fill-amber-200 text-amber-400' : 'text-slate-200 fill-slate-200'}`} />
-                  ))}
-                </div>
-                <span>{r}★ & above</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 };
@@ -279,7 +246,6 @@ export const OffersPage: React.FC = () => {
   const [priceRange,          setPriceRange]          = useState<PriceRange>(() => loadSavedPriceRange(0, 99999));
   const [selectedCategories,  setSelectedCategories]  = useState<string[]>([]);
   const [selectedBrands,      setSelectedBrands]      = useState<string[]>([]);
-  const [minRating,           setMinRating]           = useState<number | null>(null);
   const [sortBy,              setSortBy]              = useState<SortId>('discount');
   const [drawerOpen,          setDrawerOpen]          = useState(false);
   const [heartAnimIds,        setHeartAnimIds]        = useState<Set<string>>(new Set());
@@ -322,13 +288,12 @@ export const OffersPage: React.FC = () => {
     clearSavedPriceRange();
     setSelectedCategories([]);
     setSelectedBrands([]);
-    setMinRating(null);
     setSortBy('discount');
   }, [absoluteMin, absoluteMax]);
 
   const anyActive = activeChip !== 'all' ||
     priceRange.min > absoluteMin || priceRange.max < absoluteMax ||
-    selectedCategories.length > 0 || selectedBrands.length > 0 || minRating !== null;
+    selectedCategories.length > 0 || selectedBrands.length > 0;
 
   // ── Filtered + sorted products ────────────────────────────────────────────
   const chipMin = OFFER_CHIPS.find(c => c.id === activeChip)?.minDiscount ?? 0;
@@ -344,7 +309,6 @@ export const OffersPage: React.FC = () => {
     list = list.filter(p => p.price >= priceRange.min && p.price <= priceRange.max);
     if (selectedCategories.length) list = list.filter(p => selectedCategories.includes(p.category));
     if (selectedBrands.length)    list = list.filter(p => selectedBrands.includes(p.brand));
-    if (minRating)                list = list.filter(p => p.rating >= minRating);
 
     return [...list].sort((a, b) => {
       const da = Math.round(((a.oldPrice - a.price) / a.oldPrice) * 100);
@@ -352,10 +316,9 @@ export const OffersPage: React.FC = () => {
       if (sortBy === 'discount')   return db - da;
       if (sortBy === 'price_asc')  return a.price - b.price;
       if (sortBy === 'price_desc') return b.price - a.price;
-      if (sortBy === 'rating')     return b.rating - a.rating;
-      return b.reviewsCount - a.reviewsCount;
+      return (b.stockCount || 0) - (a.stockCount || 0);
     });
-  }, [discountedProducts, chipMin, priceRange, selectedCategories, selectedBrands, minRating, sortBy]);
+  }, [discountedProducts, chipMin, priceRange, selectedCategories, selectedBrands, sortBy]);
 
   // ── Trending products (top 9 by discount %) ───────────────────────────────
   const trendingProducts = useMemo(() => {
@@ -372,7 +335,6 @@ export const OffersPage: React.FC = () => {
     absoluteMin, absoluteMax, priceRange, onPriceChange: handlePriceChange,
     availableCategories, selectedCategories, onCategoryToggle: handleCategoryToggle,
     availableBrands, selectedBrands, onBrandToggle: handleBrandToggle,
-    minRating, onRatingChange: setMinRating,
     anyActive, onClearAll: clearAll,
   };
 
@@ -695,11 +657,6 @@ export const OffersPage: React.FC = () => {
                           alt={product.name}
                           className="w-full h-full object-contain p-2 transition-transform duration-400 hover:scale-110"
                         />
-
-                        {/* Rating badge */}
-                        <div className="absolute top-2 left-2 bg-white/80 backdrop-blur-md px-2 py-0.5 rounded-lg text-[10px] font-extrabold text-slate-800 flex items-center gap-0.5 shadow-sm border border-white/40">
-                          ⭐ {product.rating}
-                        </div>
 
                         {/* Wishlist */}
                         <button

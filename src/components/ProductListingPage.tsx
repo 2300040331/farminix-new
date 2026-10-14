@@ -43,7 +43,7 @@ export const ProductListingPage: React.FC = () => {
   const filteredProducts = useMemo(() => {
     let list = allProducts;
     if (filterQuery === 'popular') {
-      list = allProducts.filter((p) => p.rating >= 4.7);
+      list = allProducts;
     }
     if (!searchQuery && !categoryQuery) return list;
 
@@ -184,10 +184,6 @@ export const ProductListingPage: React.FC = () => {
                           alt={product.name}
                           className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute top-3 left-3 bg-white/70 backdrop-blur-md px-2 py-0.75 rounded-md text-[10px] font-extrabold text-slate-800 flex items-center gap-0.5 shadow-2xs border border-white/40">
-                          <span>⭐</span>
-                          <span>{product.rating}</span>
-                        </div>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -281,11 +277,6 @@ export const ProductListingPage: React.FC = () => {
                         alt={product.name}
                         className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                       />
-                      {/* Rating Badge */}
-                      <div className="absolute top-3 left-3 bg-white/70 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-extrabold text-slate-800 flex items-center gap-0.5 shadow-sm border border-white/40">
-                        <span>⭐</span>
-                        <span>{product.rating}</span>
-                      </div>
                       {/* Wishlist */}
                       <button
                         onClick={(e) => {

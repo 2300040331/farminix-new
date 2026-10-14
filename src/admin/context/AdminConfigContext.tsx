@@ -132,6 +132,9 @@ const sanitizeProducts = (products: any[]): Product[] => {
   return products.map((prod) => {
     const cleanProd = { ...prod };
     delete cleanProd.storySection;
+    delete cleanProd.rating;
+    delete cleanProd.reviewsCount;
+    delete cleanProd.reviewsList;
     if (cleanProd.id === 'r1' || cleanProd.name?.toLowerCase().includes('farminix')) {
       if (!cleanProd.specifications || cleanProd.specifications.length < 5) {
         cleanProd.specifications = defaultSiteConfig.products[0]?.specifications || cleanProd.specifications;

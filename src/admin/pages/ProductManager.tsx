@@ -34,8 +34,6 @@ export const ProductManager: React.FC = () => {
     weightOptions: ['500 g', '1 kg', '2 kg'],
     image: '/prod_daawat_rice.jpg',
     deliveryTime: '10 Mins',
-    rating: 4.8,
-    reviewsCount: 100,
     inStock: true,
     stockCount: 50,
     brand: 'Farminix',
@@ -440,25 +438,7 @@ export const ProductManager: React.FC = () => {
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Product Rating (0 - 5)</label>
-                      <input
-                        type="text"
-                        value={formData.rating || 4.8}
-                        onChange={(e) => setFormData({ ...formData, rating: Number(e.target.value.replace(/[^0-9.]/g, '')) || 0 })}
-                        className="w-full h-10 px-3 text-xs font-semibold text-slate-850 bg-slate-50 border border-slate-200 rounded-xl"
-                      />
-                    </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Total Ratings Count</label>
-                      <input
-                        type="text"
-                        value={formData.reviewsCount || 100}
-                        onChange={(e) => setFormData({ ...formData, reviewsCount: Number(e.target.value.replace(/\D/g, '')) || 0 })}
-                        className="w-full h-10 px-3 text-xs font-semibold text-slate-850 bg-slate-50 border border-slate-200 rounded-xl"
-                      />
-                    </div>
 
                     <div className="col-span-2">
                       <AdminImageUpload

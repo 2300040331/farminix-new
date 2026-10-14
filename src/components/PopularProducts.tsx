@@ -76,12 +76,6 @@ export const PopularProducts: React.FC = () => {
                   className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                 />
 
-                {/* Rating Badge (top-left, 12px margins) */}
-                <div className="absolute top-3 left-3 bg-white/70 backdrop-blur-md px-2 py-0.75 rounded-md text-[10px] font-extrabold text-slate-800 flex items-center gap-0.5 shadow-2xs border border-white/40">
-                  <span>⭐</span>
-                  <span>{product.rating}</span>
-                </div>
-
                 {/* Wishlist Heart Icon Overlay (top-right, 40px x 40px circular glassmorphism) */}
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}

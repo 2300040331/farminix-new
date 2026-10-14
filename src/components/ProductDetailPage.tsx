@@ -1,13 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  ArrowLeft, Star, Heart, CheckCircle2, Zap,
+  ArrowLeft, Heart, CheckCircle2, Zap,
   Plus, Minus, ChevronDown, ChevronUp, ShoppingBag,
-  AlertCircle, ThumbsUp, X, MessageSquarePlus
+  AlertCircle
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getProductSlug } from './ProductListingPage';
 import { farminixRiceProduct } from '../data/products';
-import type { Product, Review } from '../types';
+import type { Product } from '../types';
 
 const parsePreparationStep = (stepText: string, index: number) => {
   const cleaned = stepText.replace(/^(\d+[\.\)]\s*)+/, '').trim();
@@ -42,15 +42,7 @@ export const ProductDetailPage: React.FC = () => {
   const [selectedWeight, setSelectedWeight] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
-  const [helpfulVotes, setHelpfulVotes] = useState<Record<string, number>>({});
-  const [userVoted, setUserVoted] = useState<Record<string, boolean>>({});
 
-  // Review Modal state
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [newReviewName, setNewReviewName] = useState('');
-  const [newReviewRating, setNewReviewRating] = useState(5);
-  const [newReviewComment, setNewReviewComment] = useState('');
-  const [userSubmittedReviews, setUserSubmittedReviews] = useState<Review[]>([]);
 
   // 1. Extract slug or ID from URL (/product/[slug-or-id])
   const productIdentifier = useMemo(() => {
@@ -236,41 +228,7 @@ export const ProductDetailPage: React.FC = () => {
     'Cook using 1 part product to 2 parts water in a sealed pot or rice cooker.',
   ];
 
-  // Customer Reviews List (product.reviewsList or default verified customer reviews)
-  const defaultReviews: Review[] = [
-    {
-      id: 'rev-1',
-      userName: 'Rajesh Kumar',
-      rating: 5,
-      date: '2 days ago',
-      verified: true,
-      comment: `Excellent quality ${product.name}! The packaging was sealed tight and delivery arrived in under 15 minutes. Highly recommended for daily household use.`,
-      helpfulCount: 14,
-    },
-    {
-      id: 'rev-2',
-      userName: 'Ananya Sharma',
-      rating: 5,
-      date: '1 week ago',
-      verified: true,
-      comment: `Superior taste and aroma compared to local store products. Very good value for money at ₹${currentPrice}. Will order regularly!`,
-      helpfulCount: 9,
-    },
-    {
-      id: 'rev-3',
-      userName: 'Venkatesh Rao',
-      rating: 4,
-      date: '2 weeks ago',
-      verified: true,
-      comment: 'Good product quality and fresh stock. Super fast Farminix express delivery as always.',
-      helpfulCount: 5,
-    },
-  ];
 
-  const reviews: Review[] = [
-    ...(product.reviewsList && product.reviewsList.length > 0 ? product.reviewsList : defaultReviews),
-    ...userSubmittedReviews,
-  ];
 
   // Frequently Asked Questions
   const faqs = product.faqs || [
@@ -307,12 +265,6 @@ export const ProductDetailPage: React.FC = () => {
     setIsCartOpen(true);
   };
 
-  const handleHelpfulVote = (revId: string) => {
-    if (userVoted[revId]) return;
-    setUserVoted((prev) => ({ ...prev, [revId]: true }));
-    setHelpfulVotes((prev) => ({ ...prev, [revId]: (prev[revId] || 0) + 1 }));
-  };
-
   const handleBuyNow = () => {
     const inCart = cart.find(
       (item) => item.product.id === product.id && item.selectedWeight === currentWeight
@@ -321,27 +273,6 @@ export const ProductDetailPage: React.FC = () => {
       addToCart(product, currentWeight);
     }
     navigate('/checkout');
-  };
-
-  const handleReviewSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newReviewName.trim() || !newReviewComment.trim()) return;
-
-    const newRev: Review = {
-      id: `user-rev-${Date.now()}`,
-      userName: newReviewName.trim(),
-      rating: newReviewRating,
-      date: 'Just now',
-      verified: true,
-      comment: newReviewComment.trim(),
-      helpfulCount: 0,
-    };
-
-    setUserSubmittedReviews((prev) => [newRev, ...prev]);
-    setNewReviewName('');
-    setNewReviewComment('');
-    setNewReviewRating(5);
-    setIsReviewModalOpen(false);
   };
 
   return (
@@ -394,7 +325,7 @@ export const ProductDetailPage: React.FC = () => {
                     {discountPct}% OFF
                   </span>
                 )}
-                {product.rating >= 4.7 && (
+                {(product.badges?.includes('Bestseller') || product.id === 'r1') && (
                   <span className="bg-[#7C3AED] text-white text-[9px] sm:text-[10px] font-extrabold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-sm tracking-wider uppercase">
                     Bestseller
                   </span>
@@ -455,20 +386,6 @@ export const ProductDetailPage: React.FC = () => {
                 {product.name}
               </h1>
 
-              {/* Rating & Verified Reviews */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 sm:mt-3">
-                <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-black text-amber-800">
-                  <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400 text-amber-400" />
-                  <span>{product.rating}</span>
-                </div>
-                <span className="text-xs font-bold text-slate-500">
-                  ({product.reviewsCount.toLocaleString()} Verified Customer Reviews)
-                </span>
-                <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>Assured</span>
-                </span>
-              </div>
             </div>
 
             {/* Price Section */}
@@ -786,127 +703,7 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         )}
 
-        {/* ── CUSTOMER REVIEWS & RATINGS ── */}
-        <div className="mt-14 pt-10 border-t border-slate-100 text-left">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-            <div>
-              <span className="text-[11px] font-black text-[#7C3AED] uppercase tracking-widest">Real Customer Feedback</span>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">Customer Reviews &amp; Ratings</h2>
-            </div>
-            <button
-              onClick={() => setIsReviewModalOpen(true)}
-              className="px-4 py-2 bg-[#7C3AED] text-white hover:bg-[#6D28D9] text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
-            >
-              <MessageSquarePlus className="w-4 h-4" />
-              <span>Write a Review</span>
-            </button>
-          </div>
 
-          {reviews.length === 0 ? (
-            /* Requirement 18: If no reviews exist, show 'Be the first to review this product.' */
-            <div className="p-8 sm:p-12 bg-slate-50/70 border border-slate-200/80 rounded-3xl text-center flex flex-col items-center justify-center">
-              <div className="w-14 h-14 rounded-2xl bg-purple-100 text-[#7C3AED] flex items-center justify-center text-2xl font-black mb-3">
-                ⭐
-              </div>
-              <h3 className="text-base font-extrabold text-slate-900">Be the first to review this product.</h3>
-              <p className="text-xs text-slate-500 max-w-sm mt-1">
-                Share your experience with {product.name} to help other Farminix shoppers.
-              </p>
-              <button
-                onClick={() => setIsReviewModalOpen(true)}
-                className="mt-5 px-6 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-2"
-              >
-                <MessageSquarePlus className="w-4 h-4" />
-                <span>Write a Review</span>
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-              
-              {/* Rating Summary Card (4 cols) */}
-              <div className="md:col-span-4 p-6 bg-slate-50/80 border border-slate-200/80 rounded-3xl flex flex-col items-center text-center">
-                <div className="text-5xl font-black text-slate-900">{product.rating}</div>
-                <div className="flex items-center gap-1 my-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="w-5 h-5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <div className="text-xs font-bold text-slate-500">Based on {product.reviewsCount.toLocaleString()} Verified Ratings</div>
-
-                {/* Rating Distribution Bars */}
-                <div className="w-full space-y-2.5 mt-6">
-                  {[
-                    { stars: 5, pct: '85%' },
-                    { stars: 4, pct: '10%' },
-                    { stars: 3, pct: '3%' },
-                    { stars: 2, pct: '1%' },
-                    { stars: 1, pct: '1%' },
-                  ].map((bar) => (
-                    <div key={bar.stars} className="flex items-center gap-3 text-xs font-bold text-slate-600">
-                      <span className="w-6 text-right font-black text-slate-700">{bar.stars} ★</span>
-                      <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-400 rounded-full" style={{ width: bar.pct }} />
-                      </div>
-                      <span className="w-8 text-left text-[10px] text-slate-400 font-extrabold">{bar.pct}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Individual Reviews List (8 cols) */}
-              <div className="md:col-span-8 space-y-4">
-                {reviews.map((rev) => (
-                  <div key={rev.id} className="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-2xs space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-purple-600 text-white font-black text-xs flex items-center justify-center">
-                          {rev.userName.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="text-xs font-extrabold text-slate-900 flex items-center gap-2">
-                            <span>{rev.userName}</span>
-                            {rev.verified && (
-                              <span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.2 rounded-md font-bold">
-                                ✓ Verified Buyer
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-[10px] text-slate-400">{rev.date}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-0.5">
-                        {Array.from({ length: rev.rating }).map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        ))}
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-slate-700 leading-relaxed font-medium">
-                      "{rev.comment}"
-                    </p>
-
-                    <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400">
-                      <button
-                        onClick={() => handleHelpfulVote(rev.id)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
-                          userVoted[rev.id]
-                            ? 'bg-purple-50 text-[#7C3AED] border-purple-200 font-bold'
-                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        <ThumbsUp className="w-3.5 h-3.5" />
-                        <span>Helpful ({rev.helpfulCount + (helpfulVotes[rev.id] || 0)})</span>
-                      </button>
-                      <span className="text-[10px]">Farminix Verified Feedback</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-            </div>
-          )}
-        </div>
 
         {/* ── FREQUENTLY ASKED QUESTIONS (Accordion) ── */}
         <div className="mt-14 pt-10 border-t border-slate-100 text-left">
@@ -998,85 +795,6 @@ export const ProductDetailPage: React.FC = () => {
       </div>
 
 
-      {/* ── WRITE A REVIEW MODAL ── */}
-      {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
-          <div
-            onClick={() => setIsReviewModalOpen(false)}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-in fade-in"
-          />
-
-          <div className="relative bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 border border-slate-100 text-left">
-            <button
-              onClick={() => setIsReviewModalOpen(false)}
-              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors z-20 cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <h3 className="text-lg font-black text-slate-900 mb-1">Write a Product Review</h3>
-            <p className="text-xs text-slate-500 mb-4">Sharing feedback for <span className="font-bold text-slate-800">{product.name}</span></p>
-
-            <form onSubmit={handleReviewSubmit} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Your Rating</label>
-                <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setNewReviewRating(star)}
-                      className="p-1 text-amber-400 hover:scale-110 transition-transform cursor-pointer"
-                    >
-                      <Star className={`w-6 h-6 ${star <= newReviewRating ? 'fill-amber-400' : 'text-slate-300 fill-slate-100'}`} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Your Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Enter your name"
-                  value={newReviewName}
-                  onChange={(e) => setNewReviewName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Your Review</label>
-                <textarea
-                  required
-                  rows={4}
-                  placeholder="What did you like or dislike about this product?"
-                  value={newReviewComment}
-                  onChange={(e) => setNewReviewComment(e.target.value)}
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsReviewModalOpen(false)}
-                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-colors cursor-pointer"
-                >
-                  Submit Review
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
     </div>
   );
