@@ -636,7 +636,9 @@ export const OffersPage: React.FC = () => {
                   const cartItem    = cart.find(i => i.product.id === product.id);
                   const qty         = cartItem ? cartItem.quantity : 0;
                   const isWishlisted = wishlist.includes(product.id);
-                  const discount    = Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
+                  const discount    = product.discountPercentage !== undefined && product.discountPercentage > 0
+                    ? product.discountPercentage
+                    : Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
                   const stockPct    = Math.min(100, Math.max(8, Math.round((product.stockCount / 80) * 100)));
                   const isLowStock  = product.stockCount < 20;
                   const isAnimating = heartAnimIds.has(product.id);

@@ -76,6 +76,19 @@ export const PopularProducts: React.FC = () => {
                   className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                 />
 
+                {(() => {
+                  const discount = product.discountPercentage !== undefined && product.discountPercentage > 0
+                    ? product.discountPercentage
+                    : product.oldPrice && product.oldPrice > product.price
+                      ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+                      : 0;
+                  return discount > 0 ? (
+                    <span className="absolute top-3 left-3 bg-[#EA580C] text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-sm z-10">
+                      {discount}% OFF
+                    </span>
+                  ) : null;
+                })()}
+
                 {/* Wishlist Heart Icon Overlay (top-right, 40px x 40px circular glassmorphism) */}
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
@@ -101,16 +114,27 @@ export const PopularProducts: React.FC = () => {
                     {product.brand} • {product.weight}
                   </div>
 
-                  {/* Price info */}
-                  <div className="flex items-baseline gap-2 mb-3">
+                  <div className="flex items-baseline gap-2 mb-3 flex-wrap">
                     <span className="text-sm font-extrabold text-[#7C3AED]">
                       ₹{product.price}
                     </span>
-                    {product.oldPrice && (
+                    {product.oldPrice && product.oldPrice > product.price && (
                       <span className="text-xs font-medium text-slate-400 line-through">
                         ₹{product.oldPrice}
                       </span>
                     )}
+                    {(() => {
+                      const discount = product.discountPercentage !== undefined && product.discountPercentage > 0
+                        ? product.discountPercentage
+                        : product.oldPrice && product.oldPrice > product.price
+                          ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+                          : 0;
+                      return discount > 0 ? (
+                        <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1 py-0.2 rounded">
+                          SAVE {discount}%
+                        </span>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
 

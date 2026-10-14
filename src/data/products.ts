@@ -11,6 +11,7 @@ export const farminixRiceProduct: Product = {
   category: 'Rice & Grains',
   price: 1399,
   oldPrice: 1699,
+  discountPercentage: 18,
   weight: '26 Kg',
   weightOptions: ['26 Kg'],
   image: '/farminix_rice_front.png',

@@ -295,9 +295,11 @@ export const CategoryPage: React.FC = () => {
                 const cartItem = cart.find(item => item.product.id === product.id);
                 const qty = cartItem ? cartItem.quantity : 0;
                 const isWishlisted = wishlist.includes(product.id);
-                const discount = product.oldPrice
-                  ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
-                  : 0;
+                const discount = product.discountPercentage !== undefined && product.discountPercentage > 0
+                  ? product.discountPercentage
+                  : product.oldPrice && product.oldPrice > product.price
+                    ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+                    : 0;
 
                 return (
                   <div
@@ -348,13 +350,18 @@ export const CategoryPage: React.FC = () => {
                         </div>
 
                         {/* Price info */}
-                        <div className="flex items-baseline gap-2 mb-3">
+                        <div className="flex items-baseline gap-2 mb-3 flex-wrap">
                           <span className="text-sm font-extrabold text-[#7C3AED]">
                             ₹{product.price}
                           </span>
-                          {product.oldPrice && (
+                          {product.oldPrice && product.oldPrice > product.price && (
                             <span className="text-xs font-medium text-slate-400 line-through">
                               ₹{product.oldPrice}
+                            </span>
+                          )}
+                          {discount > 0 && (
+                            <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1 py-0.2 rounded">
+                              SAVE {discount}%
                             </span>
                           )}
                         </div>
@@ -421,9 +428,11 @@ export const CategoryPage: React.FC = () => {
                   const cartItem = cart.find(item => item.product.id === product.id);
                   const qty = cartItem ? cartItem.quantity : 0;
                   const isWishlisted = wishlist.includes(product.id);
-                  const discount = product.oldPrice
-                    ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
-                    : 0;
+                  const discount = product.discountPercentage !== undefined && product.discountPercentage > 0
+                    ? product.discountPercentage
+                    : product.oldPrice && product.oldPrice > product.price
+                      ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+                      : 0;
                   return (
                     <div key={product.id} className="bg-white rounded-[16px] border border-gray-100 shadow-[0_4px_18px_rgba(0,0,0,0.06)] flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-all duration-200">
                       <div className="relative w-full aspect-square bg-white cursor-pointer overflow-hidden shrink-0" onClick={() => { setActiveCategoryPage(null); navigate('/product/' + getProductSlug(product.name)); }}>
@@ -437,7 +446,17 @@ export const CategoryPage: React.FC = () => {
                         <div>
                           <h3 onClick={() => { setActiveCategoryPage(null); navigate('/product/' + getProductSlug(product.name)); }} className="text-xs font-bold text-slate-800 leading-snug line-clamp-2 h-8 cursor-pointer hover:text-[#7C3AED] transition-colors mb-1.5">{product.name}</h3>
                           <div className="text-[10px] font-semibold text-slate-500 mb-2">{product.brand} • {product.weight}</div>
-                          <div className="flex items-baseline gap-2 mb-3"><span className="text-sm font-extrabold text-[#7C3AED]">₹{product.price}</span>{product.oldPrice && <span className="text-xs font-medium text-slate-400 line-through">₹{product.oldPrice}</span>}</div>
+                          <div className="flex items-baseline gap-2 mb-3 flex-wrap">
+                            <span className="text-sm font-extrabold text-[#7C3AED]">₹{product.price}</span>
+                            {product.oldPrice && product.oldPrice > product.price && (
+                              <span className="text-xs font-medium text-slate-400 line-through">₹{product.oldPrice}</span>
+                            )}
+                            {discount > 0 && (
+                              <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1 py-0.2 rounded">
+                                SAVE {discount}%
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="w-full mt-auto">
                           {qty === 0 ? (

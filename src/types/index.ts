@@ -66,6 +66,7 @@ export interface Product {
   category: string;
   price: number;
   oldPrice: number;
+  discountPercentage?: number;
   weight: string;
   weightOptions?: string[];
   image: string;

@@ -152,9 +152,11 @@ export const ProductDetailPage: React.FC = () => {
 
   const currentPrice = Math.round(product.price * scale);
   const currentOldPrice = product.oldPrice ? Math.round(product.oldPrice * scale) : undefined;
-  const discountPct = currentOldPrice
-    ? Math.round(((currentOldPrice - currentPrice) / currentOldPrice) * 100)
-    : 0;
+  const discountPct = product.discountPercentage !== undefined && product.discountPercentage > 0
+    ? product.discountPercentage
+    : currentOldPrice && currentOldPrice > currentPrice
+      ? Math.round(((currentOldPrice - currentPrice) / currentOldPrice) * 100)
+      : 0;
 
   // Cart state
   const cartItem = cart.find(
@@ -395,13 +397,13 @@ export const ProductDetailPage: React.FC = () => {
                   <span className="text-2xl sm:text-3xl font-black text-[#7C3AED]">
                     ₹{currentPrice}
                   </span>
-                  {currentOldPrice && (
+                  {currentOldPrice && currentOldPrice > currentPrice && (
                     <span className="text-base sm:text-lg font-bold text-slate-400 line-through">
                       ₹{currentOldPrice}
                     </span>
                   )}
                   {discountPct > 0 && (
-                    <span className="bg-orange-100 text-[#EA580C] text-xs font-black px-2 py-0.5 rounded-md">
+                    <span className="bg-orange-100 text-[#EA580C] text-xs font-black px-2.5 py-1 rounded-lg border border-orange-200 shadow-2xs">
                       SAVE {discountPct}%
                     </span>
                   )}
@@ -448,7 +450,14 @@ export const ProductDetailPage: React.FC = () => {
                         }`}
                       >
                         <span>{w}</span>
-                        <span className="text-[10px] font-bold text-slate-500">₹{wPrice}</span>
+                        <div className="flex items-baseline gap-1 text-[10px] font-bold text-slate-500">
+                          <span>₹{wPrice}</span>
+                          {product.oldPrice && product.oldPrice > product.price && (
+                            <span className="line-through text-slate-400 text-[9px]">
+                              ₹{Math.round(product.oldPrice * (getMultiplier(w) / baseMultiplier))}
+                            </span>
+                          )}
+                        </div>
                       </button>
                     );
                   })}
@@ -772,8 +781,17 @@ export const ProductDetailPage: React.FC = () => {
       {/* ── STICKY MOBILE PURCHASE BAR ── */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 shadow-2xl flex items-center justify-between gap-3">
         <div>
-          <div className="text-[10px] font-bold text-slate-400">Pack: {currentWeight}</div>
-          <div className="text-lg font-black text-[#7C3AED]">₹{currentPrice}</div>
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-lg font-black text-[#7C3AED]">₹{currentPrice}</span>
+            {currentOldPrice && currentOldPrice > currentPrice && (
+              <span className="text-xs font-semibold text-slate-400 line-through">₹{currentOldPrice}</span>
+            )}
+            {discountPct > 0 && (
+              <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1 py-0.2 rounded">
+                SAVE {discountPct}%
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex-1 max-w-[200px]">
           {quantity === 0 ? (

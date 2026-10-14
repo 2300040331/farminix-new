@@ -30,6 +30,7 @@ export const ProductManager: React.FC = () => {
     category: config.categories[0]?.name || 'Rice & Grains',
     price: 99,
     oldPrice: 120,
+    discountPercentage: 18,
     weight: '1 kg',
     weightOptions: ['500 g', '1 kg', '2 kg'],
     image: '/prod_daawat_rice.jpg',
@@ -96,7 +97,15 @@ export const ProductManager: React.FC = () => {
   };
 
   const handleOpenEditModal = (product: Product) => {
-    setFormData(JSON.parse(JSON.stringify(product)));
+    const copy = JSON.parse(JSON.stringify(product));
+    if (copy.discountPercentage === undefined) {
+      if (copy.oldPrice && copy.price && copy.oldPrice > copy.price) {
+        copy.discountPercentage = Math.round(((copy.oldPrice - copy.price) / copy.oldPrice) * 100);
+      } else {
+        copy.discountPercentage = 0;
+      }
+    }
+    setFormData(copy);
     setEditingProductId(product.id);
     setActiveTab('basic');
     setIsModalOpen(true);
@@ -106,10 +115,17 @@ export const ProductManager: React.FC = () => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
+    const cleanData: Product = {
+      ...formData,
+      price: Number(formData.price) || 0,
+      oldPrice: Number(formData.oldPrice) || 0,
+      discountPercentage: formData.discountPercentage !== undefined ? Number(formData.discountPercentage) : 0,
+    };
+
     if (editingProductId) {
-      editProduct(formData);
+      editProduct(cleanData);
     } else {
-      addProduct(formData);
+      addProduct(cleanData);
     }
 
     setIsModalOpen(false);
@@ -243,11 +259,23 @@ export const ProductManager: React.FC = () => {
                   <td className="py-3 px-4 font-semibold text-slate-700">{product.category}</td>
 
                   <td className="py-3 px-4">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="font-black text-purple-700">₹{product.price}</span>
-                      {product.oldPrice && (
-                        <span className="text-[10px] text-slate-400 line-through">₹{product.oldPrice}</span>
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <span className="font-black text-purple-700 text-sm">₹{product.price}</span>
+                      {product.oldPrice && product.oldPrice > product.price && (
+                        <span className="text-[11px] text-slate-400 line-through">₹{product.oldPrice}</span>
                       )}
+                      {(() => {
+                        const offer = product.discountPercentage !== undefined
+                          ? product.discountPercentage
+                          : product.oldPrice && product.oldPrice > product.price
+                            ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+                            : 0;
+                        return offer > 0 ? (
+                          <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1.5 py-0.5 rounded-md">
+                            {offer}% OFF
+                          </span>
+                        ) : null;
+                      })()}
                     </div>
                   </td>
 
@@ -408,27 +436,6 @@ export const ProductManager: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Selling Price (₹) *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.price}
-                        onChange={(e) => setFormData({ ...formData, price: Number(e.target.value.replace(/[^0-9.]/g, '')) || 0 })}
-                        className="w-full h-10 px-3 text-xs font-extrabold text-purple-700 bg-slate-50 border border-slate-200 rounded-xl"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Original Price (₹)</label>
-                      <input
-                        type="text"
-                        value={formData.oldPrice || 0}
-                        onChange={(e) => setFormData({ ...formData, oldPrice: Number(e.target.value.replace(/[^0-9.]/g, '')) || 0 })}
-                        className="w-full h-10 px-3 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl"
-                      />
-                    </div>
-
-                    <div>
                       <label className="block text-xs font-bold text-slate-700 mb-1">Stock Count</label>
                       <input
                         type="text"
@@ -436,6 +443,117 @@ export const ProductManager: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, stockCount: Number(e.target.value.replace(/\D/g, '')) || 0 })}
                         className="w-full h-10 px-3 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Original Price / MRP (₹)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.oldPrice || ''}
+                        onChange={(e) => {
+                          const newOldPrice = Number(e.target.value.replace(/[^0-9.]/g, '')) || 0;
+                          const discount = formData.discountPercentage ?? 0;
+                          const newPrice = discount > 0 && newOldPrice > 0
+                            ? Math.round(newOldPrice * (1 - discount / 100))
+                            : formData.price;
+                          setFormData({ ...formData, oldPrice: newOldPrice, price: newPrice });
+                        }}
+                        placeholder="e.g. 1699"
+                        className="w-full h-10 px-3 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-slate-700">
+                          Discount / Offer Percentage (%)
+                        </label>
+                        <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1.5 py-0.5 rounded">
+                          {formData.discountPercentage ?? 0}% OFF
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.discountPercentage !== undefined ? formData.discountPercentage : ''}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9.]/g, '');
+                            const newDiscount = val === '' ? 0 : Math.min(100, Number(val));
+                            const oldP = formData.oldPrice || 0;
+                            const newPrice = oldP > 0 && newDiscount > 0
+                              ? Math.round(oldP * (1 - newDiscount / 100))
+                              : oldP > 0
+                                ? oldP
+                                : formData.price;
+                            setFormData({
+                              ...formData,
+                              discountPercentage: newDiscount,
+                              price: newPrice,
+                            });
+                          }}
+                          placeholder="e.g. 18"
+                          className="w-full h-10 px-3 pr-8 text-xs font-black text-orange-600 bg-orange-50/40 border border-orange-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-400"
+                        />
+                        <span className="absolute right-3 top-2.5 text-xs font-black text-orange-500">%</span>
+                      </div>
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Final Selling Price (₹) * (After Deducting Discount)
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.price}
+                        onChange={(e) => {
+                          const newPrice = Number(e.target.value.replace(/[^0-9.]/g, '')) || 0;
+                          const oldP = formData.oldPrice || 0;
+                          const calculatedDiscount = oldP > newPrice && oldP > 0
+                            ? Math.round(((oldP - newPrice) / oldP) * 100)
+                            : 0;
+                          setFormData({
+                            ...formData,
+                            price: newPrice,
+                            discountPercentage: calculatedDiscount,
+                          });
+                        }}
+                        className="w-full h-10 px-3 text-xs font-black text-purple-700 bg-purple-50/30 border border-purple-200 rounded-xl"
+                      />
+                    </div>
+
+                    {/* Live Pricing & Offer Summary Banner */}
+                    <div className="col-span-2 p-3.5 bg-gradient-to-r from-purple-50/90 via-orange-50/50 to-slate-50 border border-purple-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="text-[10px] font-black uppercase text-purple-700 tracking-wider flex items-center gap-1.5">
+                          <span>🏷️ Live Price &amp; Offer Display on Storefront</span>
+                        </div>
+                        <div className="flex items-baseline gap-2.5 mt-1.5">
+                          <span className="text-xl font-black text-[#7C3AED]">₹{formData.price}</span>
+                          {formData.oldPrice && formData.oldPrice > formData.price && (
+                            <span className="text-sm font-bold text-slate-400 line-through">
+                              ₹{formData.oldPrice}
+                            </span>
+                          )}
+                          {(formData.discountPercentage || 0) > 0 && (
+                            <span className="bg-orange-100 text-[#EA580C] text-xs font-black px-2.5 py-0.5 rounded-md border border-orange-200 shadow-2xs">
+                              SAVE {formData.discountPercentage}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-left sm:text-right">
+                        <div className="text-[11px] font-bold text-slate-600">
+                          Exact Offer Set: <strong className="text-orange-600 font-black">{formData.discountPercentage || 0}% OFF</strong>
+                        </div>
+                        <div className="text-[10px] font-semibold text-slate-400 mt-0.5">
+                          {formData.oldPrice && formData.oldPrice > formData.price
+                            ? `Customer saves ₹${formData.oldPrice - formData.price} per unit`
+                            : 'No active discount'}
+                        </div>
+                      </div>
                     </div>
 
 

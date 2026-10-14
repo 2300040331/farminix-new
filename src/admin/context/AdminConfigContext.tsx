@@ -135,6 +135,11 @@ const sanitizeProducts = (products: any[]): Product[] => {
     delete cleanProd.rating;
     delete cleanProd.reviewsCount;
     delete cleanProd.reviewsList;
+    if (cleanProd.discountPercentage !== undefined) {
+      cleanProd.discountPercentage = Number(cleanProd.discountPercentage);
+    } else if (cleanProd.oldPrice && cleanProd.price && cleanProd.oldPrice > cleanProd.price) {
+      cleanProd.discountPercentage = Math.round(((cleanProd.oldPrice - cleanProd.price) / cleanProd.oldPrice) * 100);
+    }
     if (cleanProd.id === 'r1' || cleanProd.name?.toLowerCase().includes('farminix')) {
       if (!cleanProd.specifications || cleanProd.specifications.length < 5) {
         cleanProd.specifications = defaultSiteConfig.products[0]?.specifications || cleanProd.specifications;

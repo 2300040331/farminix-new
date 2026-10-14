@@ -258,9 +258,11 @@ export const ProductListingPage: React.FC = () => {
                 const cartItem = cart.find((item) => item.product.id === product.id);
                 const qty = cartItem ? cartItem.quantity : 0;
                 const isWishlisted = wishlist.includes(product.id);
-                const discount = product.oldPrice
-                  ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
-                  : 0;
+                const discount = product.discountPercentage !== undefined && product.discountPercentage > 0
+                  ? product.discountPercentage
+                  : product.oldPrice && product.oldPrice > product.price
+                    ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+                    : 0;
 
                 return (
                   <div
@@ -307,10 +309,15 @@ export const ProductListingPage: React.FC = () => {
                         <div className="text-[10px] font-semibold text-slate-500 mb-2">
                           {product.brand} • {product.weight}
                         </div>
-                        <div className="flex items-baseline gap-2 mb-3">
+                        <div className="flex items-baseline gap-2 mb-3 flex-wrap">
                           <span className="text-sm font-extrabold text-[#7C3AED]">₹{product.price}</span>
-                          {product.oldPrice && (
+                          {product.oldPrice && product.oldPrice > product.price && (
                             <span className="text-xs font-medium text-slate-400 line-through">₹{product.oldPrice}</span>
+                          )}
+                          {discount > 0 && (
+                            <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1 py-0.2 rounded">
+                              SAVE {discount}%
+                            </span>
                           )}
                         </div>
                       </div>
