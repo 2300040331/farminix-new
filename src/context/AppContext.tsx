@@ -84,22 +84,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeCategoryPage, setActiveCategoryPage] = useState<string | null>(null);
 
   const [currentRoute, setCurrentRoute] = useState<{ pathname: string; searchParams: URLSearchParams }>(() => {
-    const path = window.location.pathname;
-    if (path === '/admin') {
-      return {
-        pathname: '/admin',
-        searchParams: new URLSearchParams(window.location.search),
-      };
-    }
-    // On refresh or initial visit, always open Home page ('/') per user requirement
-    if (path !== '/') {
-      try {
-        window.history.replaceState(null, '', '/');
-      } catch {}
-    }
     return {
-      pathname: '/',
-      searchParams: new URLSearchParams(),
+      pathname: window.location.pathname.replace(/\/+$/, '') || '/',
+      searchParams: new URLSearchParams(window.location.search),
     };
   });
 
@@ -133,7 +120,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         });
       } else {
         setCurrentRoute({
-          pathname: window.location.pathname,
+          pathname: window.location.pathname.replace(/\/+$/, '') || '/',
           searchParams: new URLSearchParams(window.location.search),
         });
       }

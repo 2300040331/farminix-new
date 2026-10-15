@@ -86,21 +86,12 @@ const AUTH_KEY = 'farminix_admin_auth_v5';
 
 const sanitizeManufacturer = (raw: any): ManufacturerConfig => {
   const merged = { ...defaultManufacturerConfig, ...(raw || {}) };
-  if (
-    merged.comingSoonBadge === 'Official Launch' ||
-    merged.comingSoonTitle === 'Manufacturer & Milling Center' ||
-    merged.comingSoonText?.includes('Farminix bridges generational')
-  ) {
-    return {
-      ...merged,
-      comingSoonMode: true,
-      comingSoonBadge: 'Coming Soon',
-      comingSoonTitle: 'Manufacturer',
-      comingSoonText:
-        "We're working on something exciting. This page will be available soon with all the details you need.",
-    };
-  }
-  return { ...merged, comingSoonMode: true };
+  return {
+    ...merged,
+    comingSoonMode: false,
+    manufacturedBy: { ...defaultManufacturerConfig.manufacturedBy, ...raw?.manufacturedBy },
+    marketedBy: { ...defaultManufacturerConfig.marketedBy, ...raw?.marketedBy },
+  };
 };
 
 const sanitizePaymentConfig = (raw: any): CheckoutPaymentConfig => {

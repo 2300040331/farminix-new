@@ -283,7 +283,16 @@ export interface ManufacturerCertification {
   enabled: boolean;
 }
 
+export interface ManufacturerContact {
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+}
+
 export interface ManufacturerConfig {
+  manufacturedBy: ManufacturerContact;
+  marketedBy: ManufacturerContact;
   enabled: boolean;
   comingSoonMode: boolean;
   comingSoonBadge: string;

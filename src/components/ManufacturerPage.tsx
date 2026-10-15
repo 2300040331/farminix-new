@@ -1,64 +1,26 @@
 import React, { useEffect } from 'react';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
-import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import { defaultManufacturerConfig } from '../admin/defaultConfig';
+import { ManufacturerDetails } from './ManufacturerDetails';
 
 export const ManufacturerPage: React.FC = () => {
-  const { navigate } = useApp();
   const { publishedConfig } = useAdminConfig();
-  const manufacturer = publishedConfig.manufacturer || defaultManufacturerConfig;
+  const manufacturer = {
+    ...defaultManufacturerConfig,
+    ...publishedConfig.manufacturer,
+    manufacturedBy: publishedConfig.manufacturer?.manufacturedBy || defaultManufacturerConfig.manufacturedBy,
+    marketedBy: publishedConfig.manufacturer?.marketedBy || defaultManufacturerConfig.marketedBy,
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    document.title = `${manufacturer.comingSoonTitle || 'Manufacturer'} — Coming Soon`;
-  }, [manufacturer]);
+    document.title = 'Manufacturer — Farminix';
+  }, []);
 
   return (
-    <div className="w-full min-h-[70vh] px-4 py-8 bg-gradient-to-b from-purple-50/40 to-white">
-      {/* Top Back Navigation Bar (Left side) */}
-      <div className="max-w-7xl mx-auto pb-6">
-        <button
-          onClick={() => navigate('/')}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white shadow-2xs border border-gray-200/80 hover:bg-purple-50 text-slate-700 hover:text-[#7C3AED] text-xs font-bold transition-all cursor-pointer group"
-          title="Go Back"
-        >
-          <ArrowLeft className="w-4 h-4 text-slate-500 group-hover:text-[#7C3AED] group-hover:-translate-x-0.5 transition-transform" />
-          <span>Back</span>
-        </button>
-      </div>
-
-      <div className="flex items-center justify-center py-8">
-        <div className="max-w-lg w-full text-center space-y-6">
-
-          {/* Heading */}
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-            {manufacturer.comingSoonTitle || 'Manufacturer'}
-          </h1>
-
-          {/* Coming Soon Badge */}
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-purple-100 border border-purple-200">
-            <span className="w-2 h-2 rounded-full bg-[#7C3AED] animate-pulse" />
-            <span className="text-sm font-bold text-[#7C3AED] tracking-wide">
-              {manufacturer.comingSoonBadge || 'Coming Soon'}
-            </span>
-          </div>
-
-          {/* Description */}
-          <p className="text-slate-500 text-sm sm:text-base leading-relaxed max-w-md mx-auto">
-            {manufacturer.comingSoonText ||
-              "We're working on something exciting. This page will be available soon with all the details you need."}
-          </p>
-
-          {/* Back to Home */}
-          <button
-            onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-bold rounded-xl transition-colors cursor-pointer shadow-md hover:shadow-lg active:scale-95"
-          >
-            <span>Back to Home</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+    <div className="w-full min-h-[70vh] bg-gradient-to-b from-purple-50/60 via-white to-white px-4 py-12 sm:py-20">
+      <div className="max-w-5xl mx-auto">
+        <ManufacturerDetails manufacturer={manufacturer} />
       </div>
     </div>
   );

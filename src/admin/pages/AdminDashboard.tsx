@@ -28,7 +28,7 @@ export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = 
     { id: 'hero', name: 'Hero Banner', status: 'Active', desc: 'Main Farminix 16:9 banner' },
     { id: 'categories', name: 'Categories Catalog', status: 'Active', desc: 'Add, hide, edit & delete categories' },
     { id: 'popularProducts', name: 'Popular Today', status: 'Active', desc: 'Featured product cards' },
-    { id: 'manufacturer', name: 'Manufacturer Page', status: 'Active', desc: 'Processing mills, Sortex, FSSAI & mode' },
+    { id: 'manufacturer', name: 'Manufacturer Page', status: 'Active', desc: 'Manufacturer and marketer contact details' },
     { id: 'products', name: 'Product Inventory', status: 'Active', desc: 'Catalog & pricing' },
     { id: 'orders', name: 'Orders & Fulfillment', status: 'Active', desc: 'Real customer orders' },
     { id: 'footer', name: 'Store Footer', status: 'Active', desc: 'Bottom links & brand' },

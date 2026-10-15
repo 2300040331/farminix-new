@@ -92,8 +92,20 @@ export const defaultCareersPageConfig: CareersPageConfig = {
 };
 
 export const defaultManufacturerConfig: ManufacturerConfig = {
+  manufacturedBy: {
+    name: 'PARNIKA RICE INDUSTRIES',
+    address: 'Sattenapalli, Palanadu Dist., Andhra Pradesh – 522 403',
+    phone: '+91 9248656999',
+    email: 'parnikariceindustries@gmail.com',
+  },
+  marketedBy: {
+    name: 'FARMINIX PRIVATE LIMITED',
+    address: 'Flat No. 302, Srinivasa Towers, Gorantla, Guntur Dist., Andhra Pradesh – 522034',
+    phone: '+91 7989743595',
+    email: 'farminixprivatelimited@gmail.com',
+  },
   enabled: true,
-  comingSoonMode: true,
+  comingSoonMode: false,
   comingSoonBadge: 'Coming Soon',
   comingSoonTitle: 'Manufacturer',
   comingSoonText:
