@@ -5,6 +5,7 @@ import type {
   AboutPageConfig,
   CartConfig,
   CheckoutPaymentConfig,
+  CareersPageConfig,
 } from './types';
 import { categories, allProducts, epicDeals, brandLogosList } from '../data/products';
 
@@ -65,6 +66,29 @@ export const defaultThemeTokens: ThemeTokens = {
   statusWarning: '#D97706',
   statusError: '#DC2626',
   statusInfo: '#2563EB',
+};
+
+export const defaultCareersPageConfig: CareersPageConfig = {
+  enabled: true,
+  eyebrow: 'Careers at Farminix',
+  title: 'Build the future of everyday food with us.',
+  subtitle: 'We welcome people who care about customers, dependable service, and the quality of every order.',
+  valuesTitle: 'Do work that reaches every home.',
+  valuesDescription: 'Tell us where your strengths fit best. Our team will review your application and contact you if there is a suitable opportunity.',
+  formTitle: 'Apply to join Farminix',
+  formDescription: 'Complete the application below. Fields marked with an asterisk are required.',
+  fullNameLabel: 'Full Name',
+  emailLabel: 'Email Address',
+  phoneLabel: 'Phone Number',
+  addressLabel: 'Full Address',
+  experienceLabel: 'Previous Work Experience',
+  roleLabel: 'Job Role',
+  descriptionLabel: 'Description / Additional Information',
+  submitButtonText: 'Submit Application',
+  successTitle: 'Application received',
+  successMessage: 'Thank you for your interest in Farminix. Our team will review your application and contact you if your profile matches an opportunity.',
+  privacyNote: 'Your information will be used only to review your application and contact you about relevant opportunities.',
+  jobRoles: ['Sales Executive', 'Dealer', 'Delivery Boy'],
 };
 
 export const defaultManufacturerConfig: ManufacturerConfig = {
@@ -345,6 +369,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
   theme: defaultThemeTokens,
   manufacturer: defaultManufacturerConfig,
   aboutPage: defaultAboutPageConfig,
+  careersPage: defaultCareersPageConfig,
   cart: defaultCartConfig,
   checkoutPayment: defaultCheckoutPaymentConfig,
   sectionOrder: [
@@ -399,6 +424,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
     { id: 'nav-8', label: 'Household', catId: 'household', enabled: true, order: 8 },
     { id: 'nav-9', label: 'Offers', catId: 'offers', badge: 'HOT', enabled: true, order: 9 },
     { id: 'nav-10', label: 'Manufacturer', catId: 'manufacturer', enabled: true, order: 10 },
+    { id: 'nav-11', label: 'Careers', catId: 'careers', enabled: true, order: 11 },
   ],
   hero: {
     enabled: true,

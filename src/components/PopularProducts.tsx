@@ -116,11 +116,11 @@ export const PopularProducts: React.FC = () => {
 
                   <div className="flex items-baseline gap-2 mb-3 flex-wrap">
                     <span className="text-sm font-extrabold text-[#7C3AED]">
-                      ₹{product.price}
+                      ₹{product.price.toLocaleString('en-IN')}
                     </span>
                     {product.oldPrice && product.oldPrice > product.price && (
                       <span className="text-xs font-medium text-slate-400 line-through">
-                        ₹{product.oldPrice}
+                        MRP ₹{product.oldPrice.toLocaleString('en-IN')}
                       </span>
                     )}
                     {(() => {
@@ -136,6 +136,11 @@ export const PopularProducts: React.FC = () => {
                       ) : null;
                     })()}
                   </div>
+                  {product.oldPrice && product.oldPrice > product.price && (
+                    <div className="mb-3 inline-flex rounded-md bg-orange-100 px-2 py-1 text-[10px] font-black text-orange-700">
+                      ₹{(product.oldPrice - product.price).toLocaleString('en-IN')} OFF | {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF
+                    </div>
+                  )}
                 </div>
 
                 {/* Add / Quantity Stepper Button */}

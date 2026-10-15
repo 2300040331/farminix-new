@@ -22,6 +22,7 @@ export const Navbar: React.FC = () => {
               (item.catId === null && isHomeRoute && selectedCategory === null) || 
               (item.catId === 'offers' && currentRoute.pathname === '/offers') ||
               (item.catId === 'manufacturer' && currentRoute.pathname === '/manufacturer') ||
+              (item.catId === 'careers' && currentRoute.pathname === '/careers') ||
               (item.catId !== null && item.catId !== 'offers' && item.catId !== 'manufacturer' && selectedCategory === item.catId);
             return (
               <button
@@ -33,6 +34,8 @@ export const Navbar: React.FC = () => {
                     navigate('/offers');
                   } else if (item.catId === 'manufacturer') {
                     navigate('/manufacturer');
+                  } else if (item.catId === 'careers') {
+                    navigate('/careers');
                   } else {
                     const catMatch = activeCategories.find((c) => c.id === item.catId || c.name.toLowerCase() === item.label.toLowerCase());
                     navigate('/products', `category=${encodeURIComponent(catMatch ? catMatch.name : item.label)}`);

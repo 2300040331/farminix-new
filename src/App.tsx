@@ -15,6 +15,7 @@ import { OffersPage } from './components/OffersPage';
 import { CheckoutPage } from './components/CheckoutPage';
 import { ManufacturerPage } from './components/ManufacturerPage';
 import { AboutPage } from './components/AboutPage';
+import { CareersPage } from './components/CareersPage';
 
 // Admin CRM Components
 import { AdminLayout } from './admin/AdminLayout';
@@ -91,6 +92,7 @@ export function AppContent() {
     const isCheckoutPage = currentRoute.pathname === '/checkout';
     const isManufacturerPage = currentRoute.pathname === '/manufacturer';
     const isAboutPage = currentRoute.pathname === '/about';
+    const isCareersPage = currentRoute.pathname === '/careers';
 
     if (isCheckoutPage) {
       return <CheckoutPage />;
@@ -102,6 +104,10 @@ export function AppContent() {
 
     if (isAboutPage) {
       return <AboutPage />;
+    }
+
+    if (isCareersPage) {
+      return <CareersPage />;
     }
 
     if (isOffersPage) {
@@ -160,4 +166,3 @@ export default function App() {
     </AdminConfigProvider>
   );
 }
-

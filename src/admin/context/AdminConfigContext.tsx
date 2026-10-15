@@ -22,6 +22,7 @@ import type {
   AboutPageConfig,
   CartConfig,
   CheckoutPaymentConfig,
+  CareersPageConfig,
 } from '../types';
 import type { Product, Category, Order, User } from '../../types';
 import {
@@ -31,6 +32,7 @@ import {
   defaultAboutPageConfig,
   defaultCartConfig,
   defaultCheckoutPaymentConfig,
+  defaultCareersPageConfig,
 } from '../defaultConfig';
 
 interface AdminContextType {
@@ -62,6 +64,7 @@ interface AdminContextType {
   updateShopNowConfig: (cfg: Partial<ShopNowPageConfig>) => void;
   updateManufacturer: (cfg: Partial<ManufacturerConfig>) => void;
   updateAboutPage: (cfg: Partial<AboutPageConfig>) => void;
+  updateCareersPage: (cfg: Partial<CareersPageConfig>) => void;
   updateCartConfig: (cfg: Partial<CartConfig>) => void;
   updateCheckoutPayment: (cfg: Partial<CheckoutPaymentConfig>) => void;
   updateProducts: (products: Product[]) => void;
@@ -131,6 +134,10 @@ const sanitizeProducts = (products: any[]): Product[] => {
   }
   return products.map((prod) => {
     const cleanProd = { ...prod };
+    if (cleanProd.id === 'r1' && cleanProd.price === 1399 && cleanProd.oldPrice === 1699) {
+      cleanProd.price = 2100;
+      cleanProd.oldPrice = 3000;
+    }
     delete cleanProd.storySection;
     delete cleanProd.rating;
     delete cleanProd.reviewsCount;
@@ -186,6 +193,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: sanitizeAboutPage(parsed.aboutPage),
+          careersPage: { ...defaultCareersPageConfig, ...(parsed.careersPage || {}) },
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
           checkoutPayment: sanitizePaymentConfig(parsed.checkoutPayment),
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
@@ -221,6 +229,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: sanitizeAboutPage(parsed.aboutPage),
+          careersPage: { ...defaultCareersPageConfig, ...(parsed.careersPage || {}) },
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
           checkoutPayment: sanitizePaymentConfig(parsed.checkoutPayment),
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
@@ -250,6 +259,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: sanitizeAboutPage(parsed.aboutPage),
+          careersPage: { ...defaultCareersPageConfig, ...(parsed.careersPage || {}) },
           cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
           checkoutPayment: { ...defaultCheckoutPaymentConfig, ...(parsed.checkoutPayment || {}) },
           futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
@@ -513,6 +523,11 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     saveConfig({ ...config, aboutPage: { ...current, ...cfg } });
   };
 
+  const updateCareersPage = (cfg: Partial<CareersPageConfig>) => {
+    const current = config.careersPage || defaultCareersPageConfig;
+    saveConfig({ ...config, careersPage: { ...current, ...cfg } });
+  };
+
   const updateCartConfig = (cfg: Partial<CartConfig>) => {
     const current = config.cart || defaultCartConfig;
     saveConfig({ ...config, cart: { ...current, ...cfg } });
@@ -602,6 +617,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         updateShopNowConfig,
         updateManufacturer,
         updateAboutPage,
+        updateCareersPage,
         updateCartConfig,
         updateCheckoutPayment,
         updateProducts,

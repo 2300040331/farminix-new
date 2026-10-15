@@ -207,11 +207,16 @@ export const ProductListingPage: React.FC = () => {
                             {product.brand} • {product.weight}
                           </div>
                           <div className="flex items-baseline gap-2 mb-3">
-                            <span className="text-sm font-extrabold text-[#7C3AED]">₹{product.price}</span>
+                            <span className="text-sm font-extrabold text-[#7C3AED]">₹{product.price.toLocaleString('en-IN')}</span>
                             {product.oldPrice && (
-                              <span className="text-xs font-medium text-slate-400 line-through">₹{product.oldPrice}</span>
+                              <span className="text-xs font-medium text-slate-400 line-through">MRP ₹{product.oldPrice.toLocaleString('en-IN')}</span>
                             )}
                           </div>
+                          {product.oldPrice && product.oldPrice > product.price && (
+                            <span className="inline-flex mb-2 rounded-md bg-orange-100 px-2 py-1 text-[10px] font-black text-orange-700">
+                              ₹{(product.oldPrice - product.price).toLocaleString('en-IN')} OFF | {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF
+                            </span>
+                          )}
                         </div>
 
                         <div className="w-full mt-auto">
@@ -292,7 +297,7 @@ export const ProductListingPage: React.FC = () => {
                       {/* Discount Badge */}
                       {discount > 0 && (
                         <span className="absolute bottom-2 left-2 bg-[#7C3AED] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md">
-                          {discount}% OFF
+                          ₹{(product.oldPrice - product.price).toLocaleString('en-IN')} OFF | {discount}% OFF
                         </span>
                       )}
                     </div>
@@ -310,16 +315,16 @@ export const ProductListingPage: React.FC = () => {
                           {product.brand} • {product.weight}
                         </div>
                         <div className="flex items-baseline gap-2 mb-3 flex-wrap">
-                          <span className="text-sm font-extrabold text-[#7C3AED]">₹{product.price}</span>
+                          <span className="text-sm font-extrabold text-[#7C3AED]">₹{product.price.toLocaleString('en-IN')}</span>
                           {product.oldPrice && product.oldPrice > product.price && (
-                            <span className="text-xs font-medium text-slate-400 line-through">₹{product.oldPrice}</span>
-                          )}
-                          {discount > 0 && (
-                            <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1 py-0.2 rounded">
-                              SAVE {discount}%
-                            </span>
+                            <span className="text-xs font-medium text-slate-400 line-through">MRP ₹{product.oldPrice.toLocaleString('en-IN')}</span>
                           )}
                         </div>
+                        {discount > 0 && (
+                          <span className="inline-flex mb-2 rounded-md bg-orange-100 px-2 py-1 text-[10px] font-black text-orange-700">
+                            {product.oldPrice && product.oldPrice > product.price ? `₹${(product.oldPrice - product.price).toLocaleString('en-IN')} OFF | ` : ''}{discount}% OFF
+                          </span>
+                        )}
                       </div>
 
                       {/* Add / Stepper */}

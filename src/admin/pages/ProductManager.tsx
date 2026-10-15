@@ -260,19 +260,19 @@ export const ProductManager: React.FC = () => {
 
                   <td className="py-3 px-4">
                     <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="font-black text-purple-700 text-sm">₹{product.price}</span>
+                      <span className="font-black text-purple-700 text-sm">₹{product.price.toLocaleString('en-IN')}</span>
                       {product.oldPrice && product.oldPrice > product.price && (
-                        <span className="text-[11px] text-slate-400 line-through">₹{product.oldPrice}</span>
+                        <span className="text-[11px] text-slate-400 line-through">MRP ₹{product.oldPrice.toLocaleString('en-IN')}</span>
                       )}
                       {(() => {
-                        const offer = product.discountPercentage !== undefined
+                        const offer = product.discountPercentage !== undefined && product.discountPercentage > 0
                           ? product.discountPercentage
                           : product.oldPrice && product.oldPrice > product.price
                             ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
                             : 0;
                         return offer > 0 ? (
                           <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1.5 py-0.5 rounded-md">
-                            {offer}% OFF
+                            {product.oldPrice > product.price ? `₹${(product.oldPrice - product.price).toLocaleString('en-IN')} OFF | ` : ''}{offer}% OFF
                           </span>
                         ) : null;
                       })()}

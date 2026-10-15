@@ -157,6 +157,7 @@ export const ProductDetailPage: React.FC = () => {
     : currentOldPrice && currentOldPrice > currentPrice
       ? Math.round(((currentOldPrice - currentPrice) / currentOldPrice) * 100)
       : 0;
+  const discountAmount = currentOldPrice && currentOldPrice > currentPrice ? currentOldPrice - currentPrice : 0;
 
   // Cart state
   const cartItem = cart.find(
@@ -324,7 +325,7 @@ export const ProductDetailPage: React.FC = () => {
               <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex flex-col gap-1.5 sm:gap-2 z-10">
                 {discountPct > 0 && (
                   <span className="bg-[#EA580C] text-white text-[11px] sm:text-xs font-black px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-sm tracking-wide">
-                    {discountPct}% OFF
+                    ₹{discountAmount.toLocaleString('en-IN')} OFF | {discountPct}% OFF
                   </span>
                 )}
                 {(product.badges?.includes('Bestseller') || product.id === 'r1') && (
@@ -395,21 +396,21 @@ export const ProductDetailPage: React.FC = () => {
               <div>
                 <div className="flex items-baseline gap-2.5 flex-wrap">
                   <span className="text-2xl sm:text-3xl font-black text-[#7C3AED]">
-                    ₹{currentPrice}
+                    ₹{currentPrice.toLocaleString('en-IN')}
                   </span>
                   {currentOldPrice && currentOldPrice > currentPrice && (
                     <span className="text-base sm:text-lg font-bold text-slate-400 line-through">
-                      ₹{currentOldPrice}
+                      MRP ₹{currentOldPrice.toLocaleString('en-IN')}
                     </span>
                   )}
                   {discountPct > 0 && (
-                    <span className="bg-orange-100 text-[#EA580C] text-xs font-black px-2.5 py-1 rounded-lg border border-orange-200 shadow-2xs">
-                      SAVE {discountPct}%
+                    <span className="bg-orange-100 text-[#C2410C] border border-orange-200 text-xs font-black px-2.5 py-1 rounded-lg">
+                      {discountAmount > 0 ? `₹${discountAmount.toLocaleString('en-IN')} OFF | ` : ''}{discountPct}% OFF
                     </span>
                   )}
                 </div>
                 <div className="text-[10px] sm:text-[11px] font-semibold text-slate-500 mt-1">
-                  Inclusive of all taxes • Unit Price: ₹{(currentPrice / (currentWeight.includes('kg') ? parseFloat(currentWeight) * 10 : 1)).toFixed(2)}/100g
+                  MRP inclusive of all taxes • Unit Price: ₹{(currentPrice / (currentWeight.toLowerCase().includes('kg') ? parseFloat(currentWeight) * 10 : 1)).toFixed(2)}/100g
                 </div>
               </div>
 

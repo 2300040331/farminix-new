@@ -379,6 +379,29 @@ export interface CheckoutPaymentConfig {
   razorpayThemeColor?: string;
 }
 
+export interface CareersPageConfig {
+  enabled: boolean;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  valuesTitle: string;
+  valuesDescription: string;
+  formTitle: string;
+  formDescription: string;
+  fullNameLabel: string;
+  emailLabel: string;
+  phoneLabel: string;
+  addressLabel: string;
+  experienceLabel: string;
+  roleLabel: string;
+  descriptionLabel: string;
+  submitButtonText: string;
+  successTitle: string;
+  successMessage: string;
+  privacyNote: string;
+  jobRoles: string[];
+}
+
 export interface AdminSiteConfig {
   theme: ThemeTokens;
   sectionOrder: SectionOrderItem[];
@@ -399,6 +422,7 @@ export interface AdminSiteConfig {
   shopNowConfig: ShopNowPageConfig;
   manufacturer?: ManufacturerConfig;
   aboutPage?: AboutPageConfig;
+  careersPage?: CareersPageConfig;
   cart?: CartConfig;
   checkoutPayment?: CheckoutPaymentConfig;
   products: Product[];

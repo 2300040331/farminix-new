@@ -24,12 +24,14 @@ export const MainHeader: React.FC = () => {
     currentRoute.searchParams.has('category');
   const isAboutActive = currentRoute.pathname === '/about';
   const isManufacturerActive = currentRoute.pathname === '/manufacturer';
+  const isCareersActive = currentRoute.pathname === '/careers';
 
   const navLinks = [
     { label: 'Home', path: '/', isActive: isHomeActive },
     { label: 'Products', path: '/products', isActive: isProductsActive },
     { label: 'About Farminix', path: '/about', isActive: isAboutActive },
     { label: 'Manufacturer', path: '/manufacturer', isActive: isManufacturerActive },
+    ...(publishedConfig.careersPage?.enabled === false ? [] : [{ label: 'Careers', path: '/careers', isActive: isCareersActive }]),
   ];
 
   return (
