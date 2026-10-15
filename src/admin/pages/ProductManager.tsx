@@ -186,7 +186,7 @@ export const ProductManager: React.FC = () => {
       {savedSuccess && (
         <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200 shadow-2xs">
           <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>✓ Product Catalog Changes Saved &amp; Live on the Main Storefront!</span>
+          <span>Product draft updated. Click Save Changes above to publish to all devices.</span>
         </div>
       )}
 

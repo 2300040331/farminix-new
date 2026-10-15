@@ -15,13 +15,9 @@ export const AdminAuth: React.FC<{ onBackToStore: () => void }> = ({ onBackToSto
     setError('');
     setIsLoading(true);
 
-    setTimeout(() => {
-      const ok = adminLogin(email, password);
-      if (!ok) {
-        setError('Invalid admin credentials. Please try again.');
-      }
-      setIsLoading(false);
-    }, 400);
+    void adminLogin(email, password).catch((error) => {
+      setError(error instanceof Error ? error.message : 'Unable to sign in. Please retry.');
+    }).finally(() => setIsLoading(false));
   };
 
   return (

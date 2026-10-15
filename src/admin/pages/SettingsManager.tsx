@@ -85,7 +85,7 @@ export const SettingsManager: React.FC = () => {
           {savedSuccess ? (
             <>
               <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-              <span>Saved &amp; Published!</span>
+              <span>Draft Updated</span>
             </>
           ) : (
             <>
@@ -99,7 +99,7 @@ export const SettingsManager: React.FC = () => {
       {savedSuccess && (
         <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-800 text-xs font-bold animate-in fade-in">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>Settings saved! Brand styling and coordinates updated across the platform.</span>
+          <span>Settings draft updated. Click Save Changes above to publish to all devices.</span>
         </div>
       )}
 

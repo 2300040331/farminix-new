@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type {
   AdminSiteConfig,
   ThemeTokens,
@@ -40,9 +40,12 @@ interface AdminContextType {
   publishedConfig: AdminSiteConfig; // Represents published config on store
   hasChanges: boolean;
   isAdminLoggedIn: boolean;
-  adminLogin: (email: string, pass: string) => boolean;
+  adminLogin: (email: string, pass: string) => Promise<boolean>;
+  isSaving: boolean;
+  saveError: string;
+  saveSuccess: boolean;
   adminLogout: () => void;
-  publishConfig: () => void;
+  publishConfig: () => Promise<void>;
   discardDraft: () => void;
   updateTheme: (tokens: Partial<ThemeTokens>) => void;
   updateSectionOrder: (newOrder: SectionOrderItem[]) => void;
@@ -120,7 +123,7 @@ const sanitizeAboutPage = (raw: any): AboutPageConfig => {
 };
 
 const sanitizeProducts = (products: any[]): Product[] => {
-  if (!Array.isArray(products) || products.length === 0) {
+  if (!Array.isArray(products)) {
     return defaultSiteConfig.products;
   }
   return products.map((prod) => {
@@ -174,40 +177,7 @@ const AdminConfigContext = createContext<AdminContextType | undefined>(undefined
 
 export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Published config (loaded by the storefront)
-  const [publishedConfig, setPublishedConfig] = useState<AdminSiteConfig>(() => {
-    try {
-      const saved = localStorage.getItem(PUBLISHED_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          ...defaultSiteConfig,
-          ...parsed,
-          products: sanitizeProducts(parsed.products),
-          theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
-          footer: sanitizeFooter(parsed.footer),
-          header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
-          manufacturer: sanitizeManufacturer(parsed.manufacturer),
-          aboutPage: sanitizeAboutPage(parsed.aboutPage),
-          careersPage: { ...defaultCareersPageConfig, ...(parsed.careersPage || {}) },
-          cart: { ...defaultCartConfig, ...(parsed.cart || {}) },
-          checkoutPayment: sanitizePaymentConfig(parsed.checkoutPayment),
-          futureArrivals: { ...defaultSiteConfig.futureArrivals, ...(parsed.futureArrivals || {}) },
-          categorySection: { ...defaultSiteConfig.categorySection, ...(parsed.categorySection || {}) },
-          featureStrip: { ...defaultSiteConfig.featureStrip, ...(parsed.featureStrip || {}) },
-          bottomFeatureStrip: { ...defaultSiteConfig.bottomFeatureStrip, ...(parsed.bottomFeatureStrip || {}) },
-          navItems: (() => {
-            const saved = parsed.navItems || [];
-            const savedIds = new Set(saved.map((n: NavItemConfig) => n.id));
-            const missing = defaultSiteConfig.navItems.filter((n) => !savedIds.has(n.id));
-            return [...saved, ...missing];
-          })(),
-        };
-      }
-    } catch (e) {
-      console.warn('Failed to parse published admin config, using defaults', e);
-    }
-    return defaultSiteConfig;
-  });
+  const [publishedConfig, setPublishedConfig] = useState<AdminSiteConfig>(defaultSiteConfig);
 
   // Draft config (loaded and modified in the admin crm)
   const [config, setConfig] = useState<AdminSiteConfig>(() => {
@@ -353,42 +323,81 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, [publishedConfig.theme]);
 
 
-  // Save changes to draft & immediately publish to live store
-  const saveConfig = (newConfig: AdminSiteConfig) => {
-    const sanitized = {
-      ...newConfig,
-      products: sanitizeProducts(newConfig.products),
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const draftRef = useRef(config);
+  const dirtyRef = useRef(hasChanges);
+  const savingRef = useRef(false);
+
+  useEffect(() => {
+    let disposed = false;
+    const refresh = async () => {
+      try {
+        const response = await fetch('/api/site-config', { cache: 'no-store' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to load live store.');
+        if (disposed || savingRef.current) return;
+        setSaveError('');
+        if (data.config) {
+          const live = { ...defaultSiteConfig, ...data.config, products: sanitizeProducts(data.config.products) };
+          setPublishedConfig(live);
+          if (!dirtyRef.current) {
+            draftRef.current = live;
+            setConfig(live);
+          }
+        }
+      } catch (error) {
+        if (!disposed) setSaveError(error instanceof Error ? error.message : 'Unable to connect to the live store.');
+      }
     };
+    void refresh();
+    const timer = window.setInterval(refresh, 15000);
+    window.addEventListener('focus', refresh);
+    return () => { disposed = true; clearInterval(timer); window.removeEventListener('focus', refresh); };
+  }, []);
+
+  // Edits remain drafts until the server confirms publication.
+  const saveConfig = (newConfig: AdminSiteConfig) => {
+    const sanitized = { ...newConfig, products: sanitizeProducts(newConfig.products) };
+    draftRef.current = sanitized;
+    dirtyRef.current = true;
     setConfig(sanitized);
-    setPublishedConfig(sanitized);
-    setHasChanges(false);
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(sanitized));
-      localStorage.setItem(PUBLISHED_KEY, JSON.stringify(sanitized));
-    } catch (e) {
-      console.error('Failed to save & publish admin config', e);
-    }
+    setHasChanges(true);
+    setSaveSuccess(false);
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(sanitized)); } catch {}
   };
 
-  const publishConfig = () => {
-    const sanitized = {
-      ...config,
-      products: sanitizeProducts(config.products),
-    };
+  const publishConfig = async () => {
+    if (savingRef.current) return;
+    savingRef.current = true;
+    setIsSaving(true);
+    setSaveError('');
+    setSaveSuccess(false);
+    const snapshot = draftRef.current;
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(sanitized));
-      localStorage.setItem(PUBLISHED_KEY, JSON.stringify(sanitized));
-      setConfig(sanitized);
-      setPublishedConfig(sanitized);
-      setHasChanges(false);
-    } catch (e) {
-      console.error('Failed to publish admin config', e);
-    }
+      const response = await fetch('/api/site-config', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: snapshot }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Publishing failed. Please retry.');
+      setPublishedConfig({ ...defaultSiteConfig, ...data.config });
+      const changedDuringSave = draftRef.current !== snapshot;
+      dirtyRef.current = changedDuringSave;
+      setHasChanges(changedDuringSave);
+      setSaveSuccess(!changedDuringSave);
+      try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(data.config)); } catch {}
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Publishing failed. Please retry.');
+    } finally { savingRef.current = false; setIsSaving(false); }
   };
 
   const discardDraft = () => {
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(publishedConfig));
+      draftRef.current = publishedConfig;
+      dirtyRef.current = false;
       setConfig(publishedConfig);
       setHasChanges(false);
     } catch (e) {
@@ -396,22 +405,22 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   };
 
-  const adminLogin = (email: string, pass: string): boolean => {
-    if ((email.trim().toLowerCase() === 'admin@farminix.com' || email.trim().toLowerCase() === 'admin') && (pass === 'admin123' || pass === 'farminix2026')) {
-      setIsAdminLoggedIn(true);
-      try {
-        localStorage.setItem(AUTH_KEY, 'true');
-      } catch {}
-      return true;
-    }
-    return false;
+  const adminLogin = async (email: string, pass: string): Promise<boolean> => {
+    const response = await fetch('/api/site-config', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Sign in failed.');
+    setIsAdminLoggedIn(true);
+    try { localStorage.setItem(AUTH_KEY, 'true'); } catch {}
+    return true;
   };
 
   const adminLogout = () => {
+    void fetch('/api/site-config', { method: 'DELETE' });
     setIsAdminLoggedIn(false);
-    try {
-      localStorage.removeItem(AUTH_KEY);
-    } catch {}
+    try { localStorage.removeItem(AUTH_KEY); } catch {}
   };
 
   const updateTheme = (tokens: Partial<ThemeTokens>) => {
@@ -587,6 +596,9 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         config,
         publishedConfig,
         hasChanges,
+        isSaving,
+        saveError,
+        saveSuccess,
         isAdminLoggedIn,
         adminLogin,
         adminLogout,

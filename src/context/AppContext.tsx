@@ -70,12 +70,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { publishedConfig, updateOrders } = useAdminConfig();
   
   // Filter out products and categories where enabled is explicitly set to false
-  const allProducts = (publishedConfig.products && publishedConfig.products.length > 0 
+  const allProducts = (publishedConfig.products 
     ? publishedConfig.products 
     : defaultAllProducts).filter(p => p.enabled !== false).map(p => ({ ...p, inStock: p.stockCount != null ? p.stockCount > 0 : p.inStock }));
   const products = allProducts;
   
-  const categories = (publishedConfig.categories && publishedConfig.categories.length > 0 
+  const categories = (publishedConfig.categories 
     ? publishedConfig.categories 
     : defaultCategories).filter(c => c.enabled !== false);
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Save,
   Home,
   Package,
   Heart,
@@ -32,7 +33,7 @@ interface NavSection {
 }
 
 export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onReturnToStore }) => {
-  const { adminLogout, resetToDefaults, hasChanges, publishConfig, discardDraft } = useAdminConfig();
+  const { adminLogout, resetToDefaults, hasChanges, publishConfig, discardDraft, isSaving, saveError, saveSuccess } = useAdminConfig();
   const [activePage, setActivePage] = useState<string>('home');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -224,13 +225,17 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
               <span className="text-[10px] sm:text-xs font-extrabold text-slate-700 uppercase tracking-wider">
-                Live Store Synchronization Active
+                {isSaving ? 'Publishing changes…' : hasChanges ? 'Unpublished changes' : 'Store administration'}
               </span>
             </div>
           </div>
 
-          {/* Quick External Actions */}
+          {/* Save is available on every management page. */}
           <div className="flex items-center gap-3">
+            <button onClick={() => void publishConfig()} disabled={isSaving}
+              className="px-4 py-2 bg-purple-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 disabled:opacity-50">
+              <Save className="w-4 h-4" />{isSaving ? 'Saving…' : 'Save Changes'}
+            </button>
             <button
               onClick={onReturnToStore}
               className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
@@ -256,6 +261,8 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
 
         {/* Page Body */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+          {saveError && <div role="alert" className="mb-4 p-4 rounded-xl bg-red-50 text-red-700">{saveError}</div>}
+          {saveSuccess && <div role="status" className="mb-4 p-4 rounded-xl bg-emerald-50 text-emerald-800">Changes saved to the live store. Other devices will receive the update within 15 seconds or on refresh.</div>}
           {renderCurrentPage()}
         </main>
       </div>
