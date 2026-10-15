@@ -117,6 +117,8 @@ export const ProductManager: React.FC = () => {
 
     const cleanData: Product = {
       ...formData,
+      stockCount: Math.max(0, Math.floor(Number(formData.stockCount) || 0)),
+      inStock: Number(formData.stockCount) > 0,
       price: Number(formData.price) || 0,
       oldPrice: Number(formData.oldPrice) || 0,
       discountPercentage: formData.discountPercentage !== undefined ? Number(formData.discountPercentage) : 0,
@@ -439,8 +441,8 @@ export const ProductManager: React.FC = () => {
                       <label className="block text-xs font-bold text-slate-700 mb-1">Stock Count</label>
                       <input
                         type="text"
-                        value={formData.stockCount || 50}
-                        onChange={(e) => setFormData({ ...formData, stockCount: Number(e.target.value.replace(/\D/g, '')) || 0 })}
+                        value={formData.stockCount ?? 50}
+                        onChange={(e) => setFormData({ ...formData, stockCount: Number(e.target.value.replace(/\D/g, '')) || 0, inStock: Number(e.target.value.replace(/\D/g, '')) > 0 })}
                         className="w-full h-10 px-3 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl"
                       />
                     </div>

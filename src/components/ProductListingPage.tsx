@@ -220,7 +220,9 @@ export const ProductListingPage: React.FC = () => {
                         </div>
 
                         <div className="w-full mt-auto">
-                          {qty === 0 ? (
+                          {!product.inStock ? (
+                            <button disabled className="w-full min-h-9 px-2 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold cursor-not-allowed">Out of Stock</button>
+                          ) : qty === 0 ? (
                             <button
                               onClick={() => {
                                 addToCart(product);
@@ -329,7 +331,9 @@ export const ProductListingPage: React.FC = () => {
 
                       {/* Add / Stepper */}
                       <div className="w-full mt-auto">
-                        {qty === 0 ? (
+                        {!product.inStock ? (
+                            <button disabled className="w-full min-h-9 px-2 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold cursor-not-allowed">Out of Stock</button>
+                          ) : qty === 0 ? (
                           <button
                             onClick={() => {
                               addToCart(product);

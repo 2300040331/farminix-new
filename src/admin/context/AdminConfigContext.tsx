@@ -125,6 +125,10 @@ const sanitizeProducts = (products: any[]): Product[] => {
   }
   return products.map((prod) => {
     const cleanProd = { ...prod };
+    if (cleanProd.stockCount != null) {
+      cleanProd.stockCount = Math.max(0, Math.floor(Number(cleanProd.stockCount) || 0));
+      cleanProd.inStock = cleanProd.stockCount > 0;
+    }
     if (cleanProd.id === 'r1' && cleanProd.price === 1399 && cleanProd.oldPrice === 1699) {
       cleanProd.price = 2100;
       cleanProd.oldPrice = 3000;

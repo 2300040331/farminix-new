@@ -639,7 +639,7 @@ export const OffersPage: React.FC = () => {
                   const discount    = product.discountPercentage !== undefined && product.discountPercentage > 0
                     ? product.discountPercentage
                     : Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
-                  const stockPct    = Math.min(100, Math.max(8, Math.round((product.stockCount / 80) * 100)));
+                  const stockPct    = Math.min(100, Math.max(0, Math.round((product.stockCount / 80) * 100)));
                   const isLowStock  = product.stockCount < 20;
                   const isAnimating = heartAnimIds.has(product.id);
 
@@ -713,13 +713,15 @@ export const OffersPage: React.FC = () => {
                             />
                           </div>
                           <div className={`text-[9px] font-semibold mt-0.5 ${isLowStock ? 'text-amber-600' : 'text-slate-400'}`}>
-                            {isLowStock ? `⚡ Only ${product.stockCount} left!` : 'In Stock'}
+                            {!product.inStock ? 'Out of Stock' : isLowStock ? `⚡ Only ${product.stockCount} left!` : 'In Stock'}
                           </div>
                         </div>
 
                         {/* Add / Stepper */}
                         <div className="w-full mt-auto">
-                          {qty === 0 ? (
+                          {!product.inStock ? (
+                            <button disabled className="w-full min-h-9 px-2 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold cursor-not-allowed">Out of Stock</button>
+                          ) : qty === 0 ? (
                             <button
                               onClick={() => { addToCart(product); setIsCartOpen(true); }}
                               className="w-full h-9 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"

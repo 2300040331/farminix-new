@@ -72,7 +72,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Filter out products and categories where enabled is explicitly set to false
   const allProducts = (publishedConfig.products && publishedConfig.products.length > 0 
     ? publishedConfig.products 
-    : defaultAllProducts).filter(p => p.enabled !== false);
+    : defaultAllProducts).filter(p => p.enabled !== false).map(p => ({ ...p, inStock: p.stockCount != null ? p.stockCount > 0 : p.inStock }));
   const products = allProducts;
   
   const categories = (publishedConfig.categories && publishedConfig.categories.length > 0 
@@ -106,6 +106,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('farminix_cart_v3', JSON.stringify(cart));
     } catch {}
   }, [cart]);
+
+  // Keep saved carts aligned with the latest published inventory.
+  useEffect(() => {
+    setCart(previous => previous.flatMap(item => {
+      const latest = (publishedConfig.products || defaultAllProducts).find(p => p.id === item.product.id);
+      if (!latest || latest.enabled === false || latest.stockCount <= 0 || latest.inStock === false) return [];
+      return [{ ...item, product: latest }];
+    }));
+  }, [publishedConfig.products]);
 
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>('FARM10');
 
@@ -279,6 +288,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Cart operations
   const addToCart = (product: Product, selectedWeight?: string) => {
+    const currentProduct = products.find(p => p.id === product.id);
+    if (!currentProduct?.inStock) return;
     const weight = selectedWeight || product.weight;
     setCart(prev => {
       const existing = prev.find(item => item.product.id === product.id && item.selectedWeight === weight);
@@ -298,6 +309,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateQuantity = (productId: string, delta: number) => {
+    const currentProduct = products.find(p => p.id === productId);
+    if (delta > 0 && !currentProduct?.inStock) return;
     setCart(prev => {
       return prev
         .map(item => {

@@ -369,7 +369,9 @@ export const CategoryPage: React.FC = () => {
 
                       {/* Add Button */}
                       <div className="w-full mt-auto">
-                        {qty === 0 ? (
+                        {!product.inStock ? (
+                            <button disabled className="w-full min-h-9 px-2 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold cursor-not-allowed">Out of Stock</button>
+                          ) : qty === 0 ? (
                           <button
                             onClick={() => {
                               addToCart(product);
@@ -459,7 +461,9 @@ export const CategoryPage: React.FC = () => {
                           </div>
                         </div>
                         <div className="w-full mt-auto">
-                          {qty === 0 ? (
+                          {!product.inStock ? (
+                            <button disabled className="w-full min-h-9 px-2 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold cursor-not-allowed">Out of Stock</button>
+                          ) : qty === 0 ? (
                             <button onClick={() => { addToCart(product); setIsCartOpen(true); }} className="w-full h-9 bg-[#7C3AED] hover:bg-[#6D28D9] active:scale-95 text-white text-xs font-bold rounded-[10px] flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"><span>+ Add</span></button>
                           ) : (
                             <div className="w-full h-9 bg-[#7C3AED] text-white rounded-[10px] flex items-center justify-between px-2 font-bold text-xs shadow-xs">

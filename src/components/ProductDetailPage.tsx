@@ -471,7 +471,9 @@ export const ProductDetailPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row items-center gap-3">
                 {/* Stepper / Add Button */}
                 <div className="w-full sm:flex-1">
-                  {quantity === 0 ? (
+                  {!product.inStock ? (
+                            <button disabled className="w-full min-h-9 px-2 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold cursor-not-allowed">Out of Stock</button>
+                          ) : quantity === 0 ? (
                     <button
                       onClick={() => {
                         addToCart(product, currentWeight);
@@ -795,7 +797,9 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         </div>
         <div className="flex-1 max-w-[200px]">
-          {quantity === 0 ? (
+          {!product.inStock ? (
+                            <button disabled className="w-full min-h-9 px-2 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold cursor-not-allowed">Out of Stock</button>
+                          ) : quantity === 0 ? (
             <button
               onClick={() => { addToCart(product, currentWeight); setIsCartOpen(true); }}
               className="w-full h-11 bg-[#7C3AED] text-white text-xs font-extrabold rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
