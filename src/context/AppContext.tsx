@@ -116,7 +116,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   }, [publishedConfig.products]);
 
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>('FARM10');
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -328,31 +328,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCart([]);
   };
 
+  const eligibleSubtotal = (coupon: import('../admin/types').CartCoupon) => cart.reduce((sum, item) =>
+    sum + ((!coupon.productIds?.length || coupon.productIds.includes(item.product.id)) ? item.product.price * item.quantity : 0), 0);
+  const validCoupon = (coupon: import('../admin/types').CartCoupon) => publishedConfig.cart?.couponsEnabled !== false && coupon.enabled &&
+    (!coupon.expiresAt || new Date(coupon.expiresAt).getTime() > Date.now()) &&
+    eligibleSubtotal(coupon) > 0 && eligibleSubtotal(coupon) >= (coupon.minimumSpend || 0);
   const applyCoupon = (code: string) => {
-    const configuredCodes = (publishedConfig.cart?.coupons || [])
-      .filter((c) => c.enabled)
-      .map((c) => c.code.toUpperCase());
-    const validCodes = [
-      'FARM10',
-      ...configuredCodes,
-      (publishedConfig.topOfferBar?.promoCode || '').toUpperCase(),
-      (publishedConfig.offersPage?.promoCode || '').toUpperCase(),
-    ].filter(Boolean);
-
-    if (validCodes.includes(code.toUpperCase())) {
-      setAppliedCoupon(code.toUpperCase());
-      return true;
-    }
-    return false;
+    if (!code) { setAppliedCoupon(null); return true; }
+    const coupon = publishedConfig.cart?.coupons.find(c => c.code.toUpperCase() === code.trim().toUpperCase() && validCoupon(c));
+    if (!coupon) return false;
+    setAppliedCoupon(coupon.code.toUpperCase());
+    return true;
   };
-
   const rawTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const isCouponApplied = Boolean(appliedCoupon);
-  const matchedCoupon = (publishedConfig.cart?.coupons || []).find(
-    (c) => c.enabled && c.code.toUpperCase() === appliedCoupon?.toUpperCase()
-  );
-  const discountRate = matchedCoupon ? matchedCoupon.discountPercentage / 100 : (isCouponApplied ? 0.10 : 0);
-  const cartDiscount = isCouponApplied ? Math.round(rawTotal * discountRate) : 0;
+  const matchedCoupon = publishedConfig.cart?.coupons.find(c => c.code.toUpperCase() === appliedCoupon?.toUpperCase() && validCoupon(c));
+  const cartDiscount = matchedCoupon ? Math.round(eligibleSubtotal(matchedCoupon) * Math.min(100, Math.max(0, matchedCoupon.discountPercentage)) / 100) : 0;
   const cartTotal = Math.max(0, rawTotal - cartDiscount);
 
   // Wishlist toggle
@@ -381,6 +371,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       items: itemsToUse,
       totalAmount: totalToUse,
       discount: cartDiscount,
+      couponCode: cartDiscount > 0 ? appliedCoupon || undefined : undefined,
       deliveryFee: 0,
       finalAmount: totalToUse,
       status: 'Order Received',

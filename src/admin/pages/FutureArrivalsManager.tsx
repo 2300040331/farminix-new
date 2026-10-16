@@ -39,7 +39,7 @@ export const FutureArrivalsManager: React.FC = () => {
     const newItem: FutureItemConfig = {
       id: Date.now(),
       name: finalName,
-      image: newItemImage.trim() || 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?auto=format&fit=crop&q=80&w=300',
+      image: newItemImage.trim(),
       badgeText: newItemBadge.trim() || 'Coming Soon',
       enabled: true,
       order: currentItems.length + 1,

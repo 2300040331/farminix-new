@@ -60,13 +60,15 @@ export const fetchRazorpayKey = async (): Promise<string | null> => {
 
 export const createServerOrder = async (
   amount: number,
-  notes?: Record<string, string>
+  notes?: Record<string, string>,
+  cart?: { productId: string; quantity: number }[],
+  couponCode?: string | null
 ): Promise<{ orderId?: string; keyId?: string } | null> => {
   try {
     const res = await fetch('/api/payment/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount, notes }),
+      body: JSON.stringify({ amount, notes, cart, couponCode }),
     });
     if (res.ok) {
       const data = await res.json();

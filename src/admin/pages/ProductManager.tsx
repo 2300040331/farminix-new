@@ -12,10 +12,11 @@ import {
 } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
 import { AdminImageUpload } from '../components/AdminImageUpload';
+import { CouponEditor } from '../components/CouponEditor';
 import type { Product } from '../../types';
 
 export const ProductManager: React.FC = () => {
-  const { config, addProduct, editProduct, deleteProduct } = useAdminConfig();
+  const { config, addProduct, editProduct, deleteProduct, publishConfig, isSaving, saveError } = useAdminConfig();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,50 +29,10 @@ export const ProductManager: React.FC = () => {
     id: `prod-${Date.now()}`,
     name: '',
     category: config.categories[0]?.name || 'Rice & Grains',
-    price: 99,
-    oldPrice: 120,
-    discountPercentage: 18,
-    weight: '1 kg',
-    weightOptions: ['500 g', '1 kg', '2 kg'],
-    image: '/prod_daawat_rice.jpg',
-    deliveryTime: '10 Mins',
-    inStock: true,
-    stockCount: 50,
-    brand: 'Farminix',
-    description: '',
-    ingredients: ['100% Quality Harvest Milled Rice (Premium Select Grains)'],
-    nutritionalInfo: {
-      energy: '350 kcal',
-      protein: '8 g',
-      carbs: '70 g',
-      fat: '1 g',
-    },
-    badges: ['Bestseller', 'Fresh'],
-    highlights: [
-      { icon: '🌾', title: '100% Natural', desc: 'Sourced directly from verified farms.' },
-      { icon: '⚡', title: '10 Min Express', desc: 'Packed fresh and delivered under 10 minutes.' },
-    ],
-    benefits: ['Rich in essential natural nutrients', 'Zero artificial chemicals or polish'],
-    specifications: [
-      { label: 'Brand', value: 'Farminix' },
-      { label: 'Product Name', value: 'Farminix Family Choice Rice' },
-      { label: 'Net Quantity', value: '26 Kg' },
-      { label: 'Dietary Preference', value: '100% Vegetarian 🟢' },
-      { label: 'FSSAI License No.', value: '20126142000933' },
-      { label: 'Manufactured & Marketed By', value: 'Farminix Private Limited' },
-      { label: 'Registered Address', value: 'Flat No 302, Srinivasa Towers, Gorantla, Guntur - 522034, Andhra Pradesh' },
-      { label: 'Customer Contact', value: '+91 7989743595' },
-      { label: 'Customer Support Email', value: 'info@farminix.in' },
-      { label: 'Official Website', value: 'www.farminix.in' },
-      { label: 'Shelf Life', value: '24 Months from Packaging Date' },
-      { label: 'Barcode', value: '8908032796002' },
-      { label: 'Country of Origin', value: 'India' },
-    ],
-    howToUse: ['Use as desired in traditional Indian cooking.'],
-    storageInstructions: 'Store in a cool dry place in an airtight container.',
-    faqs: [
-      { question: 'Is this product 100% authentic?', answer: 'Yes, all Farminix staples are 100% genuine and verified.' },
-    ],
+    price: 0, oldPrice: 0, discountPercentage: 0, weight: '', weightOptions: [], image: '',
+    deliveryTime: '', inStock: false, stockCount: 0, brand: '', description: '',
+    ingredients: [], nutritionalInfo: { energy: '', protein: '', carbs: '', fat: '' },
+    badges: [], highlights: [], benefits: [], specifications: [], howToUse: [], storageInstructions: '', faqs: [],
   };
 
   const [formData, setFormData] = useState<Product>(initialProductState);
@@ -111,7 +72,7 @@ export const ProductManager: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
@@ -130,13 +91,14 @@ export const ProductManager: React.FC = () => {
       addProduct(cleanData);
     }
 
-    setIsModalOpen(false);
-    setSavedSuccess(true);
+    const published = await publishConfig();
+    setSavedSuccess(published);
     setTimeout(() => setSavedSuccess(false), 2500);
   };
 
   return (
     <div className="space-y-6 text-left">
+      <div className={isModalOpen ? "hidden" : "space-y-6"}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
@@ -338,10 +300,11 @@ export const ProductManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Multi-Tab Product Edit / Add Modal */}
+      </div>
+      {/* Product editor page */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="relative bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] flex flex-col">
+        <div className="w-full">
+          <div className="bg-white rounded-3xl w-full p-6 md:p-8 border border-slate-200 flex flex-col">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
@@ -384,7 +347,7 @@ export const ProductManager: React.FC = () => {
             </div>
 
             {/* Modal Form Body */}
-            <form onSubmit={handleSave} className="flex-1 overflow-y-auto py-4 space-y-4 pr-1">
+            <form onSubmit={handleSave} className="py-6 space-y-6">
               {activeTab === 'basic' && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -502,7 +465,7 @@ export const ProductManager: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="sm:col-span-2">
                       <label className="block text-xs font-bold text-slate-700 mb-1">
                         Final Selling Price (₹) * (After Deducting Discount)
                       </label>
@@ -560,7 +523,7 @@ export const ProductManager: React.FC = () => {
 
 
 
-                    <div className="col-span-2">
+                    <div className="sm:col-span-2">
                       <AdminImageUpload
                         value={formData.image}
                         onChange={(val) => setFormData({ ...formData, image: val })}
@@ -649,36 +612,17 @@ export const ProductManager: React.FC = () => {
                 </div>
               )}
 
-              {activeTab === 'highlights' && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Primary Benefit #1</label>
-                    <input
-                      type="text"
-                      value={formData.benefits?.[0] || ''}
-                      onChange={(e) => {
-                        const b = [...(formData.benefits || [])];
-                        b[0] = e.target.value;
-                        setFormData({ ...formData, benefits: b });
-                      }}
-                      className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Primary Benefit #2</label>
-                    <input
-                      type="text"
-                      value={formData.benefits?.[1] || ''}
-                      onChange={(e) => {
-                        const b = [...(formData.benefits || [])];
-                        b[1] = e.target.value;
-                        setFormData({ ...formData, benefits: b });
-                      }}
-                      className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl"
-                    />
-                  </div>
-                </div>
-              )}
+              {activeTab === 'highlights' && <div className="space-y-5">
+                <h3 className="font-bold">Premium features — displayed in this order</h3>
+                {(formData.highlights || []).map((item, index) => <div key={index} className="grid md:grid-cols-[80px_1fr_2fr_auto] gap-3 border p-4 rounded-xl">
+                  {(['icon', 'title', 'desc'] as const).map(key => <label key={key}>{key}<input className="w-full p-2 border rounded-lg" value={item[key]} onChange={e => setFormData({...formData, highlights: formData.highlights!.map((h,i) => i === index ? {...h, [key]: e.target.value} : h)})}/></label>)}
+                  <button type="button" onClick={() => setFormData({...formData, highlights: formData.highlights!.filter((_,i) => i !== index)})}>Remove</button>
+                </div>)}
+                <button type="button" onClick={() => setFormData({...formData, highlights: [...(formData.highlights || []), {icon: '', title: '', desc: ''}]})}>Add feature</button>
+                <label className="block font-bold">Benefits & advantages (one per line)<textarea rows={6} className="block w-full p-3 border rounded-xl font-normal" value={(formData.benefits || []).join('\n')} onChange={e => setFormData({...formData, benefits: e.target.value.split('\n')})}/></label>
+                <label className="block font-bold">Ingredients (one per line)<textarea rows={3} className="block w-full p-3 border rounded-xl font-normal" value={(formData.ingredients || []).join('\n')} onChange={e => setFormData({...formData, ingredients: e.target.value.split('\n')})}/></label>
+                <label className="block font-bold">How to use (one step per line)<textarea rows={3} className="block w-full p-3 border rounded-xl font-normal" value={(formData.howToUse || []).join('\n')} onChange={e => setFormData({...formData, howToUse: e.target.value.split('\n')})}/></label>
+              </div>}
 
               {activeTab === 'faqs' && (
                 <div className="space-y-4">
@@ -835,7 +779,9 @@ export const ProductManager: React.FC = () => {
                 </div>
               )}
 
-"              {/* Modal Footer */}
+              {editingProductId && <CouponEditor productId={editingProductId} />}
+              {saveError && <p role="alert" className="text-red-600">{saveError}</p>}
+              {/* Footer */}
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                 <button
                   type="button"
@@ -848,7 +794,7 @@ export const ProductManager: React.FC = () => {
                   type="submit"
                   className="px-5 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white transition-colors cursor-pointer shadow-sm"
                 >
-                  Save Product
+                  {isSaving ? 'Saving…' : 'Save Changes'}
                 </button>
               </div>
             </form>

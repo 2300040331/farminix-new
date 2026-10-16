@@ -45,7 +45,7 @@ interface AdminContextType {
   saveError: string;
   saveSuccess: boolean;
   adminLogout: () => void;
-  publishConfig: () => Promise<void>;
+  publishConfig: () => Promise<boolean>;
   discardDraft: () => void;
   updateTheme: (tokens: Partial<ThemeTokens>) => void;
   updateSectionOrder: (newOrder: SectionOrderItem[]) => void;
@@ -145,11 +145,7 @@ const sanitizeProducts = (products: any[]): Product[] => {
     } else if (cleanProd.oldPrice && cleanProd.price && cleanProd.oldPrice > cleanProd.price) {
       cleanProd.discountPercentage = Math.round(((cleanProd.oldPrice - cleanProd.price) / cleanProd.oldPrice) * 100);
     }
-    if (cleanProd.id === 'r1' || cleanProd.name?.toLowerCase().includes('farminix')) {
-      if (!cleanProd.specifications || cleanProd.specifications.length < 5) {
-        cleanProd.specifications = defaultSiteConfig.products[0]?.specifications || cleanProd.specifications;
-      }
-    }
+
     return cleanProd;
   });
 };
@@ -173,6 +169,10 @@ const sanitizeFooter = (raw: any): FooterConfig => {
   return merged;
 };
 
+// Remove bundled stock-photo placeholders while retaining uploaded and real product assets.
+const removePlaceholderImages = <T,>(value: T): T => JSON.parse(JSON.stringify(value), (_key, item) =>
+  typeof item === 'string' && (/^https:\/\/(images\.unsplash\.com|picsum\.photos)\//.test(item) || /^\/prod_(daawat_rice|aashirvaad_atta|fortune_oil|tata_salt)\.jpg$/.test(item)) ? '' : item);
+
 const AdminConfigContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -184,7 +184,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       const saved = localStorage.getItem(DRAFT_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
+        const parsed = removePlaceholderImages(JSON.parse(saved));
         return {
           ...defaultSiteConfig,
           ...parsed,
@@ -214,7 +214,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // Fallback to published if no draft exists
       const publishedSaved = localStorage.getItem(PUBLISHED_KEY);
       if (publishedSaved) {
-        const parsed = JSON.parse(publishedSaved);
+        const parsed = removePlaceholderImages(JSON.parse(publishedSaved));
         return {
           ...defaultSiteConfig,
           ...parsed,
@@ -344,7 +344,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (disposed || savingRef.current) return;
         setSaveError('');
         if (data.config) {
-          const live = { ...defaultSiteConfig, ...data.config, products: sanitizeProducts(data.config.products) };
+          const live = { ...defaultSiteConfig, ...removePlaceholderImages(data.config), products: sanitizeProducts(removePlaceholderImages(data.config.products)) };
           setPublishedConfig(live);
           if (!dirtyRef.current) {
             draftRef.current = live;
@@ -363,7 +363,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Edits remain drafts until the server confirms publication.
   const saveConfig = (newConfig: AdminSiteConfig) => {
-    const sanitized = { ...newConfig, products: sanitizeProducts(newConfig.products) };
+    const sanitized = removePlaceholderImages({ ...newConfig, products: sanitizeProducts(newConfig.products) });
     draftRef.current = sanitized;
     dirtyRef.current = true;
     setConfig(sanitized);
@@ -373,7 +373,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const publishConfig = async () => {
-    if (savingRef.current) return;
+    if (savingRef.current) return false;
     savingRef.current = true;
     setIsSaving(true);
     setSaveError('');
@@ -389,20 +389,18 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         setPublishedConfig({ ...defaultSiteConfig, ...data.config });
         try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(data.config)); } catch {}
       } else {
-        // Fall back to local storage publication if backend shared storage is unconfigured
-        setPublishedConfig({ ...defaultSiteConfig, ...snapshot });
-        try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(snapshot)); } catch {}
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Changes could not be published. Please retry.');
       }
       const changedDuringSave = draftRef.current !== snapshot;
       dirtyRef.current = changedDuringSave;
       setHasChanges(changedDuringSave);
       setSaveSuccess(true);
+      return true;
     } catch (error) {
-      // Offline / network failure fallback
-      setPublishedConfig({ ...defaultSiteConfig, ...snapshot });
-      try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(snapshot)); } catch {}
-      setHasChanges(false);
-      setSaveSuccess(true);
+      setSaveError(error instanceof Error ? error.message : 'Unable to publish changes.');
+      setHasChanges(true);
+      return false;
     } finally { savingRef.current = false; setIsSaving(false); }
   };
 

@@ -149,6 +149,7 @@ export interface User {
 }
 
 export interface Order {
+  couponCode?: string;
   id: string;
   date: string;
   items: CartItem[];

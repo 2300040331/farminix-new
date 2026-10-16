@@ -17,11 +17,16 @@ export const CheckoutPage: React.FC = () => {
     cart,
     cartTotal,
     cartDiscount,
+    appliedCoupon,
+    applyCoupon,
     user,
     setUser,
     setLocation,
     createOrder,
   } = useApp();
+
+  const [couponCode, setCouponCode] = useState('');
+  const [couponError, setCouponError] = useState('');
 
   // Document title
   useEffect(() => {
@@ -267,7 +272,8 @@ export const CheckoutPage: React.FC = () => {
         customer_name: selectedAddress.name || user?.name || '',
         customer_phone: selectedAddress.phone || user?.phone || '',
         delivery_slot: selectedSlot,
-      });
+      }, cart.map(item => ({ productId: item.product.id, quantity: item.quantity })), appliedCoupon);
+      if (!serverOrder?.orderId) throw new Error('Unable to validate this order. Please retry.');
 
       const options = {
         key: activeKey,
@@ -881,6 +887,12 @@ export const CheckoutPage: React.FC = () => {
                   <span>₹{cartTotal + cartDiscount}</span>
                 </div>
 
+                {publishedConfig.cart?.couponsEnabled !== false && <div className="py-3 space-y-2">
+                  <label htmlFor="checkout-coupon" className="font-bold">Coupon code</label>
+                  <div className="flex gap-2"><input id="checkout-coupon" value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} className="min-w-0 flex-1 p-2 border rounded-xl" placeholder="Enter coupon code"/><button type="button" onClick={() => setCouponError(applyCoupon(couponCode) ? '' : 'Coupon is unavailable, expired, or does not qualify for this cart.')}>Apply</button></div>
+                  {appliedCoupon && <div>{appliedCoupon} {cartDiscount > 0 ? 'applied' : 'no longer eligible'} <button type="button" onClick={() => applyCoupon('')}>Remove</button></div>}
+                  {couponError && <p role="alert" className="text-red-600 text-sm">{couponError}</p>}
+                </div>}
                 {cartDiscount > 0 && (
                   <div className="flex justify-between text-purple-700 font-bold">
                     <span>Coupon Discount</span>

@@ -345,6 +345,9 @@ export interface AboutPageConfig {
 }
 
 export interface CartCoupon {
+  productIds?: string[];
+  minimumSpend?: number;
+  expiresAt?: string;
   code: string;
   discountPercentage: number;
   description: string;
@@ -352,6 +355,7 @@ export interface CartCoupon {
 }
 
 export interface CartConfig {
+  couponsEnabled?: boolean;
   deliveryBannerText: string;
   deliveryTimeText: string;
   handlingFee: number;

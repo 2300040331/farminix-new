@@ -38,8 +38,8 @@ export const CartDrawer: React.FC = () => {
       const discount = match ? match.discountPercentage : 10;
       setCouponMsg({ text: `Coupon ${cleanCode} applied! ${discount}% discount added.`, isError: false });
     } else {
-      const sampleCodes = (cartCfg.coupons || []).filter(c => c.enabled).map(c => c.code).join(' or ') || 'FARM10';
-      setCouponMsg({ text: `Invalid coupon code. Try ${sampleCodes}`, isError: true });
+      const sampleCodes = (cartCfg.coupons || []).filter(c => c.enabled).map(c => c.code).join(' or ') || '';
+      setCouponMsg({ text: sampleCodes ? `Coupon unavailable or cart not eligible. Available codes: ${sampleCodes}` : 'No eligible coupon is available.', isError: true });
     }
   };
 
@@ -166,7 +166,7 @@ export const CartDrawer: React.FC = () => {
                         type="text"
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value)}
-                        placeholder={`Try code: ${(cartCfg.coupons || []).find(c => c.enabled)?.code || 'FARM10'}`}
+                        placeholder="Enter coupon code"
                         className="w-full h-10 pl-9 pr-3 text-xs bg-slate-50 border border-gray-200 rounded-xl uppercase font-semibold focus:outline-none focus:border-[#7C3AED]"
                       />
                     </div>
@@ -185,7 +185,7 @@ export const CartDrawer: React.FC = () => {
                   {appliedCoupon && !couponMsg && (
                     <div className="text-[11px] font-semibold text-purple-700 mt-1 flex items-center gap-1">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      Coupon {appliedCoupon} active ({activeCouponObj ? `${activeCouponObj.discountPercentage}% OFF` : '10% OFF'})
+                      Coupon {appliedCoupon} active ({activeCouponObj ? `${activeCouponObj.discountPercentage}% OFF` : 'Unavailable'})
                     </div>
                   )}
                 </div>
@@ -203,7 +203,7 @@ export const CartDrawer: React.FC = () => {
                 </div>
                 {cartDiscount > 0 && (
                   <div className="flex justify-between items-center text-purple-700 font-semibold">
-                    <span>Coupon Discount ({appliedCoupon || 'FARM10'})</span>
+                    <span>Coupon Discount ({appliedCoupon || ''})</span>
                     <span>-₹{cartDiscount}</span>
                   </div>
                 )}

@@ -254,11 +254,9 @@ export const ProductDetailPage: React.FC = () => {
   ];
 
   // Frequently Bought Together Products
-  const bundleProducts = useMemo(() => {
-    return allProducts
-      .filter((p) => p.id !== product.id && p.category === product.category)
-      .slice(0, 2);
-  }, [allProducts, product]);
+  const bundleProducts = allProducts
+    .filter((p) => p.id !== product.id && p.category === product.category)
+    .slice(0, 2);
 
   const bundleTotal = currentPrice + bundleProducts.reduce((sum, p) => sum + p.price, 0);
 

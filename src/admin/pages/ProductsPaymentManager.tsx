@@ -7,6 +7,7 @@ import {
   Save,
   Clock,
 } from 'lucide-react';
+import { CouponEditor } from '../components/CouponEditor';
 import { ProductManager } from './ProductManager';
 import { OrderManager } from './OrderManager';
 import { useAdminConfig } from '../context/AdminConfigContext';
@@ -16,7 +17,7 @@ import type { CheckoutPaymentConfig } from '../types';
 type ProductTab = 'catalog' | 'checkout' | 'orders';
 
 export const ProductsPaymentManager: React.FC = () => {
-  const { config, updateCheckoutPayment } = useAdminConfig();
+  const { config, updateCheckoutPayment, publishConfig } = useAdminConfig();
   const [activeTab, setActiveTab] = useState<ProductTab>('catalog');
 
   const [checkoutData, setCheckoutData] = useState<CheckoutPaymentConfig>(
@@ -24,9 +25,9 @@ export const ProductsPaymentManager: React.FC = () => {
   );
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  const handleSaveCheckout = () => {
+  const handleSaveCheckout = async () => {
     updateCheckoutPayment(checkoutData);
-    setSavedSuccess(true);
+    setSavedSuccess(await publishConfig());
     setTimeout(() => setSavedSuccess(false), 2500);
   };
 
@@ -112,6 +113,7 @@ export const ProductsPaymentManager: React.FC = () => {
 
         {activeTab === 'checkout' && (
           <div className="space-y-6">
+            <CouponEditor />
             {/* Header & Save Button */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
               <div>
