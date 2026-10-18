@@ -1,5 +1,6 @@
 import type {
   AdminSiteConfig,
+  ReachOutPageConfig,
   ThemeTokens,
   ManufacturerConfig,
   AboutPageConfig,
@@ -8,6 +9,39 @@ import type {
   CareersPageConfig,
 } from './types';
 import { categories, allProducts, epicDeals, brandLogosList } from '../data/products';
+
+export const defaultReachOutPageConfig: ReachOutPageConfig = {
+  enabled: true,
+  title: 'Reach Out to Us',
+  subtitle: 'Find Farminix’s manufacturing unit, corporate office, and warehouse. Choose the location you need below.',
+  badge: 'Our locations',
+  locations: [
+    { id: 'manufacturing', label: 'Manufacturing Unit', name: 'PARNIKA RICE INDUSTRIES', address: 'Sattenapalli, Palnadu District, Andhra Pradesh – 522403', phone: '+91 9248656999', email: 'parnikariceindustries@gmail.com', enabled: true },
+    { id: 'corporate', label: 'Corporate Office', name: 'FARMINIX PRIVATE LIMITED', address: 'Flat No. 302, Srinivasa Towers, Gorantla, Guntur District, Andhra Pradesh – 522034', phone: '+91 7989743595', email: 'info@farminix.in', enabled: true },
+    { id: 'warehouse', label: 'Warehouse', name: '', address: "Shop No. 2, Arogyamatha Church Complex, Beside St. Ann's College for Women, Gorantla, Guntur District, Andhra Pradesh – 522034.", phone: '', email: '', enabled: true },
+  ],
+};
+
+export const defaultQueriesPageConfig = {
+  enabled: true,
+  title: 'Any Queries?',
+  subtitle: 'A question, a concern, or something you would like us to know? Write to Farminix.',
+  badge: 'We’re here to listen',
+  formHeading: 'Let’s start a conversation',
+  submitLabel: 'Send enquiry',
+  successMessage: 'Your enquiry has been received. Please keep your reference number for any follow-up.',
+  privacyNote: 'Your contact details and message are shared with the Farminix team to handle your enquiry.',
+  complianceTitle: 'Queries & compliance',
+  complianceBody: 'For product information, order concerns, complaints, or compliance-related questions, choose a topic and describe your request below.',
+  image: '',
+};
+
+export const defaultSocialBlogConfig = {
+  enabled: false,
+  title: 'From Farminix on Instagram',
+  subtitle: 'Watch the latest updates shared by Farminix.',
+  entries: [],
+};
 
 export const defaultThemeTokens: ThemeTokens = {
   colorPrimary: '#7C3AED',
@@ -89,6 +123,12 @@ export const defaultCareersPageConfig: CareersPageConfig = {
   successMessage: 'Thank you for your interest in Farminix. Our team will review your application and contact you if your profile matches an opportunity.',
   privacyNote: 'Your information will be used only to review your application and contact you about relevant opportunities.',
   jobRoles: ['Sales Executive', 'Dealer', 'Delivery Boy'],
+};
+
+export const defaultIntroVideoConfig = {
+  enabled: true,
+  desktopUrl: '/farminix_intro.mp4',
+  mobileUrl: '/farminix_intro_mobile.mp4',
 };
 
 export const defaultManufacturerConfig: ManufacturerConfig = {
@@ -378,9 +418,10 @@ export const defaultSiteConfig: AdminSiteConfig = {
     { id: 'featureStrip', name: 'Top 5 Feature Strip', enabled: false, order: 3 },
     { id: 'categorySection', name: 'Shop by Category', enabled: false, order: 4 },
     { id: 'popularProducts', name: 'Popular Today ⚡', enabled: true, order: 5 },
-    { id: 'epicDeals', name: 'Epic Deals All Day', enabled: false, order: 6 },
-    { id: 'futureArrivals', name: 'Future Arrivals', enabled: false, order: 7 },
-    { id: 'bottomFeatureStrip', name: 'Bottom Benefits Strip', enabled: false, order: 8 },
+    { id: 'socialBlog', name: 'Instagram & Blog Videos', enabled: false, order: 6 },
+    { id: 'epicDeals', name: 'Epic Deals All Day', enabled: false, order: 7 },
+    { id: 'futureArrivals', name: 'Future Arrivals', enabled: false, order: 8 },
+    { id: 'bottomFeatureStrip', name: 'Bottom Benefits Strip', enabled: false, order: 9 },
   ],
   topOfferBar: {
     enabled: false,
@@ -506,11 +547,13 @@ export const defaultSiteConfig: AdminSiteConfig = {
     logoUrl: '/farminix_logo.png?v=2',
     bioText: 'Your trusted partner for premium staples and authentic grains. Pure quality, farm-direct freshness, and reliable doorstep delivery.',
     socialLinks: {
-      instagram: 'https://www.instagram.com',
-      facebook: 'https://www.facebook.com',
-      twitter: 'https://twitter.com',
-      youtube: 'https://www.youtube.com',
+      instagram: '',
+      facebook: '',
+      twitter: '',
+      youtube: '',
     },
+    whatsappPhone: '917989743595',
+    whatsappMessage: 'Hello Farminix! 👋 I would like to know more about your rice & grocery products and place an order.',
     companyLinks: [
       { id: 'c1', label: 'Home', url: '/' },
       { id: 'c2', label: 'Products', url: '/products' },
@@ -519,11 +562,10 @@ export const defaultSiteConfig: AdminSiteConfig = {
       { id: 'c5', label: 'Special Offers', url: '/offers' },
     ],
     helpLinks: [
-      { id: 'h1', label: '24/7 Live Support', url: '#', actionType: 'support' },
-      { id: 'h2', label: 'Track Order', url: '#', actionType: 'track' },
-      { id: 'h3', label: 'Shopping Cart', url: '#', actionType: 'cart' },
-      { id: 'h4', label: 'FAQs & Help', url: '#', actionType: 'support' },
-      { id: 'h5', label: 'Contact Us', url: '#', actionType: 'support' },
+      { id: 'h1', label: 'Any Queries?', url: '/queries', enabled: true },
+      { id: 'h2', label: 'Reach Out to Us', url: '/reach-out', enabled: true },
+      { id: 'h3', label: 'Shopping Cart', url: '#', actionType: 'cart', enabled: true },
+      { id: 'h4', label: 'WhatsApp Support', url: '#', actionType: 'whatsapp', enabled: true },
     ],
     downloadApp: {
       googlePlayUrl: '#',
@@ -537,6 +579,8 @@ export const defaultSiteConfig: AdminSiteConfig = {
     ],
     copyrightText: '',
   },
+  socialBlog: defaultSocialBlogConfig,
+  introVideo: defaultIntroVideoConfig,
   offersPage: {
     enabled: true,
     heroBadge: 'MEGA SAVINGS FESTIVAL',
@@ -552,63 +596,10 @@ export const defaultSiteConfig: AdminSiteConfig = {
     maxPriceLimit: 3000,
     itemsPerPage: 12,
   },
+  queriesPage: defaultQueriesPageConfig,
+  reachOutPage: defaultReachOutPageConfig,
   products: allProducts,
-  orders: [
-    {
-      id: 'ORD-89241',
-      date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-      items: [{ product: allProducts[0], quantity: 1, selectedWeight: '26 Kg' }],
-      totalAmount: 1399,
-      discount: 0,
-      deliveryFee: 0,
-      finalAmount: 1399,
-      status: 'Out for Delivery',
-      estimatedTime: '15 Mins',
-      deliveryAddress: {
-        id: 'addr-sample-1',
-        name: 'Express Customer',
-        street: 'Main Road',
-        city: 'Guntur',
-        state: 'Andhra Pradesh',
-        pincode: '522002',
-        phone: '+91 98000 00000',
-        isDefault: true,
-      },
-      paymentMethod: 'UPI',
-    },
-    {
-      id: 'ORD-77412',
-      date: '12 Aug 2026',
-      items: [{ product: allProducts[0], quantity: 2, selectedWeight: '26 Kg' }],
-      totalAmount: 2798,
-      discount: 0,
-      deliveryFee: 0,
-      finalAmount: 2798,
-      status: 'Delivered',
-      estimatedTime: 'Delivered',
-      deliveryAddress: {
-        id: 'addr-sample-2',
-        name: 'Express Customer',
-        street: 'Main Road',
-        city: 'Guntur',
-        state: 'Andhra Pradesh',
-        pincode: '522002',
-        phone: '+91 98000 00000',
-        isDefault: true,
-      },
-      paymentMethod: 'CARD',
-    },
-  ],
-  users: [
-    {
-      id: 'usr-1',
-      name: '',
-      phone: '',
-      email: '',
-      rewardPoints: 0,
-      walletBalance: 0,
-      addresses: [],
-    },
-  ],
+  orders: [],
+  users: [],
   mediaLibrary: [],
 };

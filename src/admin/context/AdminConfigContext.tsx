@@ -6,14 +6,18 @@ import type {
   HeaderConfig,
   NavItemConfig,
   HeroConfig,
+  QueriesPageConfig,
+  ReachOutPageConfig,
   BrandMarqueeConfig,
   FeatureStripConfig,
   CategorySectionConfig,
   PopularProductsConfig,
+  SocialBlogConfig,
   EpicDealsConfig,
   FutureArrivalsConfig,
   BottomFeatureStripConfig,
   FooterConfig,
+  IntroVideoConfig,
   OffersPageConfig,
   SectionOrderItem,
   MediaItem,
@@ -33,6 +37,8 @@ import {
   defaultCartConfig,
   defaultCheckoutPaymentConfig,
   defaultCareersPageConfig,
+  defaultIntroVideoConfig,
+  defaultSocialBlogConfig,
 } from '../defaultConfig';
 
 interface AdminContextType {
@@ -54,15 +60,19 @@ interface AdminContextType {
   updateHeader: (cfg: Partial<HeaderConfig>) => void;
   updateNavItems: (items: NavItemConfig[]) => void;
   updateHero: (cfg: Partial<HeroConfig>) => void;
+  updateQueriesPage: (cfg: QueriesPageConfig) => void;
+  updateReachOutPage: (cfg: ReachOutPageConfig) => void;
   updateBrandMarquee: (cfg: Partial<BrandMarqueeConfig>) => void;
   updateFeatureStrip: (cfg: Partial<FeatureStripConfig>) => void;
   updateCategorySection: (cfg: Partial<CategorySectionConfig>) => void;
   updateCategories: (cats: Category[]) => void;
   updatePopularProducts: (cfg: Partial<PopularProductsConfig>) => void;
+  updateSocialBlog: (cfg: Partial<SocialBlogConfig>) => void;
   updateEpicDeals: (cfg: Partial<EpicDealsConfig>) => void;
   updateFutureArrivals: (cfg: Partial<FutureArrivalsConfig>) => void;
   updateBottomFeatureStrip: (cfg: Partial<BottomFeatureStripConfig>) => void;
   updateFooter: (cfg: Partial<FooterConfig>) => void;
+  updateIntroVideo: (cfg: Partial<IntroVideoConfig>) => void;
   updateOffersPage: (cfg: Partial<OffersPageConfig>) => void;
   updateShopNowConfig: (cfg: Partial<ShopNowPageConfig>) => void;
   updateManufacturer: (cfg: Partial<ManufacturerConfig>) => void;
@@ -132,14 +142,10 @@ const sanitizeProducts = (products: any[]): Product[] => {
       cleanProd.stockCount = Math.max(0, Math.floor(Number(cleanProd.stockCount) || 0));
       cleanProd.inStock = cleanProd.stockCount > 0;
     }
-    if (cleanProd.id === 'r1' && cleanProd.price === 1399 && cleanProd.oldPrice === 1699) {
-      cleanProd.price = 2100;
-      cleanProd.oldPrice = 3000;
-    }
     delete cleanProd.storySection;
     delete cleanProd.rating;
     delete cleanProd.reviewsCount;
-    delete cleanProd.reviewsList;
+    cleanProd.reviewsList = (cleanProd.reviewsList || []).filter((review: any) => review.source === 'admin');
     if (cleanProd.discountPercentage !== undefined) {
       cleanProd.discountPercentage = Number(cleanProd.discountPercentage);
     } else if (cleanProd.oldPrice && cleanProd.price && cleanProd.oldPrice > cleanProd.price) {
@@ -152,32 +158,48 @@ const sanitizeProducts = (products: any[]): Product[] => {
 
 const sanitizeFooter = (raw: any): FooterConfig => {
   const merged = { ...defaultSiteConfig.footer, ...(raw || {}) };
-  if (
-    !merged.companyLinks ||
-    merged.companyLinks.length === 0 ||
-    merged.companyLinks.some((l: any) => l.label === 'Career' || l.label === 'Blog' || l.url === '#')
-  ) {
-    merged.companyLinks = defaultSiteConfig.footer.companyLinks;
+  const placeholderSocials = new Set(['https://www.instagram.com', 'https://www.facebook.com', 'https://twitter.com', 'https://www.youtube.com']);
+  const socialLinks = { ...defaultSiteConfig.footer.socialLinks, ...(raw?.socialLinks || {}) };
+  for (const key of Object.keys(socialLinks) as Array<keyof typeof socialLinks>) {
+    if (placeholderSocials.has(socialLinks[key])) socialLinks[key] = '';
   }
-  if (
-    !merged.helpLinks ||
-    merged.helpLinks.length === 0 ||
-    merged.helpLinks.some((l: any) => l.label === 'Shipping & Delivery' || l.label === 'Returns & Refunds')
-  ) {
-    merged.helpLinks = defaultSiteConfig.footer.helpLinks;
-  }
-  return merged;
+  const cleanLinks = (links: any, fallback: any[]) => Array.isArray(links)
+    ? links.filter((link) => link && String(link.label || '').trim()).map((link) => ({ ...link, enabled: link.enabled !== false }))
+    : fallback;
+  const rawHelpLinks = cleanLinks(raw?.helpLinks, defaultSiteConfig.footer.helpLinks);
+  const legacyHelp = rawHelpLinks.some((link: any) => ['24/7 Live Support', 'Track Order', 'FAQs & Help', 'Contact Us'].includes(link.label));
+  return {
+    ...merged,
+    socialLinks,
+    whatsappPhone: String(raw?.whatsappPhone || merged.whatsappPhone || defaultSiteConfig.footer.whatsappPhone).replace(/\D/g, ''),
+    whatsappMessage: String(raw?.whatsappMessage || merged.whatsappMessage || defaultSiteConfig.footer.whatsappMessage),
+    companyLinks: cleanLinks(raw?.companyLinks, defaultSiteConfig.footer.companyLinks),
+    helpLinks: legacyHelp ? defaultSiteConfig.footer.helpLinks : rawHelpLinks,
+    downloadApp: { googlePlayUrl: '', appleAppStoreUrl: '' },
+    legalLinks: [],
+  };
 };
 
 // Remove bundled stock-photo placeholders while retaining uploaded and real product assets.
 const removePlaceholderImages = <T,>(value: T): T => JSON.parse(JSON.stringify(value), (_key, item) =>
   typeof item === 'string' && (/^https:\/\/(images\.unsplash\.com|picsum\.photos)\//.test(item) || /^\/prod_(daawat_rice|aashirvaad_atta|fortune_oil|tata_salt)\.jpg$/.test(item)) ? '' : item);
 
+const publicationSnapshot = (config: AdminSiteConfig) => {
+  const { razorpayKeySecret: _privateKey, ...payment } = config.checkoutPayment || {};
+  return { ...config, orders: [], users: [], checkoutPayment: payment };
+};
+
 const AdminConfigContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Published config (loaded by the storefront)
-  const [publishedConfig, setPublishedConfig] = useState<AdminSiteConfig>(defaultSiteConfig);
+  const [publishedConfig, setPublishedConfig] = useState<AdminSiteConfig>(() => {
+    try {
+      const cached = localStorage.getItem(PUBLISHED_KEY);
+      if (cached) return { ...defaultSiteConfig, ...JSON.parse(cached) };
+    } catch {}
+    return defaultSiteConfig;
+  });
 
   // Draft config (loaded and modified in the admin crm)
   const [config, setConfig] = useState<AdminSiteConfig>(() => {
@@ -191,6 +213,8 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           products: sanitizeProducts(parsed.products),
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: sanitizeFooter(parsed.footer),
+          socialBlog: { ...defaultSocialBlogConfig, ...(parsed.socialBlog || {}), entries: Array.isArray(parsed.socialBlog?.entries) ? parsed.socialBlog.entries : [] },
+          introVideo: { ...defaultIntroVideoConfig, ...(parsed.introVideo || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: sanitizeAboutPage(parsed.aboutPage),
@@ -220,7 +244,9 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           ...parsed,
           products: sanitizeProducts(parsed.products),
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
-          footer: { ...defaultSiteConfig.footer, ...(parsed.footer || {}) },
+          footer: sanitizeFooter(parsed.footer),
+          socialBlog: { ...defaultSocialBlogConfig, ...(parsed.socialBlog || {}), entries: Array.isArray(parsed.socialBlog?.entries) ? parsed.socialBlog.entries : [] },
+          introVideo: { ...defaultIntroVideoConfig, ...(parsed.introVideo || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
           aboutPage: sanitizeAboutPage(parsed.aboutPage),
@@ -246,20 +272,20 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return defaultSiteConfig;
   });
 
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(AUTH_KEY) === 'true';
-    } catch {
-      return false;
-    }
-  });
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  useEffect(() => {
+    void fetch('/api/site-config?session=1', { credentials: 'same-origin', cache: 'no-store' })
+      .then(response => response.ok ? response.json() : { authenticated: false })
+      .then(data => setIsAdminLoggedIn(data.authenticated === true))
+      .catch(() => setIsAdminLoggedIn(false));
+  }, []);
 
   const [hasChanges, setHasChanges] = useState<boolean>(() => {
     const draft = localStorage.getItem(DRAFT_KEY);
     const pub = localStorage.getItem(PUBLISHED_KEY);
     if (!draft) return false;
     if (!pub) return true;
-    return draft !== pub;
+    try { return JSON.stringify(publicationSnapshot(JSON.parse(draft))) !== JSON.stringify(publicationSnapshot(JSON.parse(pub))); } catch { return true; }
   });
 
   // Cross-tab real-time synchronization
@@ -279,10 +305,10 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (e.key === DRAFT_KEY && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
-          setConfig((prev) => ({
-            ...prev,
-            ...parsed,
-          }));
+          draftRef.current = parsed;
+          dirtyRef.current = true;
+          setConfig(parsed);
+          setHasChanges(true);
         } catch (err) {}
       }
     };
@@ -329,26 +355,27 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const draftRef = useRef(config);
   const dirtyRef = useRef(hasChanges);
   const savingRef = useRef(false);
+  const publishVersion = useRef(0);
 
   useEffect(() => {
     let disposed = false;
     const refresh = async () => {
+      const version = publishVersion.current;
       try {
         const response = await fetch('/api/site-config', { cache: 'no-store' });
-        if (response.status === 503) {
-          // Shared Redis not configured yet; operate seamlessly in local mode
-          return;
-        }
+
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Unable to load live store.');
-        if (disposed || savingRef.current) return;
-        setSaveError('');
+        if (disposed || savingRef.current || version !== publishVersion.current) return;
         if (data.config) {
-          const live = { ...defaultSiteConfig, ...removePlaceholderImages(data.config), products: sanitizeProducts(removePlaceholderImages(data.config.products)) };
+          const liveRaw = removePlaceholderImages(data.config);
+          const live = { ...defaultSiteConfig, ...liveRaw, footer: sanitizeFooter(liveRaw.footer), introVideo: { ...defaultIntroVideoConfig, ...(liveRaw.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(liveRaw.socialBlog || {}), entries: Array.isArray(liveRaw.socialBlog?.entries) ? liveRaw.socialBlog.entries : [] }, products: sanitizeProducts(removePlaceholderImages(data.config.products)) };
           setPublishedConfig(live);
+          try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(live)); } catch {}
           if (!dirtyRef.current) {
             draftRef.current = live;
             setConfig(live);
+            try { localStorage.setItem(DRAFT_KEY, JSON.stringify(live)); } catch {}
           }
         }
       } catch (error) {
@@ -375,21 +402,24 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const publishConfig = async () => {
     if (savingRef.current) return false;
     savingRef.current = true;
+    publishVersion.current += 1;
     setIsSaving(true);
     setSaveError('');
     setSaveSuccess(false);
     const snapshot = draftRef.current;
     try {
       const response = await fetch('/api/site-config', {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ config: snapshot }),
+        method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: publicationSnapshot(snapshot) }),
+        signal: AbortSignal.timeout(25000),
       });
       if (response.ok) {
         const data = await response.json();
-        setPublishedConfig({ ...defaultSiteConfig, ...data.config });
+        setPublishedConfig({ ...defaultSiteConfig, ...data.config, footer: sanitizeFooter(data.config.footer), introVideo: { ...defaultIntroVideoConfig, ...(data.config.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(data.config.socialBlog || {}), entries: Array.isArray(data.config.socialBlog?.entries) ? data.config.socialBlog.entries : [] } });
         try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(data.config)); } catch {}
       } else {
         const data = await response.json().catch(() => ({}));
+        if (response.status === 401) setIsAdminLoggedIn(false);
         throw new Error(data.error || 'Changes could not be published. Please retry.');
       }
       const changedDuringSave = draftRef.current !== snapshot;
@@ -416,36 +446,16 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   };
 
-  const adminLogin = async (email: string, pass: string): Promise<boolean> => {
-    const isLocalValid =
-      (email.trim().toLowerCase() === 'admin@farminix.com' || email.trim().toLowerCase() === 'admin') &&
-      (pass === 'admin123' || pass === 'farminix2026');
-
-    try {
-      const response = await fetch('/api/site-config', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: pass }),
-      });
-      if (response.ok) {
-        setIsAdminLoggedIn(true);
-        try { localStorage.setItem(AUTH_KEY, 'true'); } catch {}
-        return true;
-      }
-      if (response.status === 401) {
-        const data = await response.json();
-        throw new Error(data.error || 'Invalid admin credentials.');
-      }
-    } catch (err: any) {
-      if (err.message === 'Invalid admin credentials.') throw err;
-    }
-
-    if (isLocalValid) {
-      setIsAdminLoggedIn(true);
-      try { localStorage.setItem(AUTH_KEY, 'true'); } catch {}
-      return true;
-    }
-
-    throw new Error('Invalid admin credentials. Please try again.');
+  const adminLogin = async (email: string, password: string): Promise<boolean> => {
+    const response = await fetch('/api/site-config', {
+      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.authenticated) throw new Error(data.error || 'Unable to sign in to the server. Please retry.');
+    setIsAdminLoggedIn(true);
+    setSaveError('');
+    return true;
   };
 
   const adminLogout = () => {
@@ -481,6 +491,10 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const updateNavItems = (items: NavItemConfig[]) => {
     saveConfig({ ...config, navItems: items });
   };
+
+  const updateReachOutPage = (reachOutPage: ReachOutPageConfig) => saveConfig({ ...draftRef.current, reachOutPage });
+
+  const updateQueriesPage = (queriesPage: QueriesPageConfig) => saveConfig({ ...draftRef.current, queriesPage });
 
   const updateHero = (cfg: Partial<HeroConfig>) => {
     let updatedSectionOrder = config.sectionOrder;
@@ -523,6 +537,14 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
     saveConfig({ ...config, popularProducts: { ...config.popularProducts, ...cfg }, sectionOrder: updatedSectionOrder });
   };
+  const updateSocialBlog = (cfg: Partial<SocialBlogConfig>) => {
+    const next = { ...draftRef.current.socialBlog, ...cfg };
+    const enabled = cfg.enabled ?? next.enabled;
+    const sectionOrder = draftRef.current.sectionOrder.some((s) => s.id === 'socialBlog')
+      ? draftRef.current.sectionOrder.map((s) => s.id === 'socialBlog' ? { ...s, enabled } : s)
+      : [...draftRef.current.sectionOrder, { id: 'socialBlog', name: 'Instagram & Blog Videos', enabled, order: draftRef.current.sectionOrder.length + 1 }];
+    saveConfig({ ...draftRef.current, socialBlog: next, sectionOrder });
+  };
 
   const updateEpicDeals = (cfg: Partial<EpicDealsConfig>) => {
     saveConfig({ ...config, epicDeals: { ...config.epicDeals, ...cfg } });
@@ -537,7 +559,10 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const updateFooter = (cfg: Partial<FooterConfig>) => {
-    saveConfig({ ...config, footer: { ...config.footer, ...cfg } });
+    saveConfig({ ...draftRef.current, footer: { ...draftRef.current.footer, ...cfg } });
+  };
+  const updateIntroVideo = (cfg: Partial<IntroVideoConfig>) => {
+    saveConfig({ ...draftRef.current, introVideo: { ...draftRef.current.introVideo, ...cfg } });
   };
 
   const updateOffersPage = (cfg: Partial<OffersPageConfig>) => {
@@ -642,15 +667,19 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         updateHeader,
         updateNavItems,
         updateHero,
+        updateQueriesPage,
+        updateReachOutPage,
         updateBrandMarquee,
         updateFeatureStrip,
         updateCategorySection,
         updateCategories,
         updatePopularProducts,
+        updateSocialBlog,
         updateEpicDeals,
         updateFutureArrivals,
         updateBottomFeatureStrip,
         updateFooter,
+        updateIntroVideo,
         updateOffersPage,
         updateShopNowConfig,
         updateManufacturer,

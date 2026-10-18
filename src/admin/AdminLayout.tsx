@@ -4,6 +4,8 @@ import {
   Home,
   Package,
   Heart,
+  MessageCircle,
+  MapPin,
   BriefcaseBusiness,
   Factory,
   ShoppingCart,
@@ -25,6 +27,8 @@ import { ManufacturerManager } from './pages/ManufacturerManager';
 import { CartManager } from './pages/CartManager';
 import { FooterManager } from './pages/FooterManager';
 import { SettingsManager } from './pages/SettingsManager';
+import { ReachOutManager } from './pages/ReachOutManager';
+import { QueriesManager } from './pages/QueriesManager';
 import { CareersManager } from './pages/CareersManager';
 
 interface NavSection {
@@ -48,6 +52,8 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
         { id: 'home', label: 'Home Page', icon: <Home className="w-4 h-4" /> },
         { id: 'products', label: 'Products (Payment to Delivery)', icon: <Package className="w-4 h-4" /> },
         { id: 'about', label: 'About Farminix', icon: <Heart className="w-4 h-4" /> },
+        { id: 'reach-out', label: 'Reach Out Page', icon: <MapPin className="w-4 h-4" /> },
+        { id: 'queries', label: 'Queries & Compliance', icon: <MessageCircle className="w-4 h-4" /> },
         { id: 'careers', label: 'Careers Page', icon: <BriefcaseBusiness className="w-4 h-4" /> },
         { id: 'manufacturer', label: 'Manufacturer', icon: <Factory className="w-4 h-4" /> },
         { id: 'cart', label: 'Cart', icon: <ShoppingCart className="w-4 h-4" /> },
@@ -65,6 +71,10 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
         return <ProductsPaymentManager />;
       case 'about':
         return <AboutFarminixManager />;
+      case 'reach-out':
+        return <ReachOutManager />;
+      case 'queries':
+        return <QueriesManager />;
       case 'careers':
         return <CareersManager />;
       case 'manufacturer':
@@ -204,10 +214,11 @@ export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onRetur
                 Discard Draft
               </button>
               <button
-                onClick={publishConfig}
+                onClick={() => void publishConfig()}
+                disabled={isSaving}
                 className="px-4 py-1 bg-slate-950 hover:bg-slate-900 text-white rounded-xl transition-colors cursor-pointer text-[11px] font-black shadow-sm"
               >
-                Publish Changes
+                {isSaving ? 'Publishing…' : 'Publish Changes'}
               </button>
             </div>
           </div>

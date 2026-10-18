@@ -48,9 +48,10 @@ export const SectionOrderingHub: React.FC<{ onNavigateToSection: (id: string) =>
       { id: 'featureStrip', name: 'Top 5 Feature Strip', enabled: false, order: 3 },
       { id: 'categorySection', name: 'Shop by Category', enabled: false, order: 4 },
       { id: 'popularProducts', name: 'Popular Today ⚡', enabled: true, order: 5 },
-      { id: 'epicDeals', name: 'Epic Deals All Day', enabled: false, order: 6 },
-      { id: 'futureArrivals', name: 'Future Arrivals', enabled: false, order: 7 },
-      { id: 'bottomFeatureStrip', name: 'Bottom Benefits Strip', enabled: false, order: 8 },
+      { id: 'socialBlog', name: 'Instagram & Blog Videos', enabled: false, order: 6 },
+      { id: 'epicDeals', name: 'Epic Deals All Day', enabled: false, order: 7 },
+      { id: 'futureArrivals', name: 'Future Arrivals', enabled: false, order: 8 },
+      { id: 'bottomFeatureStrip', name: 'Bottom Benefits Strip', enabled: false, order: 9 },
     ];
     setSections(defaultOrder);
     updateSectionOrder(defaultOrder);

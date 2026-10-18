@@ -17,6 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!['admin', 'admin@farminix.com'].includes(email) || !equal(String(req.body?.password || ''), password)) {
       return res.status(401).json({ error: 'Invalid admin credentials.' });
     }
+    if (!(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL) || !(process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN)) return res.status(503).json({ error: 'Shared store storage is not configured. Connect Redis in the hosting settings.' });
     const expires = String(Date.now() + 8 * 60 * 60 * 1000);
     res.setHeader('Set-Cookie', `farminix_admin=${expires}.${sign(expires)}; HttpOnly; Secure; SameSite=Strict; Path=/api/site-config; Max-Age=28800`);
     return res.status(200).json({ authenticated: true });
@@ -26,12 +27,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ authenticated: false });
   }
   if (!['GET', 'PUT'].includes(req.method || '')) return res.status(405).json({ error: 'Method not allowed.' });
+  const sessionToken = req.cookies?.farminix_admin || '';
+  const [sessionExpiry, sessionSignature] = sessionToken.split('.');
+  const authenticated = Boolean(secret && sessionExpiry && Number.isFinite(Number(sessionExpiry)) && Number(sessionExpiry) > Date.now() && sessionSignature && equal(sessionSignature, sign(sessionExpiry)));
+  if (req.method === 'GET' && req.query.session === '1') return res.status(200).json({ authenticated });
   if (req.method === 'PUT') {
-    const token = req.cookies?.farminix_admin || '';
-    const [expires, signature] = token.split('.');
-    if (!secret || !expires || Number(expires) <= Date.now() || !signature || !equal(signature, sign(expires))) {
-      return res.status(401).json({ error: 'Please sign out and sign in again to publish changes.' });
-    }
+    if (!authenticated) return res.status(401).json({ error: 'Your admin session expired. Sign in to publish your retained draft.' });
     if (!req.body?.config || !Array.isArray(req.body.config.products) || !req.body.config.theme) {
       return res.status(400).json({ error: 'Invalid store configuration.' });
     }

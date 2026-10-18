@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowRight, Play } from 'lucide-react';
+import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
 interface IntroVideoOverlayProps {
   onFinish?: () => void;
@@ -9,6 +10,8 @@ interface IntroVideoOverlayProps {
 let hasIntroPlayedInSession = false;
 
 export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }) => {
+  const { publishedConfig } = useAdminConfig();
+  const introConfig = publishedConfig.introVideo;
   const [isOpen, setIsOpen] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     // Clear any obsolete localStorage/sessionStorage blocks so refresh always plays logo entry
@@ -26,12 +29,17 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
     if (typeof window !== 'undefined') {
       const isMobile = window.innerWidth < 768 || /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
       if (isMobile) {
-        return '/farminix_intro_mobile.mp4';
+        return introConfig.mobileUrl || introConfig.desktopUrl;
       }
     }
-    return '/farminix_intro.mp4';
+    return introConfig.desktopUrl;
   });
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768 || /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+    setVideoSrc(isMobile ? (introConfig.mobileUrl || introConfig.desktopUrl) : introConfig.desktopUrl);
+  }, [introConfig.desktopUrl, introConfig.mobileUrl]);
 
   const handleClose = () => {
     hasIntroPlayedInSession = true;
@@ -68,7 +76,7 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
     };
   }, [videoSrc]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !introConfig.enabled || !introConfig.desktopUrl) return null;
 
   return (
     <div
@@ -87,8 +95,8 @@ export const IntroVideoOverlay: React.FC<IntroVideoOverlayProps> = ({ onFinish }
         preload="auto"
         onError={() => {
           // If mobile video is not yet placed in public or fails to load, gracefully fallback to default
-          if (videoSrc !== '/farminix_intro.mp4') {
-            setVideoSrc('/farminix_intro.mp4');
+          if (videoSrc !== introConfig.desktopUrl) {
+            setVideoSrc(introConfig.desktopUrl);
           }
         }}
       />

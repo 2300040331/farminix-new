@@ -4,6 +4,7 @@ import { AdminConfigProvider, useAdminConfig } from './admin/context/AdminConfig
 import { MainHeader } from './components/MainHeader';
 import { HeroBanner } from './components/HeroBanner';
 import { PopularProducts } from './components/PopularProducts';
+import { SocialBlogSection } from './components/SocialBlogSection';
 import { Footer } from './components/Footer';
 import { CategorySection } from './components/CategorySection';
 import { CategoryPage } from './components/CategoryPage';
@@ -15,6 +16,8 @@ import { OffersPage } from './components/OffersPage';
 import { CheckoutPage } from './components/CheckoutPage';
 import { ManufacturerPage } from './components/ManufacturerPage';
 import { AboutPage } from './components/AboutPage';
+import { ReachOutPage } from './components/ReachOutPage';
+import { QueriesPage } from './components/QueriesPage';
 import { CareersPage } from './components/CareersPage';
 
 // Admin CRM Components
@@ -74,6 +77,7 @@ export function AppContent() {
     const sectionComponentMap: Record<string, React.ReactNode> = {
       hero: <HeroBanner key="hero" />,
       popularProducts: <PopularProducts key="popularProducts" />,
+      socialBlog: <SocialBlogSection key="socialBlog" />,
       categorySection: <CategorySection key="categorySection" />,
       categories: <CategorySection key="categories" />,
     };
@@ -93,6 +97,10 @@ export function AppContent() {
     const isManufacturerPage = currentRoute.pathname === '/manufacturer';
     const isAboutPage = currentRoute.pathname === '/about';
     const isCareersPage = currentRoute.pathname === '/careers';
+
+    if (['/reach-out', '/reach-out-to-us'].includes(currentRoute.pathname)) return <ReachOutPage />;
+
+    if (['/queries', '/compliance', '/contact'].includes(currentRoute.pathname)) return <QueriesPage />;
 
     if (isCheckoutPage) {
       return <CheckoutPage />;

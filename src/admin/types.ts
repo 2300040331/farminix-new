@@ -98,7 +98,20 @@ export interface NavItemConfig {
   order: number;
 }
 
+export interface HeroSlide {
+  id: string;
+  image: string;
+  altText: string;
+  linkUrl: string;
+  buttonText: string;
+  enabled: boolean;
+  legacyHotspots?: boolean;
+}
+
 export interface HeroConfig {
+  slides?: HeroSlide[];
+  autoplay?: boolean;
+  intervalSeconds?: number;
   enabled: boolean;
   bannerImage: string;
   altText: string;
@@ -154,6 +167,23 @@ export interface PopularProductsConfig {
   featuredProductIds: string[];
 }
 
+export interface SocialBlogEntry {
+  id: string;
+  title: string;
+  caption: string;
+  mediaUrl: string;
+  sourceUrl: string;
+  enabled: boolean;
+  order: number;
+}
+
+export interface SocialBlogConfig {
+  enabled: boolean;
+  title: string;
+  subtitle: string;
+  entries: SocialBlogEntry[];
+}
+
 export interface EpicDealsConfig {
   enabled: boolean;
   topPillText: string;
@@ -198,7 +228,14 @@ export interface FooterLink {
   id: string;
   label: string;
   url: string;
-  actionType?: 'support' | 'url' | 'track' | 'cart';
+  actionType?: 'support' | 'url' | 'track' | 'cart' | 'whatsapp';
+  enabled?: boolean;
+}
+
+export interface IntroVideoConfig {
+  enabled: boolean;
+  desktopUrl: string;
+  mobileUrl: string;
 }
 
 export interface FooterConfig {
@@ -211,6 +248,8 @@ export interface FooterConfig {
     twitter: string;
     youtube: string;
   };
+  whatsappPhone: string;
+  whatsappMessage: string;
   companyLinks: FooterLink[];
   helpLinks: FooterLink[];
   downloadApp: {
@@ -415,6 +454,51 @@ export interface CareersPageConfig {
   jobRoles: string[];
 }
 
+export interface ReachOutLocation {
+  id: string;
+  label: string;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  enabled: boolean;
+}
+
+export interface ReachOutPageConfig {
+  enabled: boolean;
+  title: string;
+  subtitle: string;
+  badge: string;
+  locations: ReachOutLocation[];
+}
+
+export interface QueriesPageConfig {
+  enabled: boolean;
+  title: string;
+  subtitle: string;
+  badge: string;
+  formHeading: string;
+  submitLabel: string;
+  successMessage: string;
+  privacyNote: string;
+  complianceTitle: string;
+  complianceBody: string;
+  image: string;
+}
+
+export interface CustomerEnquiry {
+  id: string;
+  name: string;
+  mobile: string;
+  email: string;
+  message: string;
+  kind: 'query' | 'complaint' | 'compliance';
+  status: 'new' | 'in-progress' | 'resolved';
+  adminNotes: string;
+  createdAt: string;
+  deletedAt?: string;
+}
+
 export interface AdminSiteConfig {
   theme: ThemeTokens;
   sectionOrder: SectionOrderItem[];
@@ -422,15 +506,19 @@ export interface AdminSiteConfig {
   header: HeaderConfig;
   navItems: NavItemConfig[];
   hero: HeroConfig;
+  queriesPage?: QueriesPageConfig;
+  reachOutPage?: ReachOutPageConfig;
   brandMarquee: BrandMarqueeConfig;
   featureStrip: FeatureStripConfig;
   categorySection: CategorySectionConfig;
   categories: Category[];
   popularProducts: PopularProductsConfig;
+  socialBlog: SocialBlogConfig;
   epicDeals: EpicDealsConfig;
   futureArrivals: FutureArrivalsConfig;
   bottomFeatureStrip: BottomFeatureStripConfig;
   footer: FooterConfig;
+  introVideo: IntroVideoConfig;
   offersPage: OffersPageConfig;
   shopNowConfig: ShopNowPageConfig;
   manufacturer?: ManufacturerConfig;

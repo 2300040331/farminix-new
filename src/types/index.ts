@@ -1,4 +1,6 @@
 export interface Review {
+  source?: 'admin';
+  enabled?: boolean;
   id: string;
   userName: string;
   rating: number;
@@ -80,6 +82,7 @@ export interface Product {
   description: string;
   enabled?: boolean; // Add support for Hide/Show
   ingredients?: string[];
+  nutritionBasis?: string;
   nutritionalInfo?: {
     energy: string;
     protein: string;

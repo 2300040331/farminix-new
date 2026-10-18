@@ -11,8 +11,9 @@ import { HeaderManager } from './HeaderManager';
 import { HeroManager } from './HeroManager';
 import { CategoryManager } from './CategoryManager';
 import { PopularProductsManager } from './PopularProductsManager';
+import { SocialBlogManager } from './SocialBlogManager';
 
-type HomeTab = 'header' | 'hero' | 'categories' | 'popular';
+type HomeTab = 'header' | 'hero' | 'categories' | 'popular' | 'socialBlog';
 
 export const HomePageManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState<HomeTab>('header');
@@ -41,6 +42,12 @@ export const HomePageManager: React.FC = () => {
       label: 'Popular Today',
       icon: <Zap className="w-4 h-4" />,
       desc: 'Top trending rice & staples cards',
+    },
+    {
+      id: 'socialBlog',
+      label: 'Instagram & Videos',
+      icon: <Image className="w-4 h-4" />,
+      desc: 'Publish real Instagram posts or video links below Popular Today',
     },
   ];
 
@@ -101,6 +108,7 @@ export const HomePageManager: React.FC = () => {
         {activeTab === 'hero' && <HeroManager />}
         {activeTab === 'categories' && <CategoryManager />}
         {activeTab === 'popular' && <PopularProductsManager />}
+        {activeTab === 'socialBlog' && <SocialBlogManager />}
       </div>
     </div>
   );

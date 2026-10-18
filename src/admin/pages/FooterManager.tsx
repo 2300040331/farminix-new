@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Layers, Check } from 'lucide-react';
+import { Layers, Check, Plus, Trash2, Eye, EyeOff, MessageCircle, Video } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
 import { AdminImageUpload } from '../components/AdminImageUpload';
+import { AdminVideoUpload } from '../components/AdminVideoUpload';
 import type { FooterConfig } from '../types';
 
 export const FooterManager: React.FC = () => {
-  const { config, updateFooter } = useAdminConfig();
+  const { config, updateFooter, updateIntroVideo, publishConfig } = useAdminConfig();
   const [formData, setFormData] = useState<FooterConfig>(config.footer);
+  const [videoData, setVideoData] = useState(config.introVideo);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const handleUpdateField = (keyofFooter: keyof FooterConfig, value: any) => {
@@ -16,6 +18,11 @@ export const FooterManager: React.FC = () => {
     updateFooter({ [keyofFooter]: value });
     notifySaved();
   };
+
+  React.useEffect(() => {
+    setFormData(config.footer);
+    setVideoData(config.introVideo);
+  }, [config.footer, config.introVideo]);
 
   const handleUpdateSocial = (platform: string, url: string) => {
     const updatedSocials = { ...formData.socialLinks, [platform]: url };
@@ -32,6 +39,27 @@ export const FooterManager: React.FC = () => {
     const copy = [...formData.helpLinks];
     copy[index] = { ...copy[index], label, url };
     handleUpdateField('helpLinks', copy);
+  };
+
+  const toggleLink = (group: 'companyLinks' | 'helpLinks', index: number) => {
+    const links = [...formData[group]];
+    links[index] = { ...links[index], enabled: links[index].enabled === false };
+    handleUpdateField(group, links);
+  };
+
+  const removeLink = (group: 'companyLinks' | 'helpLinks', index: number) => {
+    handleUpdateField(group, formData[group].filter((_, i) => i !== index));
+  };
+
+  const addLink = (group: 'companyLinks' | 'helpLinks') => {
+    const prefix = group === 'companyLinks' ? 'c' : 'h';
+    handleUpdateField(group, [...formData[group], { id: `${prefix}-${Date.now()}`, label: 'New link', url: '/', enabled: true }]);
+  };
+
+  const handlePublish = async () => {
+    updateFooter(formData);
+    updateIntroVideo(videoData);
+    await publishConfig();
   };
 
   const notifySaved = () => {
@@ -58,10 +86,7 @@ export const FooterManager: React.FC = () => {
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => {
-              updateFooter(formData);
-              notifySaved();
-            }}
+            onClick={() => { void handlePublish(); notifySaved(); }}
             className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
           >
             <Check className="w-4 h-4" />
@@ -105,6 +130,11 @@ export const FooterManager: React.FC = () => {
             />
           </div>
 
+          <label className="flex items-center gap-2 text-xs font-bold text-slate-700 mt-6 cursor-pointer">
+            <input type="checkbox" checked={formData.enabled} onChange={(e) => handleUpdateField('enabled', e.target.checked)} className="accent-purple-600" />
+            Show footer on the public website
+          </label>
+
           <div>
             <AdminImageUpload
               value={formData.logoUrl}
@@ -114,6 +144,24 @@ export const FooterManager: React.FC = () => {
               recommendedDimensions="400 × 120 px (Transparent PNG)"
             />
           </div>
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+        <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2"><MessageCircle className="w-4 h-4 text-emerald-600" />WhatsApp routing</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label className="text-xs font-bold text-slate-700">WhatsApp number<input value={formData.whatsappPhone} onChange={(e) => handleUpdateField('whatsappPhone', e.target.value)} placeholder="Country code + number" className="w-full mt-1 h-10 px-3 text-xs font-mono font-normal bg-slate-50 border border-slate-200 rounded-xl" /></label>
+          <label className="text-xs font-bold text-slate-700">Prefilled message<textarea value={formData.whatsappMessage} onChange={(e) => handleUpdateField('whatsappMessage', e.target.value)} rows={2} className="w-full mt-1 p-3 text-xs font-normal bg-slate-50 border border-slate-200 rounded-xl" /></label>
+        </div>
+        <p className="text-[11px] text-slate-500">Saving publishes the number and message used by the floating button, footer button, and support modal.</p>
+      </div>
+
+      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+        <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2"><Video className="w-4 h-4 text-purple-600" />Intro videos</h2>
+        <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer"><input type="checkbox" checked={videoData.enabled} onChange={(e) => { const next = { ...videoData, enabled: e.target.checked }; setVideoData(next); updateIntroVideo(next); }} className="accent-purple-600" />Show intro video on the home page</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AdminVideoUpload label="Desktop intro video" value={videoData.desktopUrl} onChange={(desktopUrl) => { const next = { ...videoData, desktopUrl }; setVideoData(next); updateIntroVideo({ desktopUrl }); }} />
+          <AdminVideoUpload label="Mobile intro video" value={videoData.mobileUrl} onChange={(mobileUrl) => { const next = { ...videoData, mobileUrl }; setVideoData(next); updateIntroVideo({ mobileUrl }); }} />
         </div>
       </div>
 
@@ -185,9 +233,12 @@ export const FooterManager: React.FC = () => {
                   onChange={(e) => handleUpdateCompanyLink(idx, link.label, e.target.value)}
                   className="w-1/2 h-9 px-3 text-xs font-mono text-slate-600 bg-slate-50 border border-slate-200 rounded-xl"
                 />
+                <button type="button" onClick={() => toggleLink('companyLinks', idx)} title={link.enabled === false ? 'Show link' : 'Hide link'} className="p-2 text-slate-500 hover:text-purple-600 cursor-pointer">{link.enabled === false ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                <button type="button" onClick={() => removeLink('companyLinks', idx)} title="Remove link" className="p-2 text-rose-500 hover:text-rose-700 cursor-pointer"><Trash2 className="w-4 h-4" /></button>
               </div>
             ))}
           </div>
+          <button type="button" onClick={() => addLink('companyLinks')} className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-purple-600 cursor-pointer"><Plus className="w-4 h-4" />Add company link</button>
         </div>
 
         {/* Help Links */}
@@ -210,9 +261,12 @@ export const FooterManager: React.FC = () => {
                   onChange={(e) => handleUpdateHelpLink(idx, link.label, e.target.value)}
                   className="w-1/2 h-9 px-3 text-xs font-mono text-slate-600 bg-slate-50 border border-slate-200 rounded-xl"
                 />
+                <button type="button" onClick={() => toggleLink('helpLinks', idx)} title={link.enabled === false ? 'Show link' : 'Hide link'} className="p-2 text-slate-500 hover:text-purple-600 cursor-pointer">{link.enabled === false ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                <button type="button" onClick={() => removeLink('helpLinks', idx)} title="Remove link" className="p-2 text-rose-500 hover:text-rose-700 cursor-pointer"><Trash2 className="w-4 h-4" /></button>
               </div>
             ))}
           </div>
+          <button type="button" onClick={() => addLink('helpLinks')} className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-purple-600 cursor-pointer"><Plus className="w-4 h-4" />Add help link</button>
         </div>
       </div>
 
@@ -222,10 +276,7 @@ export const FooterManager: React.FC = () => {
           Changes saved here are instantly published and visible on the main website footer.
         </p>
         <button
-          onClick={() => {
-            updateFooter(formData);
-            notifySaved();
-          }}
+          onClick={() => { void handlePublish(); notifySaved(); }}
           className="w-full sm:w-auto px-6 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
         >
           <Check className="w-4 h-4" />

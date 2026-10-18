@@ -1,62 +1,25 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
-export const HeroBanner: React.FC = () => {
+export function HeroBanner() {
   const { navigate } = useApp();
   const { publishedConfig } = useAdminConfig();
   const hero = publishedConfig.hero;
-
-  if (!hero.enabled) return null;
-
-  return (
-    <section className="w-full relative select-none bg-gradient-to-b from-[#F3E8FF]/40 to-white border-b border-purple-100/60">
-      {/* ── Full-Width Hero Image Container ── */}
-      <div className="relative w-full overflow-hidden group">
-        {/* Banner image with safe data/blob handling */}
-        <img 
-          src={(() => {
-            const img = hero.bannerImage;
-            if (!img) return '/hero_banner_original.jpg?v=7';
-            if (img.startsWith('data:') || img.startsWith('blob:') || img.includes('?')) return img;
-            return `${img}?v=7`;
-          })()} 
-          alt={hero.altText || 'Farminix Fresh Groceries'} 
-          className="w-full h-auto block" 
-          draggable="false"
-        />
-
-        {/* Real interactive HTML SHOP NOW button aligned just below feature text */}
-        <div 
-          className="absolute flex items-center justify-center z-10"
-          style={{
-            left: '4.1%',
-            top: '54.2%',
-            width: '15.8%',
-            height: '6.4%',
-          }}
-        >
-          <button
-            onClick={() => navigate(hero.shopNowUrl || '/products')}
-            className="w-full h-full bg-[#7C3AED] hover:bg-[#6D28D9] active:bg-[#5B21B6] text-white font-black tracking-wider text-[8px] sm:text-[10px] md:text-[12px] lg:text-[1.05vw] uppercase rounded-full shadow-lg flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 transition-all cursor-pointer transform hover:scale-[1.02] active:scale-[0.98] border-0 focus:outline-hidden"
-          >
-            <span>SHOP NOW</span>
-            <svg className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 lg:w-[1.2vw] lg:h-[1.2vw] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </button>
-        </div>
-
-        {/* Transparent absolute overlay for logo home navigation */}
-        <button
-          onClick={() => navigate(hero.homeUrl || '/')}
-          className="absolute left-[4.5%] top-[3.5%] w-[13.5%] h-[7.5%] cursor-pointer bg-transparent border-0 focus:outline-hidden"
-          title="Home"
-        />
-      </div>
-    </section>
-  );
-};
-
-
+  const slides = (hero.slides ?? (hero.bannerImage ? [{id:'original-banner',image:hero.bannerImage,altText:hero.altText,linkUrl:hero.shopNowUrl,buttonText:'Shop now',enabled:true,legacyHotspots:true}] : [])).filter(s => s.enabled && s.image);
+  const [index,setIndex]=useState(0);
+  useEffect(() => {if (!hero.enabled || slides.length < 2) return;const timer=window.setInterval(()=>setIndex(i=>(i+1)%slides.length),5000);return()=>clearInterval(timer);},[hero.enabled,slides.length]);
+  if (!hero.enabled || !slides.length) return null;
+  const active=index%slides.length;
+  const move=(direction:number)=>setIndex(i=>(i+direction+slides.length)%slides.length);
+  const open=(url:string)=>{if(url.startsWith('/') && !url.startsWith('//')) navigate(url);else if(/^https?:\/\//i.test(url)) window.location.assign(url);};
+  return <section aria-label="Farminix home banners" aria-roledescription="carousel" className="relative w-full bg-purple-50">
+    <div className="relative overflow-hidden">{slides.map((slide,i)=><div key={slide.id} hidden={i!==active} role="group" aria-roledescription="slide" aria-label={`${i+1} of ${slides.length}`} className="relative">
+      <img src={slide.image} alt={slide.altText || 'Farminix banner'} className="w-full h-auto block" draggable="false" loading={i===0?'eager':'lazy'}/>
+      {slide.linkUrl && !slide.buttonText && !slide.legacyHotspots && <button type="button" className="absolute inset-0 cursor-pointer" aria-label={slide.altText || `Open banner ${i+1}`} onClick={()=>open(slide.linkUrl)}/>}
+      {slide.linkUrl && (slide.buttonText || slide.legacyHotspots) && <button type="button" onClick={()=>open(slide.linkUrl)} className={slide.legacyHotspots ? 'absolute left-[4.1%] top-[54.2%] w-[15.8%] h-[6.4%] bg-purple-600 text-white rounded-full font-bold text-[8px] sm:text-sm cursor-pointer' : 'absolute bottom-6 left-6 sm:bottom-12 sm:left-12 bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-xl font-bold shadow-lg'}>{slide.buttonText || 'Shop now'} →</button>}
+    </div>)}</div>
+    {slides.length>1 && <><button type="button" aria-label="Previous banner" onClick={()=>move(-1)} className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-purple-800 shadow"><ChevronLeft size={22}/></button><button type="button" aria-label="Next banner" onClick={()=>move(1)} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-purple-800 shadow"><ChevronRight size={22}/></button><div className="flex justify-center items-center gap-2 py-3 bg-white">{slides.map((s,i)=><button key={s.id} type="button" aria-label={`Show banner ${i+1}`} aria-current={i===active?'true':undefined} onClick={()=>setIndex(i)} className={`h-2.5 rounded-full transition-all ${i===active?'w-7 bg-purple-600':'w-2.5 bg-purple-200'}`}/>)}</div></>}
+  </section>;
+}

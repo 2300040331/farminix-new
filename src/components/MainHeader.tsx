@@ -30,6 +30,8 @@ export const MainHeader: React.FC = () => {
     { label: 'Home', path: '/', isActive: isHomeActive },
     { label: 'Products', path: '/products', isActive: isProductsActive },
     { label: 'About Farminix', path: '/about', isActive: isAboutActive },
+    ...(publishedConfig.queriesPage?.enabled === false ? [] : [{ label: 'Any Queries?', path: '/queries', isActive: currentRoute.pathname === '/queries' }]),
+    ...(publishedConfig.reachOutPage?.enabled === false ? [] : [{ label: 'Reach Out', path: '/reach-out', isActive: currentRoute.pathname.startsWith('/reach-out') }]),
     { label: 'Manufacturer', path: '/manufacturer', isActive: isManufacturerActive },
     ...(publishedConfig.careersPage?.enabled === false ? [] : [{ label: 'Careers', path: '/careers', isActive: isCareersActive }]),
   ];
@@ -49,7 +51,7 @@ export const MainHeader: React.FC = () => {
         </div>
 
         {/* Center: Navigation Options - Hidden on mobile, visible on desktop */}
-        <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-10">
+        <nav className="hidden xl:flex items-center justify-center gap-3 lg:gap-6">
           {navLinks.map((link) => (
             <button
               key={link.label}
@@ -92,7 +94,7 @@ export const MainHeader: React.FC = () => {
           {/* Three-lines Hamburger Menu button (mobile only) */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2.5 text-slate-700 hover:text-[#7C3AED] hover:bg-purple-50 rounded-xl transition-colors cursor-pointer border border-slate-200/80 active:scale-95 flex items-center justify-center"
+            className="xl:hidden p-2.5 text-slate-700 hover:text-[#7C3AED] hover:bg-purple-50 rounded-xl transition-colors cursor-pointer border border-slate-200/80 active:scale-95 flex items-center justify-center"
             aria-label="Toggle Navigation Menu"
             title="Toggle Menu"
           >
@@ -107,7 +109,7 @@ export const MainHeader: React.FC = () => {
 
       {/* Mobile Vertical Navigation Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 shadow-xl px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
+        <div className="xl:hidden bg-white border-t border-slate-100 shadow-xl px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
           {navLinks.map((link) => (
             <button
               key={link.label}

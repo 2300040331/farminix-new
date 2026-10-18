@@ -6,13 +6,11 @@ import {
   Edit2,
   Trash2,
   Check,
-  X,
   Eye,
   EyeOff,
 } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
-import { AdminImageUpload } from '../components/AdminImageUpload';
-import { CouponEditor } from '../components/CouponEditor';
+import { ProductContentEditor } from '../components/ProductContentEditor';
 import type { Product } from '../../types';
 
 export const ProductManager: React.FC = () => {
@@ -21,7 +19,6 @@ export const ProductManager: React.FC = () => {
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'basic' | 'specifications' | 'nutrition' | 'highlights' | 'faqs'>('basic');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   // Form State
@@ -53,7 +50,6 @@ export const ProductManager: React.FC = () => {
   const handleOpenAddModal = () => {
     setFormData({ ...initialProductState, id: `prod-${Date.now()}` });
     setEditingProductId(null);
-    setActiveTab('basic');
     setIsModalOpen(true);
   };
 
@@ -68,12 +64,10 @@ export const ProductManager: React.FC = () => {
     }
     setFormData(copy);
     setEditingProductId(product.id);
-    setActiveTab('basic');
     setIsModalOpen(true);
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async () => {
     if (!formData.name.trim()) return;
 
     const cleanData: Product = {
@@ -89,12 +83,15 @@ export const ProductManager: React.FC = () => {
       editProduct(cleanData);
     } else {
       addProduct(cleanData);
+      setEditingProductId(cleanData.id);
     }
 
     const published = await publishConfig();
     setSavedSuccess(published);
     setTimeout(() => setSavedSuccess(false), 2500);
   };
+
+  if (isModalOpen) return <ProductContentEditor product={formData} onChange={product => {setFormData(product); if (editingProductId) editProduct(product);}} onBack={() => setIsModalOpen(false)} onSave={handleSave} saving={isSaving} error={saveError}/>;
 
   return (
     <div className="space-y-6 text-left">
@@ -301,506 +298,6 @@ export const ProductManager: React.FC = () => {
       </div>
 
       </div>
-      {/* Product editor page */}
-      {isModalOpen && (
-        <div className="w-full">
-          <div className="bg-white rounded-3xl w-full p-6 md:p-8 border border-slate-200 flex flex-col">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div>
-                <h2 className="text-base font-bold text-slate-900">
-                  {editingProductId ? 'Edit Product Details' : 'Add New Grocery Product'}
-                </h2>
-                <p className="text-xs text-slate-500 font-medium">
-                  {editingProductId ? `Product ID: ${formData.id}` : 'Fill in the information below'}
-                </p>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Sub-tabs */}
-            <div className="flex gap-2 border-b border-slate-100 py-3 overflow-x-auto">
-              {[
-                { id: 'basic', label: 'Basic Info' },
-                { id: 'specifications', label: '📋 Specifications' },
-                { id: 'nutrition', label: 'Nutritional Info' },
-                { id: 'highlights', label: 'Highlights & Benefits' },
-                { id: 'faqs', label: 'FAQs & Storage' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'bg-purple-100 text-purple-800'
-                      : 'text-slate-600 hover:bg-slate-100'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Modal Form Body */}
-            <form onSubmit={handleSave} className="py-6 space-y-6">
-              {activeTab === 'basic' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Product Title *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="E.g., Daawat Super Basmati Rice"
-                        className="w-full h-10 px-3 text-xs font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Brand Name *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.brand}
-                        onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                        className="w-full h-10 px-3 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Category *</label>
-                      <select
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full h-10 px-3 text-xs font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl"
-                      >
-                        {config.categories.map((c) => (
-                          <option key={c.id} value={c.name}>
-                            {c.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Default Weight / Size</label>
-                      <input
-                        type="text"
-                        value={formData.weight}
-                        onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                        placeholder="1 kg, 500 g, 5 kg..."
-                        className="w-full h-10 px-3 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Stock Count</label>
-                      <input
-                        type="text"
-                        value={formData.stockCount ?? 50}
-                        onChange={(e) => setFormData({ ...formData, stockCount: Number(e.target.value.replace(/\D/g, '')) || 0, inStock: Number(e.target.value.replace(/\D/g, '')) > 0 })}
-                        className="w-full h-10 px-3 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Original Price / MRP (₹)
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.oldPrice || ''}
-                        onChange={(e) => {
-                          const newOldPrice = Number(e.target.value.replace(/[^0-9.]/g, '')) || 0;
-                          const discount = formData.discountPercentage ?? 0;
-                          const newPrice = discount > 0 && newOldPrice > 0
-                            ? Math.round(newOldPrice * (1 - discount / 100))
-                            : formData.price;
-                          setFormData({ ...formData, oldPrice: newOldPrice, price: newPrice });
-                        }}
-                        placeholder="e.g. 1699"
-                        className="w-full h-10 px-3 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl"
-                      />
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-xs font-bold text-slate-700">
-                          Discount / Offer Percentage (%)
-                        </label>
-                        <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200 px-1.5 py-0.5 rounded">
-                          {formData.discountPercentage ?? 0}% OFF
-                        </span>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={formData.discountPercentage !== undefined ? formData.discountPercentage : ''}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/[^0-9.]/g, '');
-                            const newDiscount = val === '' ? 0 : Math.min(100, Number(val));
-                            const oldP = formData.oldPrice || 0;
-                            const newPrice = oldP > 0 && newDiscount > 0
-                              ? Math.round(oldP * (1 - newDiscount / 100))
-                              : oldP > 0
-                                ? oldP
-                                : formData.price;
-                            setFormData({
-                              ...formData,
-                              discountPercentage: newDiscount,
-                              price: newPrice,
-                            });
-                          }}
-                          placeholder="e.g. 18"
-                          className="w-full h-10 px-3 pr-8 text-xs font-black text-orange-600 bg-orange-50/40 border border-orange-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-400"
-                        />
-                        <span className="absolute right-3 top-2.5 text-xs font-black text-orange-500">%</span>
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Final Selling Price (₹) * (After Deducting Discount)
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.price}
-                        onChange={(e) => {
-                          const newPrice = Number(e.target.value.replace(/[^0-9.]/g, '')) || 0;
-                          const oldP = formData.oldPrice || 0;
-                          const calculatedDiscount = oldP > newPrice && oldP > 0
-                            ? Math.round(((oldP - newPrice) / oldP) * 100)
-                            : 0;
-                          setFormData({
-                            ...formData,
-                            price: newPrice,
-                            discountPercentage: calculatedDiscount,
-                          });
-                        }}
-                        className="w-full h-10 px-3 text-xs font-black text-purple-700 bg-purple-50/30 border border-purple-200 rounded-xl"
-                      />
-                    </div>
-
-                    {/* Live Pricing & Offer Summary Banner */}
-                    <div className="col-span-2 p-3.5 bg-gradient-to-r from-purple-50/90 via-orange-50/50 to-slate-50 border border-purple-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div>
-                        <div className="text-[10px] font-black uppercase text-purple-700 tracking-wider flex items-center gap-1.5">
-                          <span>🏷️ Live Price &amp; Offer Display on Storefront</span>
-                        </div>
-                        <div className="flex items-baseline gap-2.5 mt-1.5">
-                          <span className="text-xl font-black text-[#7C3AED]">₹{formData.price}</span>
-                          {formData.oldPrice && formData.oldPrice > formData.price && (
-                            <span className="text-sm font-bold text-slate-400 line-through">
-                              ₹{formData.oldPrice}
-                            </span>
-                          )}
-                          {(formData.discountPercentage || 0) > 0 && (
-                            <span className="bg-orange-100 text-[#EA580C] text-xs font-black px-2.5 py-0.5 rounded-md border border-orange-200 shadow-2xs">
-                              SAVE {formData.discountPercentage}%
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-left sm:text-right">
-                        <div className="text-[11px] font-bold text-slate-600">
-                          Exact Offer Set: <strong className="text-orange-600 font-black">{formData.discountPercentage || 0}% OFF</strong>
-                        </div>
-                        <div className="text-[10px] font-semibold text-slate-400 mt-0.5">
-                          {formData.oldPrice && formData.oldPrice > formData.price
-                            ? `Customer saves ₹${formData.oldPrice - formData.price} per unit`
-                            : 'No active discount'}
-                        </div>
-                      </div>
-                    </div>
-
-
-
-                    <div className="sm:col-span-2">
-                      <AdminImageUpload
-                        value={formData.image}
-                        onChange={(val) => setFormData({ ...formData, image: val })}
-                        label="Product Thumbnail Image"
-                        aspectRatio="square"
-                        recommendedDimensions="800 × 800 px (1:1 ratio)"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Description</label>
-                    <textarea
-                      rows={3}
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Product details and quality guarantees..."
-                      className="w-full p-3 text-xs font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-xl"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'nutrition' && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Energy / Calories</label>
-                    <input
-                      type="text"
-                      value={formData.nutritionalInfo?.energy || ''}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          nutritionalInfo: { ...formData.nutritionalInfo!, energy: e.target.value },
-                        })
-                      }
-                      placeholder="350 kcal"
-                      className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Protein</label>
-                    <input
-                      type="text"
-                      value={formData.nutritionalInfo?.protein || ''}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          nutritionalInfo: { ...formData.nutritionalInfo!, protein: e.target.value },
-                        })
-                      }
-                      placeholder="8.5 g"
-                      className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Carbohydrates</label>
-                    <input
-                      type="text"
-                      value={formData.nutritionalInfo?.carbs || ''}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          nutritionalInfo: { ...formData.nutritionalInfo!, carbs: e.target.value },
-                        })
-                      }
-                      placeholder="78 g"
-                      className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Fats</label>
-                    <input
-                      type="text"
-                      value={formData.nutritionalInfo?.fat || ''}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          nutritionalInfo: { ...formData.nutritionalInfo!, fat: e.target.value },
-                        })
-                      }
-                      placeholder="0.6 g"
-                      className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'highlights' && <div className="space-y-5">
-                <h3 className="font-bold">Premium features — displayed in this order</h3>
-                {(formData.highlights || []).map((item, index) => <div key={index} className="grid md:grid-cols-[80px_1fr_2fr_auto] gap-3 border p-4 rounded-xl">
-                  {(['icon', 'title', 'desc'] as const).map(key => <label key={key}>{key}<input className="w-full p-2 border rounded-lg" value={item[key]} onChange={e => setFormData({...formData, highlights: formData.highlights!.map((h,i) => i === index ? {...h, [key]: e.target.value} : h)})}/></label>)}
-                  <button type="button" onClick={() => setFormData({...formData, highlights: formData.highlights!.filter((_,i) => i !== index)})}>Remove</button>
-                </div>)}
-                <button type="button" onClick={() => setFormData({...formData, highlights: [...(formData.highlights || []), {icon: '', title: '', desc: ''}]})}>Add feature</button>
-                <label className="block font-bold">Benefits & advantages (one per line)<textarea rows={6} className="block w-full p-3 border rounded-xl font-normal" value={(formData.benefits || []).join('\n')} onChange={e => setFormData({...formData, benefits: e.target.value.split('\n')})}/></label>
-                <label className="block font-bold">Ingredients (one per line)<textarea rows={3} className="block w-full p-3 border rounded-xl font-normal" value={(formData.ingredients || []).join('\n')} onChange={e => setFormData({...formData, ingredients: e.target.value.split('\n')})}/></label>
-                <label className="block font-bold">How to use (one step per line)<textarea rows={3} className="block w-full p-3 border rounded-xl font-normal" value={(formData.howToUse || []).join('\n')} onChange={e => setFormData({...formData, howToUse: e.target.value.split('\n')})}/></label>
-              </div>}
-
-              {activeTab === 'faqs' && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Storage Advice</label>
-                    <input
-                      type="text"
-                      value={formData.storageInstructions || ''}
-                      onChange={(e) => setFormData({ ...formData, storageInstructions: e.target.value })}
-                      placeholder="Store in cool, dry hygienic container..."
-                      className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Frequently Asked Question</label>
-                    <input
-                      type="text"
-                      value={formData.faqs?.[0]?.question || ''}
-                      onChange={(e) => {
-                        const f = [...(formData.faqs || [{ question: '', answer: '' }])];
-                        f[0] = { ...f[0], question: e.target.value };
-                        setFormData({ ...formData, faqs: f });
-                      }}
-                      placeholder="Question..."
-                      className="w-full h-9 px-3 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl mb-2"
-                    />
-                    <textarea
-                      rows={2}
-                      value={formData.faqs?.[0]?.answer || ''}
-                      onChange={(e) => {
-                        const f = [...(formData.faqs || [{ question: '', answer: '' }])];
-                        f[0] = { ...f[0], answer: e.target.value };
-                        setFormData({ ...formData, faqs: f });
-                      }}
-                      placeholder="Answer..."
-                      className="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'specifications' && (
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-purple-50/70 p-3.5 rounded-2xl border border-purple-150">
-                    <div>
-                      <h4 className="text-xs font-black text-purple-950 uppercase tracking-wider">
-                        Product Specifications Table
-                      </h4>
-                      <p className="text-[11px] text-purple-700 font-medium">
-                        Visible on the live product detail page under "📋 PRODUCT SPECIFICATIONS".
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData({
-                          ...formData,
-                          specifications: [
-                            { label: 'Brand', value: formData.brand || 'Farminix' },
-                            { label: 'Product Name', value: formData.name || 'Farminix Family Choice Rice' },
-                            { label: 'Net Quantity', value: formData.weight || '26 Kg' },
-                            { label: 'Dietary Preference', value: '100% Vegetarian 🟢' },
-                            { label: 'FSSAI License No.', value: '20126142000933' },
-                            { label: 'Manufactured & Marketed By', value: 'Farminix Private Limited' },
-                            { label: 'Registered Address', value: 'Flat No 302, Srinivasa Towers, Gorantla, Guntur - 522034, Andhra Pradesh' },
-                            { label: 'Customer Contact', value: '+91 7989743595' },
-                            { label: 'Customer Support Email', value: 'info@farminix.in' },
-                            { label: 'Official Website', value: 'www.farminix.in' },
-                            { label: 'Shelf Life', value: '24 Months from Packaging Date' },
-                            { label: 'Barcode', value: '8908032796002' },
-                            { label: 'Country of Origin', value: 'India' },
-                          ],
-                        });
-                      }}
-                      className="px-3 py-1.5 text-[11px] font-bold text-purple-800 bg-white hover:bg-purple-100 rounded-xl border border-purple-200 transition-colors shadow-2xs self-start sm:self-auto cursor-pointer"
-                    >
-                      Load Farminix Specs Template
-                    </button>
-                  </div>
-
-                  <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
-                    {(!formData.specifications || formData.specifications.length === 0) ? (
-                      <div className="p-8 text-center border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-medium">
-                        No specifications added. Click "Load Farminix Specs Template" or "Add Specification Row" below.
-                      </div>
-                    ) : (
-                      formData.specifications.map((spec, idx) => (
-                        <div
-                          key={idx}
-                          className="p-3 bg-slate-50/80 rounded-2xl border border-slate-200 flex items-start gap-2.5 hover:border-purple-300 transition-colors"
-                        >
-                          <div className="w-2/5">
-                            <label className="block text-[10px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">
-                              Specification Label
-                            </label>
-                            <input
-                              type="text"
-                              value={spec.label}
-                              onChange={(e) => {
-                                const list = [...(formData.specifications || [])];
-                                list[idx] = { ...list[idx], label: e.target.value };
-                                setFormData({ ...formData, specifications: list });
-                              }}
-                              placeholder="e.g. Brand, FSSAI Lic."
-                              className="w-full h-8 px-2.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500"
-                            />
-                          </div>
-
-                          <div className="flex-1">
-                            <label className="block text-[10px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">
-                              Specification Value
-                            </label>
-                            <input
-                              type="text"
-                              value={spec.value}
-                              onChange={(e) => {
-                                const list = [...(formData.specifications || [])];
-                                list[idx] = { ...list[idx], value: e.target.value };
-                                setFormData({ ...formData, specifications: list });
-                              }}
-                              placeholder="e.g. Farminix, 26 Kg..."
-                              className="w-full h-8 px-2.5 text-xs font-extrabold text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500"
-                            />
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const list = (formData.specifications || []).filter((_, i) => i !== idx);
-                              setFormData({ ...formData, specifications: list });
-                            }}
-                            className="mt-5 p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Delete row"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const list = [...(formData.specifications || [])];
-                      list.push({ label: '', value: '' });
-                      setFormData({ ...formData, specifications: list });
-                    }}
-                    className="w-full py-2.5 border-2 border-dashed border-purple-300 hover:border-purple-500 hover:bg-purple-50/50 text-purple-700 text-xs font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Add Specification Row</span>
-                  </button>
-                </div>
-              )}
-
-              {editingProductId && <CouponEditor productId={editingProductId} />}
-              {saveError && <p role="alert" className="text-red-600">{saveError}</p>}
-              {/* Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white transition-colors cursor-pointer shadow-sm"
-                >
-                  {isSaving ? 'Saving…' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

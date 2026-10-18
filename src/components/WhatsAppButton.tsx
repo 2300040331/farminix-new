@@ -1,8 +1,13 @@
 import React from 'react';
+import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
 export const WHATSAPP_PHONE = '917989743595';
 export const WHATSAPP_DEFAULT_MESSAGE = "Hello Farminix! 👋 I would like to know more about your rice & grocery products and place an order.";
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(WHATSAPP_DEFAULT_MESSAGE)}`;
+export const buildWhatsAppUrl = (phone: string, message: string) => {
+  const normalized = phone.replace(/\D/g, '');
+  return normalized ? `https://wa.me/${normalized}?text=${encodeURIComponent(message)}` : '';
+};
 
 export const WhatsAppIcon: React.FC<{ className?: string }> = ({ className = 'w-6 h-6' }) => (
   <svg
@@ -20,9 +25,12 @@ export const WhatsAppIcon: React.FC<{ className?: string }> = ({ className = 'w-
 );
 
 export const WhatsAppFloatingButton: React.FC = () => {
+  const { publishedConfig } = useAdminConfig();
+  const whatsappUrl = buildWhatsAppUrl(publishedConfig.footer.whatsappPhone, publishedConfig.footer.whatsappMessage);
+  if (!whatsappUrl) return null;
   return (
     <a
-      href={WHATSAPP_URL}
+      href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with Farminix on WhatsApp"

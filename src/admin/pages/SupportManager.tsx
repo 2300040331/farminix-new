@@ -13,34 +13,7 @@ interface Ticket {
 }
 
 export const SupportManager: React.FC = () => {
-  const [tickets, setTickets] = useState<Ticket[]>([
-    {
-      id: 'TCK-1092',
-      userName: 'Customer',
-      userPhone: '+91 98000 00000',
-      subject: 'Order Tracking Query for ORD-89241',
-      message: 'When will the 10 min express delivery arrive?',
-      status: 'OPEN',
-      createdAt: 'Today, 2:15 PM',
-      replies: [
-        { sender: 'user', text: 'When will the 10 min express delivery arrive?', time: '2:15 PM' },
-        { sender: 'agent', text: 'Your delivery executive is 4 minutes away from your location.', time: '2:16 PM' },
-      ],
-    },
-    {
-      id: 'TCK-1088',
-      userName: 'Rajesh Kumar',
-      userPhone: '+91 98111 22334',
-      subject: 'Discount code FARM10 validation',
-      message: 'How to apply 10% coupon on bulk Basmati Rice purchase?',
-      status: 'RESOLVED',
-      createdAt: 'Yesterday, 5:40 PM',
-      replies: [
-        { sender: 'user', text: 'How to apply 10% coupon on bulk Basmati Rice purchase?', time: '5:40 PM' },
-        { sender: 'agent', text: 'Apply code FARM10 at checkout on cart total above ₹500 for instant discount.', time: '5:42 PM' },
-      ],
-    },
-  ]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
 
   const [selectedTicketId, setSelectedTicketId] = useState<string>(tickets[0]?.id || '');
   const [replyText, setReplyText] = useState('');

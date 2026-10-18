@@ -2,15 +2,16 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   ArrowLeft, Heart, CheckCircle2, Zap,
   Plus, Minus, ChevronDown, ChevronUp, ShoppingBag,
-  AlertCircle
+  AlertCircle, Leaf, BarChart3, ClipboardList, ChefHat, Utensils, Microwave
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getProductSlug } from './ProductListingPage';
-import { farminixRiceProduct } from '../data/products';
+import { ProductReviews } from './ProductReviews';
+import { ProductFeatureIcon } from './ProductFeatureIcon';
 import type { Product } from '../types';
 
 const parsePreparationStep = (stepText: string, index: number) => {
-  const cleaned = stepText.replace(/^(\d+[\.\)]\s*)+/, '').trim();
+  const cleaned = stepText.replace(/^(\d+[.)]\s*)+/, '').trim();
   const colonIndex = cleaned.indexOf(':');
   if (colonIndex > 0 && colonIndex < 35) {
     return {
@@ -150,14 +151,14 @@ export const ProductDetailPage: React.FC = () => {
   const baseMultiplier = getMultiplier(product.weight);
   const scale = multiplier / baseMultiplier;
 
-  const currentPrice = Math.round(product.price * scale);
-  const currentOldPrice = product.oldPrice ? Math.round(product.oldPrice * scale) : undefined;
+  const currentPrice = Math.round(product.price * scale * 100) / 100;
+  const currentOldPrice = product.oldPrice ? Math.round(product.oldPrice * scale * 100) / 100 : undefined;
   const discountPct = product.discountPercentage !== undefined && product.discountPercentage > 0
     ? product.discountPercentage
     : currentOldPrice && currentOldPrice > currentPrice
       ? Math.round(((currentOldPrice - currentPrice) / currentOldPrice) * 100)
       : 0;
-  const discountAmount = currentOldPrice && currentOldPrice > currentPrice ? currentOldPrice - currentPrice : 0;
+  const discountAmount = currentOldPrice && currentOldPrice > currentPrice ? Math.round((currentOldPrice - currentPrice) * 100) / 100 : 0;
 
   // Cart state
   const cartItem = cart.find(
@@ -169,89 +170,12 @@ export const ProductDetailPage: React.FC = () => {
   // Gallery Images
   const gallery = [product.image, ...(product.galleryImages || [])];
 
-  // Dynamic Product Highlights ("Why You'll Love It")
-  const highlights = product.highlights || [
-    { icon: '✨', title: 'Premium Sourced', desc: 'Directly sourced from trusted certified farm partners.' },
-    { icon: '🌿', title: '100% Authentic', desc: 'No artificial preservatives, unadulterated freshness guaranteed.' },
-    { icon: '⚡', title: 'Express Delivery', desc: 'Packed carefully and delivered to your doorstep in 10-20 mins.' },
-    { icon: '🛡️', title: 'Quality Tested', desc: 'Multi-stage quality checks for superior taste and nutrition.' },
-  ];
-
-  // Category Benefits
-  const getCategoryBenefits = (category: string) => {
-    if (category.includes('Rice') || category.includes('Grain')) {
-      return [
-        'Aged for optimal texture, aroma, and non-sticky fluffy grain separation.',
-        'Low glycemic index staple ideal for everyday family meals, biryani, and pulao.',
-        'High energy density, easily digestible, and rich in natural carbohydrates.',
-      ];
-    }
-    if (category.includes('Dal') || category.includes('Pulse')) {
-      return [
-        'Rich natural source of plant protein, dietary fiber, and essential minerals.',
-        'Unpolished grains retaining full nutritional kernel value and natural color.',
-        'Ideal for daily dal tadka, sambar, khichdi, and protein-rich soups.',
-      ];
-    }
-    if (category.includes('Oil') || category.includes('Ghee')) {
-      return [
-        'Cold-pressed / traditional extraction retaining natural vitamins and antioxidants.',
-        'High smoke point ideal for frying, tempering, and rich traditional Indian cooking.',
-        'Free from chemical refining agents, trans fats, and artificial additives.',
-      ];
-    }
-    return [
-      'Carefully selected and quality-checked for maximum freshness and flavor.',
-      'Sourced from top-tier brand partners straight to your kitchen.',
-      'Hygienically packaged with tamper-proof seal to lock in authentic taste.',
-    ];
-  };
-  const benefits = product.benefits || getCategoryBenefits(product.category);
-
-  // Specifications
-  const specifications = (product.specifications && product.specifications.length > 0)
-    ? product.specifications
-    : (product.brand?.toLowerCase().includes('farminix') || product.id === 'r1')
-      ? (farminixRiceProduct.specifications || [])
-      : [
-          { label: 'Brand', value: product.brand },
-          { label: 'Category', value: product.category },
-          { label: 'Net Weight', value: currentWeight },
-          { label: 'Country of Origin', value: product.origin || 'India' },
-          { label: 'Shelf Life', value: product.shelfLife || '12 Months' },
-          { label: 'Dietary Type', value: product.dietaryType === 'veg' ? '100% Vegetarian 🟢' : '100% Vegetarian 🟢' },
-          { label: 'Item Form', value: 'Fresh Packaged' },
-          { label: 'Storage', value: product.storageInstructions || 'Store in a cool, dry place away from direct sunlight.' },
-        ];
-
-  // Usage Instructions
-  const howToUse = product.howToUse || [
-    'Rinse thoroughly 2-3 times in cold water before cooking.',
-    'Soak for 20-30 minutes for optimum grain length and texture.',
-    'Cook using 1 part product to 2 parts water in a sealed pot or rice cooker.',
-  ];
-
-
-
-  // Frequently Asked Questions
-  const faqs = product.faqs || [
-    {
-      question: `Is ${product.name} 100% authentic and fresh?`,
-      answer: `Yes, all ${product.name} inventory at Farminix is 100% authentic, sourced directly from verified manufacturers, and quality-tested before packaging.`
-    },
-    {
-      question: `What pack sizes are available?`,
-      answer: `This product is available in ${product.weightOptions ? product.weightOptions.join(', ') : product.weight} pack sizes.`
-    },
-    {
-      question: `How fast will this item be delivered?`,
-      answer: `Farminix delivers this item in 10-20 minutes in supported express delivery locations.`
-    },
-    {
-      question: `What is the return policy?`,
-      answer: `Farminix offers hassle-free 100% replacement or instant wallet refund if you receive damaged or incorrect items.`
-    }
-  ];
+  // Product sections use only the saved product content.
+  const highlights = (product.highlights || []).filter(h => h.title.trim() && h.desc.trim());
+  const benefits = (product.benefits || []).filter(b => b.trim());
+  const specifications = (product.specifications || []).filter(s => s.label.trim() && s.value.trim());
+  const howToUse = (product.howToUse || []).filter(s => s.trim());
+  const faqs = (product.faqs || []).filter(f => f.question.trim() && f.answer.trim());
 
   // Frequently Bought Together Products
   const bundleProducts = allProducts
@@ -529,7 +453,7 @@ export const ProductDetailPage: React.FC = () => {
         </div>
 
         {/* ── KEY HIGHLIGHTS ("Why You'll Love It") ── */}
-        <div className="mt-14 pt-10 border-t border-slate-100">
+        {highlights.length > 0 && <div className="mt-14 pt-10 border-t border-slate-100">
           <div className="text-center mb-8">
             <span className="text-[11px] font-black text-[#7C3AED] uppercase tracking-widest">Premium Features</span>
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">Why You'll Love It</h2>
@@ -538,7 +462,7 @@ export const ProductDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {highlights.map((h, idx) => (
               <div key={idx} className="p-5 bg-purple-50/50 border border-purple-100 rounded-2xl flex items-start gap-4">
-                <span className="text-2xl shrink-0">{h.icon}</span>
+                <ProductFeatureIcon name={h.icon} className="h-8 w-8 shrink-0 text-purple-600" />
                 <div className="text-left">
                   <h3 className="text-xs font-black text-slate-900">{h.title}</h3>
                   <p className="text-[11px] font-medium text-slate-600 mt-1 leading-normal">{h.desc}</p>
@@ -548,8 +472,9 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         </div>
 
+        }
         {/* ── BENEFITS & ADVANTAGES ── */}
-        <div className="mt-12 p-6 sm:p-8 bg-slate-50/70 border border-slate-200/70 rounded-3xl">
+        {benefits.length > 0 && <div className="mt-12 p-6 sm:p-8 bg-slate-50/70 border border-slate-200/70 rounded-3xl">
           <h2 className="text-base font-black text-slate-900 uppercase tracking-wider mb-4 text-left">
             Benefits &amp; Advantages
           </h2>
@@ -563,6 +488,7 @@ export const ProductDetailPage: React.FC = () => {
           </ul>
         </div>
 
+        }
         {/* ── INGREDIENTS & NUTRITIONAL INFO & SPECIFICATIONS ── */}
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
           
@@ -571,7 +497,7 @@ export const ProductDetailPage: React.FC = () => {
             {product.ingredients && product.ingredients.length > 0 && (
               <div className="p-6 bg-white border border-slate-200/80 rounded-3xl text-left shadow-2xs">
                 <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <span>🌿 Ingredients &amp; Composition</span>
+                  <><Leaf className="w-4 h-4 text-purple-600" /> <span>Ingredients &amp; Composition</span></>
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-700 font-semibold leading-relaxed">
                   {product.ingredients.join(', ')}
@@ -579,47 +505,32 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             )}
 
-            {product.nutritionalInfo && (
+            {product.nutritionalInfo && Object.values(product.nutritionalInfo).some(Boolean) && (
               <div className="p-6 bg-white border border-slate-200/80 rounded-3xl text-left shadow-2xs">
                 <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <span>📊 Nutritional Information (per 100g)</span>
+                  <><BarChart3 className="w-4 h-4 text-purple-600" /> <span>Nutritional Information{product.nutritionBasis ? ` (${product.nutritionBasis})` : ''}</span></>
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="p-3 bg-purple-50 rounded-xl text-center border border-purple-100">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Energy</div>
-                    <div className="text-xs sm:text-sm font-black text-[#7C3AED] mt-0.5">{product.nutritionalInfo.energy}</div>
-                  </div>
-                  <div className="p-3 bg-emerald-50 rounded-xl text-center border border-emerald-100">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Protein</div>
-                    <div className="text-xs sm:text-sm font-black text-emerald-700 mt-0.5">{product.nutritionalInfo.protein}</div>
-                  </div>
-                  <div className="p-3 bg-amber-50 rounded-xl text-center border border-amber-100">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Carbs</div>
-                    <div className="text-xs sm:text-sm font-black text-amber-700 mt-0.5">{product.nutritionalInfo.carbs}</div>
-                  </div>
-                  <div className="p-3 bg-slate-100 rounded-xl text-center border border-slate-200">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Fat</div>
-                    <div className="text-xs sm:text-sm font-black text-slate-800 mt-0.5">{product.nutritionalInfo.fat}</div>
-                  </div>
+                  {Object.entries(product.nutritionalInfo).filter(([,value]) => value).map(([label,value]) => <div key={label} className="p-3 bg-purple-50 rounded-xl text-center border border-purple-100"><div className="text-[10px] font-bold text-slate-500 uppercase">{label}</div><div className="text-xs sm:text-sm font-black text-purple-700 mt-0.5 break-words">{value}</div></div>)}
                 </div>
               </div>
             )}
           </div>
 
           {/* Right Column: Product Specifications Table */}
-          <div className="p-6 sm:p-8 bg-white border border-slate-200/90 rounded-3xl text-left shadow-xs">
+          {specifications.length > 0 && <div className="p-6 sm:p-8 bg-white border border-slate-200/90 rounded-3xl text-left shadow-xs">
             <h3 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
-              <span>📋 PRODUCT SPECIFICATIONS</span>
+              <><ClipboardList className="w-4 h-4 text-purple-600" /> <span>PRODUCT SPECIFICATIONS</span></>
             </h3>
             <div className="divide-y divide-slate-100 text-xs sm:text-sm">
               {specifications.map((s, idx) => (
-                <div key={idx} className="py-3 sm:py-3.5 flex justify-between items-start gap-4">
-                  <span className="font-bold text-slate-500 shrink-0">{s.label}</span>
-                  <span className="font-extrabold text-slate-900 text-right leading-relaxed">{s.value}</span>
+                <div key={idx} className="py-3 sm:py-3.5 grid grid-cols-1 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-2 sm:gap-4">
+                  <span className="font-bold text-slate-500 break-words">{s.label}</span>
+                  <span className="font-extrabold text-slate-900 sm:text-right leading-relaxed break-words">{s.value}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </div>}
 
         </div>
 
@@ -627,7 +538,7 @@ export const ProductDetailPage: React.FC = () => {
         {howToUse && howToUse.length > 0 && (
           <div className="mt-12 p-6 sm:p-8 bg-white border border-slate-200/90 rounded-3xl text-left shadow-2xs">
             <div className="flex items-center gap-2.5 mb-6 pb-4 border-b border-slate-100">
-              <span className="text-xl">🍳</span>
+              <ChefHat className="w-5 h-5 text-purple-600" />
               <h3 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider">
                 How to Use / Preparation
               </h3>
@@ -636,8 +547,8 @@ export const ProductDetailPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
               {howToUse.map((step, idx) => {
                 const parsed = parsePreparationStep(step, idx);
-                const icons = ['🍲', '🥘', '♨️'];
-                const icon = icons[idx % icons.length];
+                const icons = [Utensils, ChefHat, Microwave];
+                const MethodIcon = icons[idx % icons.length];
 
                 return (
                   <div
@@ -648,7 +559,7 @@ export const ProductDetailPage: React.FC = () => {
                       <span className="px-2.5 py-1 rounded-lg bg-purple-100 text-[#7C3AED] font-black text-xs tracking-wider">
                         Method 0{parsed.stepNum}
                       </span>
-                      <span className="text-xl">{icon}</span>
+                      <MethodIcon className="w-5 h-5 text-purple-600" />
                     </div>
 
                     <div>
@@ -716,7 +627,7 @@ export const ProductDetailPage: React.FC = () => {
 
 
         {/* ── FREQUENTLY ASKED QUESTIONS (Accordion) ── */}
-        <div className="mt-14 pt-10 border-t border-slate-100 text-left">
+        {faqs.length > 0 && <div className="mt-14 pt-10 border-t border-slate-100 text-left">
           <div className="mb-6">
             <span className="text-[11px] font-black text-[#7C3AED] uppercase tracking-widest">Got Questions?</span>
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">Frequently Asked Questions</h2>
@@ -750,6 +661,9 @@ export const ProductDetailPage: React.FC = () => {
         </div>
 
 
+
+        }
+        <ProductReviews reviews={product.reviewsList} />
 
         {/* ── RECENTLY VIEWED PRODUCTS ── */}
         {recentlyViewedProducts.length > 0 && (
