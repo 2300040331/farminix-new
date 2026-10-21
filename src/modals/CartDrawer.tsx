@@ -56,19 +56,20 @@ export const CartDrawer: React.FC = () => {
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex">
-        <div className="w-screen max-w-full sm:max-w-md bg-white shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-300">
+        <div role="dialog" aria-modal="true" aria-labelledby="store-cart-title" className="store-cart-panel w-screen max-w-full sm:max-w-md bg-white shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-300">
           
           {/* Drawer Header */}
           <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-slate-50">
             <div className="flex items-center gap-2">
               <img src="/farminix_logo.png" alt="Farminix Logo" className="h-6 sm:h-7 w-auto object-contain" />
               <span className="h-4 w-px bg-gray-300" />
-              <h2 className="text-sm sm:text-base font-bold text-gray-900">Your Cart</h2>
+              <h2 id="store-cart-title" className="text-sm sm:text-base font-bold text-gray-900">Your Cart</h2>
               <span className="bg-emerald-100 text-[#15803D] text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full">
                 {cart.reduce((sum, i) => sum + i.quantity, 0)} Items
               </span>
             </div>
             <button
+              aria-label="Close shopping cart"
               onClick={() => setIsCartOpen(false)}
               className="w-8 h-8 rounded-full bg-white hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors cursor-pointer shrink-0"
             >

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { ArrowLeft, Leaf } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import { defaultAboutPageConfig } from '../admin/defaultConfig';
@@ -9,25 +9,13 @@ export const AboutPage: React.FC = () => {
   const { publishedConfig } = useAdminConfig();
   const about = publishedConfig.aboutPage || defaultAboutPageConfig;
 
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  // 3D Parallax tilt handler for the interactive hero section
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setMousePos({ x, y });
-  };
-
-  const handleMouseLeave = () => {
-    setMousePos({ x: 0, y: 0 });
-  };
+  useEffect(() => { document.title = 'Our Story — Farminix'; }, []);
 
   return (
-    <div className="w-full bg-[#FAFAFC] text-slate-900 font-sans overflow-hidden">
+    <div className="store-information-page store-about-page w-full text-slate-900 overflow-hidden">
       
       {/* ── 3D AMBIENT BACKGROUND GLOWS ── */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-300/25 rounded-full blur-3xl animate-pulse-glow" />
         <div className="absolute top-1/3 -right-32 w-[30rem] h-[30rem] bg-indigo-200/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '2s' }} />
         <div className="absolute bottom-10 left-1/4 w-[28rem] h-[28rem] bg-amber-100/30 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '4s' }} />
@@ -51,12 +39,11 @@ export const AboutPage: React.FC = () => {
             HERO SECTION WITH 3D INTERACTIVE PARALLAX & 3D BAG SHOWCASE
             ══════════════════════════════════════════════════════════════════ */}
         <section
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          className="perspective-1500 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center pt-2 sm:pt-4"
+          className="store-about-hero grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center pt-2 sm:pt-4"
         >
           {/* Left: Open Narrative */}
           <div className="lg:col-span-7 space-y-6 text-left">
+            <span className="store-eyebrow"><Leaf size={15} />The Farminix story</span>
             {/* Main 3D Title */}
             <div className="space-y-3">
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] text-slate-900">
@@ -95,26 +82,7 @@ export const AboutPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: 3D Interactive Floating Showcase of Farminix 26 Kg Bag */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
-            <div
-              style={{
-                transform: `perspective(1000px) rotateY(${mousePos.x * 16}deg) rotateX(${-mousePos.y * 16}deg) translateZ(10px)`,
-                transition: 'transform 0.15s ease-out',
-              }}
-              className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-[4/5] flex items-center justify-center preserve-3d"
-            >
-              <div className="absolute inset-4 bg-gradient-to-tr from-purple-200/60 via-purple-100/40 to-indigo-100/60 rounded-3xl blur-2xl -z-10" />
-              <div className="relative w-full h-full flex flex-col items-center justify-center animate-float-3d">
-                <img
-                  src="/farminix_rice_front.png"
-                  alt="Farminix Family Choice Rice 26 Kg"
-                  className="max-h-[88%] w-auto object-contain drop-shadow-[0_25px_35px_rgba(124,58,237,0.22)] transition-all duration-500 ease-out"
-                />
-                <div className="w-44 h-5 bg-purple-950/20 rounded-full blur-md animate-float-shadow mt-2" />
-              </div>
-            </div>
-          </div>
+          <div className="lg:col-span-5 store-about-product"><img src="/farminix_rice_front.png" alt="Farminix Family Choice Rice 26 Kg" /></div>
         </section>
 
 

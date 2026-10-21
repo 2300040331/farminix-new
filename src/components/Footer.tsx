@@ -1,9 +1,10 @@
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import { buildWhatsAppUrl, WhatsAppIcon } from './WhatsAppButton';
+import { ArrowRight, Leaf } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { navigate, setIsSupportOpen, setIsCartOpen } = useApp();
+  const { navigate, setIsSupportOpen, setIsCartOpen, currentRoute } = useApp();
   const { publishedConfig } = useAdminConfig();
   const footerConfig = publishedConfig.footer;
 
@@ -73,8 +74,9 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="w-full bg-slate-900 text-slate-300 border-t border-slate-800 pt-12 pb-12 select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="store-footer w-full select-none">
+      {currentRoute.pathname !== '/checkout' && <div className="store-footer-invite"><div className="store-container"><div><span className="store-eyebrow"><Leaf size={16} />From farm to family</span><h2>Good food brings us together.</h2><p>Bring a little farm-fresh goodness to your everyday.</p></div><button className="store-button" onClick={() => navigate('/products')}>Explore our collection<ArrowRight size={18} /></button></div></div>}
+      <div className="store-container store-footer-body">
         
         {/* Main Footer Layout */}
         <div className="flex flex-col md:flex-row items-start justify-between gap-10">
@@ -187,6 +189,7 @@ export const Footer: React.FC = () => {
 
         </div>
 
+        <div className="store-footer-bottom"><p>{footerConfig.copyrightText || `© ${new Date().getFullYear()} Farminix. From farm to family.`}</p><nav aria-label="Legal information">{(footerConfig.legalLinks || []).filter((link) => link.enabled !== false && link.label.trim() && ((link.url && link.url !== '#') || (link.actionType && link.actionType !== 'url'))).map((link) => <button key={link.id} onClick={() => handleLinkClick(link)}>{link.label}</button>)}</nav></div>
       </div>
     </footer>
   );

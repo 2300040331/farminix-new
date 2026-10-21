@@ -34,34 +34,28 @@ import { TrackOrderModal } from './modals/TrackOrderModal';
 import { SupportModal } from './modals/SupportModal';
 import { IntroVideoOverlay } from './components/IntroVideoOverlay';
 import { WhatsAppFloatingButton } from './components/WhatsAppButton';
+import './storefront.css';
+import './admin/admin-premium.css';
+
+const PaddyHarvestScene = React.lazy(() => import('./components/PaddyHarvestScene'));
 
 export function AppContent() {
   const { currentRoute, navigate } = useApp();
   const { publishedConfig, isAdminLoggedIn } = useAdminConfig();
+  const isCommercePage = ['/checkout', '/products', '/offers'].includes(currentRoute.pathname) || currentRoute.pathname.startsWith('/product/') || currentRoute.searchParams.has('search') || currentRoute.searchParams.has('category');
 
-  // Detect OS: zoom 125% for Windows, 100% for Mac
+  // All pages share the same responsive scale across operating systems.
   React.useEffect(() => {
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isWindows = userAgent.indexOf('windows') !== -1;
-    const isMac = userAgent.indexOf('macintosh') !== -1 || userAgent.indexOf('mac os') !== -1;
-    
-    if (currentRoute.pathname === '/admin') {
-      document.documentElement.style.zoom = '1.0';
-    } else if (isWindows) {
-      document.documentElement.style.zoom = '1.25';
-    } else if (isMac) {
-      document.documentElement.style.zoom = '1.0';
-    } else {
-      document.documentElement.style.zoom = '1.0';
-    }
-  }, [currentRoute.pathname]);
+    document.documentElement.style.zoom = '1';
+  }, []);
 
   // Ensure scroll is at the top on every page/route change
+  const routeSearch = currentRoute.searchParams.toString();
   React.useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-  }, [currentRoute.pathname, currentRoute.searchParams.toString()]);
+  }, [currentRoute.pathname, routeSearch]);
 
   // Handle Admin CRM Route
   if (currentRoute.pathname === '/admin') {
@@ -77,7 +71,7 @@ export function AppContent() {
       .sort((a, b) => a.order - b.order);
 
     const sectionComponentMap: Record<string, React.ReactNode> = {
-      hero: <HeroBanner key="hero" />,
+      hero: publishedConfig.hero.enabled ? <React.Fragment key="hero"><HeroBanner /><React.Suspense fallback={null}><PaddyHarvestScene /></React.Suspense></React.Fragment> : null,
       popularProducts: <PopularProducts key="popularProducts" />,
       socialBlog: <SocialBlogSection key="socialBlog" />,
       categorySection: <CategorySection key="categorySection" />,
@@ -136,12 +130,12 @@ export function AppContent() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white text-slate-900 font-sans flex flex-col relative">
+    <div className="premium-storefront w-full min-h-screen flex flex-col relative">
       {/* MAIN HEADER */}
       <MainHeader />
 
       {/* MAIN CONTENT BODY */}
-      <main className="flex-1 w-full">
+      <main className="storefront-main flex-1 w-full">
         {renderMainContent()}
       </main>
 
@@ -158,11 +152,11 @@ export function AppContent() {
       <SupportModal />
       <CategoryPage />
 
-      {/* INTRO VIDEO OVERLAY ON SITE OPEN */}
+      {/* BRANDED HARVEST ANIMATION ON SITE OPEN */}
       {currentRoute.pathname === '/' && <IntroVideoOverlay />}
 
       {/* FLOATING WHATSAPP BUTTON */}
-      <WhatsAppFloatingButton />
+      {!isCommercePage && <WhatsAppFloatingButton />}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, BriefcaseBusiness, CheckCircle2, MapPin, ShieldCheck, Users } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import { defaultCareersPageConfig } from '../admin/defaultConfig';
+import { StorefrontPageHero } from './StorefrontPageHero';
 
 export interface CareerApplication {
   id: string;
@@ -62,24 +63,8 @@ export const CareersPage: React.FC = () => {
   const fieldClass = 'mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100';
 
   return (
-    <div className="bg-slate-50 overflow-hidden">
-      <section className="relative bg-slate-950 text-white">
-        <div className="absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_20%_20%,#7c3aed_0,transparent_35%),radial-gradient(circle_at_80%_70%,#16a34a_0,transparent_30%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-28 grid lg:grid-cols-[1.15fr_.85fr] gap-12 items-end">
-          <div>
-            <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-purple-200"><BriefcaseBusiness className="w-4 h-4" />{cfg.eyebrow}</span>
-            <h1 className="mt-5 max-w-3xl text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05]">{cfg.title}</h1>
-            <p className="mt-6 max-w-2xl text-base sm:text-lg text-slate-300 leading-relaxed">{cfg.subtitle}</p>
-            <a href="#apply" className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-black text-slate-950 hover:bg-purple-100 transition">Apply now <ArrowRight className="w-4 h-4" /></a>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {[['Customers', Users], ['Local work', MapPin], ['Privacy', ShieldCheck]].map(([label, Icon]) => {
-              const IconComponent = Icon as React.ComponentType<{ className?: string }>;
-              return <div key={label as string} className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4 text-center"><IconComponent className="w-5 h-5 mx-auto text-emerald-300" /><span className="block mt-2 text-[11px] sm:text-xs font-bold text-slate-200">{label as string}</span></div>;
-            })}
-          </div>
-        </div>
-      </section>
+    <div className="store-information-page store-careers-page overflow-hidden">
+      <StorefrontPageHero eyebrow={cfg.eyebrow} title={cfg.title} description={cfg.subtitle}><a href="#apply" className="store-button">Apply now <ArrowRight size={17} /></a></StorefrontPageHero>
 
       <section id="apply" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 grid lg:grid-cols-[.75fr_1.25fr] gap-8 lg:gap-14 items-start">
         <div className="lg:sticky lg:top-28 rounded-3xl bg-gradient-to-br from-purple-700 to-purple-950 p-7 sm:p-9 text-white shadow-xl">

@@ -16,12 +16,14 @@ export const MainHeader: React.FC = () => {
   }, [currentRoute.pathname]);
 
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const isCheckout = currentRoute.pathname === '/checkout';
 
   const isHomeActive = currentRoute.pathname === '/' || currentRoute.pathname === '';
   const isProductsActive =
     currentRoute.pathname === '/products' ||
     currentRoute.searchParams.has('search') ||
     currentRoute.searchParams.has('category');
+  const isHomeHero = isHomeActive && !isProductsActive && publishedConfig.hero.enabled && Boolean(publishedConfig.hero.slides ? publishedConfig.hero.slides.some((slide) => slide.enabled && slide.image) : publishedConfig.hero.bannerImage);
   const isAboutActive = currentRoute.pathname === '/about';
   const isManufacturerActive = currentRoute.pathname === '/manufacturer';
   const isCareersActive = currentRoute.pathname === '/careers';
@@ -37,21 +39,21 @@ export const MainHeader: React.FC = () => {
   ];
 
   return (
-    <header className="w-full bg-white border-b border-slate-100 sticky top-0 z-30 select-none shadow-xs">
+    <header className={`w-full bg-white border-b border-slate-100 sticky top-0 z-30 select-none shadow-xs ${isCheckout ? 'checkout-site-header' : ''} ${isHomeHero ? 'home-site-header' : 'premium-inner-header'}`}>
       <div className="max-w-7xl mx-auto h-20 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-4 w-full">
         {/* Left: Farminix Logo */}
         <div className="flex items-center shrink-0">
-          <div onClick={() => { setIsMobileMenuOpen(false); navigate('/'); }} className="flex items-center cursor-pointer group">
+          <button aria-label="Farminix home" onClick={() => { setIsMobileMenuOpen(false); navigate('/'); }} className="flex items-center cursor-pointer group">
             <img
               src={headerCfg.logoUrl ? headerCfg.logoUrl : '/farminix_logo.png?v=2'}
               alt={headerCfg.logoAlt || 'Farminix Logo'}
               className="h-9 sm:h-10 md:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
             />
-          </div>
+          </button>
         </div>
 
         {/* Center: Navigation Options - Hidden on mobile, visible on desktop */}
-        <nav className="hidden xl:flex items-center justify-center gap-3 lg:gap-6">
+        <nav aria-label="Main navigation" className="hidden xl:flex items-center justify-center gap-3 lg:gap-6">
           {navLinks.map((link) => (
             <button
               key={link.label}
@@ -74,7 +76,7 @@ export const MainHeader: React.FC = () => {
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2.5 sm:py-2 text-xs font-bold text-white bg-[#7C3AED] hover:bg-[#6D28D9] border border-transparent rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95"
+            className={`relative flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2.5 sm:py-2 text-xs font-bold text-white bg-[#7C3AED] hover:bg-[#6D28D9] border border-transparent rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95 ${isCheckout ? 'checkout-header-cart' : ''} ${isHomeHero ? 'home-header-cart' : ''}`}
             title="Open Shopping Cart"
           >
             <ShoppingCart className="w-5 h-5 sm:w-4 sm:h-4 text-white shrink-0" />
@@ -85,7 +87,7 @@ export const MainHeader: React.FC = () => {
               <span className="sm:hidden font-black text-xs">{totalCartItems}</span>
             )}
             {totalCartItems > 0 && (
-              <span className="hidden sm:flex absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#EA580C] text-white text-[10px] font-bold rounded-full items-center justify-center border-2 border-white shadow-xs">
+              <span className="header-cart-count-badge hidden sm:flex absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#EA580C] text-white text-[10px] font-bold rounded-full items-center justify-center border-2 border-white shadow-xs">
                 {totalCartItems}
               </span>
             )}
@@ -96,6 +98,8 @@ export const MainHeader: React.FC = () => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="xl:hidden p-2.5 text-slate-700 hover:text-[#7C3AED] hover:bg-purple-50 rounded-xl transition-colors cursor-pointer border border-slate-200/80 active:scale-95 flex items-center justify-center"
             aria-label="Toggle Navigation Menu"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="store-mobile-navigation"
             title="Toggle Menu"
           >
             {isMobileMenuOpen ? (
@@ -109,7 +113,7 @@ export const MainHeader: React.FC = () => {
 
       {/* Mobile Vertical Navigation Menu */}
       {isMobileMenuOpen && (
-        <div className="xl:hidden bg-white border-t border-slate-100 shadow-xl px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
+        <div id="store-mobile-navigation" className="xl:hidden bg-white border-t border-slate-100 shadow-xl px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
           {navLinks.map((link) => (
             <button
               key={link.label}

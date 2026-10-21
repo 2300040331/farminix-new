@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import { defaultManufacturerConfig } from '../admin/defaultConfig';
 import { ManufacturerDetails } from './ManufacturerDetails';
+import { StorefrontPageHero } from './StorefrontPageHero';
 
 export const ManufacturerPage: React.FC = () => {
   const { publishedConfig } = useAdminConfig();
@@ -18,8 +19,9 @@ export const ManufacturerPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full min-h-[70vh] bg-gradient-to-b from-purple-50/60 via-white to-white px-4 py-12 sm:py-20">
-      <div className="max-w-5xl mx-auto">
+    <div className="store-information-page store-manufacturer-page min-h-[70vh]">
+      <StorefrontPageHero eyebrow="The people behind the grain" title="Rooted in quality." description="Meet the manufacturing and marketing teams bringing Farminix from our farms to your family's table." />
+      <div className="store-container store-section">
         <ManufacturerDetails manufacturer={manufacturer} />
       </div>
     </div>

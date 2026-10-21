@@ -11,7 +11,7 @@ export const CategorySection: React.FC = () => {
   if (!catSection.enabled) return null;
 
   return (
-    <section className="w-full py-8 border-b border-slate-100">
+    <section className="store-category-section w-full py-8 border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-5">
@@ -28,7 +28,7 @@ export const CategorySection: React.FC = () => {
         </div>
 
         {/* Grid of Category Cards */}
-        <div className="grid grid-cols-4 lg:grid-cols-8 gap-2.5 sm:gap-3.5">
+        <div className="store-category-grid">
           {categories.map((cat) => (
             <div
               key={cat.id}

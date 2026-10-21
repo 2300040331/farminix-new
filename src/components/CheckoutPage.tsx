@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  ArrowLeft, CheckCircle2, Truck, Zap,
-  Plus, Navigation, Loader2, Check, Phone, ShieldCheck, AlertCircle, Trash2, MapPin
+  CheckCircle2, Truck, Zap,
+  Plus, Navigation, Loader2, Check, Phone, ShieldCheck, AlertCircle, Trash2, MapPin,
+  ChevronRight, ChevronDown, House, Building2, Pencil, Leaf, LockKeyhole, Tag, CreditCard, Smartphone, Banknote, Landmark, X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
@@ -11,6 +12,16 @@ import { detectUserLocation, lookupPincode } from '../utils/location';
 import { loadRazorpayScript, fetchRazorpayKey, createServerOrder, verifyServerPayment } from '../utils/razorpay';
 import type { UserAddress, Order } from '../types';
 import type { CartItem } from '../types';
+import './CheckoutPage.css';
+
+const formatMoney = (amount: number) => `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+const emptyAddresses: UserAddress[] = [];
+
+const addressDetails = (name: string) => {
+  const parts = name.split(/[•·]/);
+  const tag = /work/i.test(parts[0]) ? 'Work' : /home/i.test(parts[0]) ? 'Home' : 'Other';
+  return { tag, name: parts.length > 1 ? parts.slice(1).join(' · ').trim() : name };
+};
 
 interface PendingPayment {
   address: UserAddress;
@@ -44,7 +55,7 @@ export const CheckoutPage: React.FC = () => {
   }, []);
 
   // State management - no hardcoded default addresses
-  const addresses: UserAddress[] = user?.addresses || [];
+  const addresses: UserAddress[] = user?.addresses || emptyAddresses;
 
   const [selectedAddressId, setSelectedAddressId] = useState<string>(() => {
     return addresses.find((a) => a.isDefault)?.id || addresses[0]?.id || '';
@@ -62,10 +73,11 @@ export const CheckoutPage: React.FC = () => {
   const { publishedConfig } = useAdminConfig();
   const checkoutCfg = publishedConfig.checkoutPayment || defaultCheckoutPaymentConfig;
   const cartCfg = publishedConfig.cart || defaultCartConfig;
+  const expressLabel = checkoutCfg.expressSlotLabel?.trim() || 'Express Delivery';
+  const scheduledLabel = checkoutCfg.scheduledSlotLabel?.trim() || 'Scheduled Delivery';
 
-  const [selectedSlot, setSelectedSlot] = useState(
-    checkoutCfg.expressSlotLabel || '10-20 Min Express'
-  );
+  const [selectedDelivery, setSelectedDelivery] = useState<'express' | 'scheduled'>('express');
+  const selectedSlot = selectedDelivery === 'express' ? expressLabel : scheduledLabel;
   const [paymentMethod, setPaymentMethod] = useState<'RAZORPAY' | 'UPI' | 'CARD' | 'NETBANKING' | 'COD'>('RAZORPAY');
   const [deliveryNote, setDeliveryNote] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -85,6 +97,7 @@ export const CheckoutPage: React.FC = () => {
 
   // Address Modal / Form state
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [isDetectingGps, setIsDetectingGps] = useState(false);
   const [gpsStatus, setGpsStatus] = useState<string | null>(null);
 
@@ -98,6 +111,7 @@ export const CheckoutPage: React.FC = () => {
   const [formTag, setFormTag] = useState<'Home' | 'Work' | 'Other'>('Home');
 
   const openAddAddressModal = () => {
+    setEditingAddressId(null);
     setFormName('');
     setFormPhone('');
     setFormStreet('');
@@ -106,6 +120,21 @@ export const CheckoutPage: React.FC = () => {
     setFormPincode('');
     setFormTag('Home');
     setFormIsDefault(addresses.length === 0);
+    setIsAddAddressOpen(true);
+  };
+
+  const openEditAddressModal = (address: UserAddress) => {
+    const details = addressDetails(address.name);
+    setEditingAddressId(address.id);
+    setFormName(details.name);
+    setFormPhone(address.phone);
+    setFormStreet(address.street);
+    setFormCity(address.city);
+    setFormState(address.state);
+    setFormPincode(address.pincode);
+    setFormTag(details.tag as 'Home' | 'Work' | 'Other');
+    setFormIsDefault(Boolean(address.isDefault));
+    setGpsStatus(null);
     setIsAddAddressOpen(true);
   };
 
@@ -159,14 +188,14 @@ export const CheckoutPage: React.FC = () => {
   // Save new address handler
   const handleSaveAddress = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName.trim() || !formStreet.trim() || formPincode.length !== 6) return;
+    if (!formName.trim() || !formStreet.trim() || !formCity.trim() || !formState.trim() || formPincode.length !== 6 || formPhone.length !== 10) return;
 
     const isFirst = addresses.length === 0;
     const shouldBeDefault = formIsDefault || isFirst;
 
     const tagPrefix = formTag === 'Home' ? '🏠 Home' : formTag === 'Work' ? '🏢 Work' : '📍 Other';
     const newAddr: UserAddress = {
-      id: `addr-${Date.now()}`,
+      id: editingAddressId || `addr-${Date.now()}`,
       name: `${tagPrefix} • ${formName.trim()}`,
       street: formStreet.trim(),
       city: formCity.trim(),
@@ -176,9 +205,10 @@ export const CheckoutPage: React.FC = () => {
       isDefault: shouldBeDefault,
     };
 
-    const updatedAddresses = shouldBeDefault
-      ? addresses.map((a) => ({ ...a, isDefault: false })).concat(newAddr)
-      : [...addresses, newAddr];
+    const normalizedAddresses = addresses.map((address) => shouldBeDefault ? { ...address, isDefault: false } : address);
+    const updatedAddresses = editingAddressId
+      ? normalizedAddresses.map((address) => address.id === editingAddressId ? newAddr : address)
+      : [...normalizedAddresses, newAddr];
 
     if (user) {
       setUser({ ...user, addresses: updatedAddresses });
@@ -387,7 +417,7 @@ export const CheckoutPage: React.FC = () => {
 
   if (placedOrder) {
     return (
-      <div className="w-full min-h-[75vh] bg-white flex flex-col items-center justify-center p-4 sm:p-6 text-center animate-in zoom-in-95 duration-200">
+      <div className="store-order-confirmation w-full min-h-[75vh] flex flex-col items-center justify-center p-4 sm:p-6 text-center animate-in zoom-in-95 duration-200">
         <div className="max-w-md w-full bg-slate-50/80 p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xl space-y-6">
           <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 shadow-lg shadow-emerald-600/20">
             <CheckCircle2 className="w-10 h-10 animate-bounce" />
@@ -477,544 +507,194 @@ export const CheckoutPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full bg-slate-50/50 min-h-screen text-slate-900 font-sans pb-20">
-      
-      {/* ── BREADCRUMB BAR ── */}
-      <div className="border-b border-slate-200/80 bg-white py-3.5 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/')}
-              className="inline-flex items-center gap-1.5 font-bold text-slate-700 hover:text-[#7C3AED] transition-colors cursor-pointer shrink-0 pr-3 border-r border-slate-200"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back</span>
-            </button>
-            <div className="flex items-center gap-2 text-slate-500 font-medium">
-              <button onClick={() => navigate('/')} className="hover:text-[#7C3AED] transition-colors cursor-pointer">Home</button>
-              <span>/</span>
-              <span className="text-slate-900 font-bold">Checkout</span>
+    <div className="checkout-page">
+      <div className="checkout-shell">
+        <section className="checkout-hero" aria-labelledby="checkout-title">
+          <div className="checkout-hero-copy">
+            <nav className="checkout-breadcrumb" aria-label="Breadcrumb">
+              <button onClick={() => navigate('/')}>Home</button><ChevronRight size={14} /><span aria-current="page">Checkout</span>
+            </nav>
+            <h1 id="checkout-title">Secure <span>Checkout</span></h1>
+            <p>Review your details and complete your order securely</p>
+            <div className="checkout-hero-benefits">
+              <span><ShieldCheck />Secure payments</span>
+              <span><Truck />Fast &amp; reliable delivery</span>
+              <span><Leaf />Fresh from our farms</span>
             </div>
           </div>
-        </div>
-      </div>
+          <div className="checkout-farm-promise"><Leaf /><span>Good Food<br /><strong>Brighter Tomorrow</strong></span></div>
+          <img className="checkout-hero-rice" src="/cat_rice.jpg" alt="" aria-hidden="true" />
+        </section>
 
-      {/* ── MAIN CHECKOUT LAYOUT ── */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-8">
-        
-        {/* Title */}
-        <div className="flex items-center justify-between mb-5 sm:mb-8 text-left">
-          <div>
-            <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Secure Checkout
-            </h1>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-          
-          {/* LEFT COLUMN: Steps 1 to 4 (7 cols on lg) */}
-          <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-left">
-            
-            {/* STEP 1: DELIVERY ADDRESS SELECTION */}
-            <div className="p-4 sm:p-6 bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl shadow-2xs space-y-3 sm:space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-purple-600 text-white font-black text-xs flex items-center justify-center">
-                    1
-                  </div>
-                  <h2 className="text-sm sm:text-base font-black text-slate-900">Delivery Address</h2>
-                </div>
-
-                {/* Add Address Button */}
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <button
-                    onClick={openAddAddressModal}
-                    className="px-2.5 sm:px-3 py-1.5 bg-[#7C3AED] text-white hover:bg-[#6D28D9] text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Add New</span>
-                  </button>
-                </div>
+        <div className="checkout-layout">
+          <div className="checkout-steps">
+            <section className="checkout-panel" aria-labelledby="address-title">
+              <div className="checkout-section-heading">
+                <span className="checkout-step-number">1</span>
+                <div><h2 id="address-title">Delivery Address</h2><p>Choose where you want your order to be delivered.</p></div>
+                <button className="checkout-outline-button" onClick={openAddAddressModal}><Plus size={18} /><span>Add New Address</span></button>
               </div>
-
-              {gpsStatus && (
-                <div className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl flex items-center gap-1.5 animate-in fade-in">
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{gpsStatus}</span>
-                </div>
-              )}
-
-              {/* Saved Addresses List or Empty State */}
               {addresses.length === 0 ? (
-                <div className="p-6 border-2 border-dashed border-purple-200 bg-purple-50/40 rounded-2xl text-center flex flex-col items-center justify-center">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-100 text-[#7C3AED] flex items-center justify-center mb-2.5">
-                    <MapPin className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-sm font-black text-slate-900">No Delivery Address Added Yet</h3>
-                  <p className="text-xs text-slate-500 max-w-sm mt-1">
-                    Please add your delivery address (Home, Work, or Other) to proceed with your order.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={openAddAddressModal}
-                    className="mt-4 px-5 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-black rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>+ Add Delivery Address</span>
-                  </button>
+                <div className="checkout-empty-address">
+                  <MapPin size={28} /><h3>Where should we deliver?</h3>
+                  <p>Add your delivery address to continue with your order.</p>
+                  <button className="checkout-outline-button" onClick={openAddAddressModal}><Plus size={16} />Add Delivery Address</button>
                 </div>
               ) : (
-                <div className="space-y-2.5 sm:space-y-3">
-                  {addresses.map((addr) => {
-                    const isSelected = selectedAddressId === addr.id;
+                <div className="checkout-addresses" role="radiogroup" aria-label="Delivery address">
+                  {addresses.map((address) => {
+                    const details = addressDetails(address.name);
+                    const AddressIcon = details.tag === 'Home' ? House : details.tag === 'Work' ? Building2 : MapPin;
                     return (
-                      <div
-                        key={addr.id}
-                        onClick={() => {
-                          setSelectedAddressId(addr.id);
-                          setLocation(`${addr.city}, ${addr.state} - ${addr.pincode}`);
-                        }}
-                        className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left flex items-start justify-between gap-2.5 sm:gap-3 cursor-pointer transition-all ${
-                          isSelected
-                            ? 'border-[#7C3AED] bg-purple-50/70 ring-2 ring-purple-200 shadow-xs'
-                            : 'border-slate-200 hover:border-slate-300 bg-white'
-                        }`}
-                      >
-                        <div className="flex items-start gap-2.5 sm:gap-3 min-w-0">
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
-                            isSelected ? 'border-[#7C3AED] bg-[#7C3AED]' : 'border-slate-300'
-                          }`}>
-                            {isSelected && <Check className="w-3 h-3 text-white stroke-[3]" />}
-                          </div>
-
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-xs font-black text-slate-900">{addr.name}</span>
-                              {addr.isDefault ? (
-                                <span className="text-[9px] font-black text-[#7C3AED] bg-white px-1.5 py-0.5 rounded-md border border-purple-200">
-                                  DEFAULT
-                                </span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={(e) => handleSetDefaultAddress(addr.id, e)}
-                                  className="text-[9px] font-bold text-slate-500 hover:text-[#7C3AED] hover:underline"
-                                >
-                                  Set as default
-                                </button>
-                              )}
-                            </div>
-                            <p className="text-xs text-slate-600 mt-1 leading-normal font-medium break-words">
-                              {addr.street}, {addr.city}, {addr.state} - {addr.pincode}
-                            </p>
-                            <div className="text-[11px] font-bold text-slate-500 mt-1 flex items-center gap-1">
-                              <Phone className="w-3 h-3 text-slate-400 shrink-0" />
-                              <span>Phone: {addr.phone}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-[11px] font-bold text-[#7C3AED]">
-                            {isSelected ? 'Selected' : 'Select'}
+                      <div key={address.id} className={`checkout-address ${selectedAddressId === address.id ? 'is-selected' : ''}`}>
+                        <label className="checkout-address-choice">
+                          <input type="radio" name="delivery-address" checked={selectedAddressId === address.id} onChange={() => {
+                            setSelectedAddressId(address.id);
+                            setLocation(`${address.city}, ${address.state} - ${address.pincode}`);
+                          }} />
+                          <AddressIcon className="checkout-address-icon" size={24} />
+                          <span className="checkout-address-info">
+                            <span className="checkout-address-tags"><span>{details.tag}</span>{address.isDefault && <small>Default</small>}</span>
+                            <strong>{details.name}</strong>
+                            <span className="checkout-address-line">{address.street}, {address.city}, {address.state} - {address.pincode}</span>
+                            <span className="checkout-address-phone"><Phone size={16} />{address.phone}</span>
                           </span>
-                          <button
-                            type="button"
-                            onClick={(e) => handleDeleteAddress(addr.id, e)}
-                            className="p-1 text-slate-400 hover:text-red-500 rounded-md transition-colors"
-                            title="Delete address"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                        </label>
+                        <div className="checkout-address-actions">
+                          <button onClick={() => openEditAddressModal(address)} aria-label={`Edit address for ${details.name}`}><Pencil size={17} /><span>Edit</span></button>
+                          {!address.isDefault && <button className="checkout-default-action" onClick={(e) => handleSetDefaultAddress(address.id, e)}>Make default</button>}
+                          <button className="checkout-delete-action" onClick={(e) => handleDeleteAddress(address.id, e)} aria-label={`Delete address for ${details.name}`}><Trash2 size={15} /></button>
                         </div>
                       </div>
                     );
                   })}
                 </div>
               )}
-            </div>
+            </section>
 
-            {/* STEP 2: DELIVERY SLOT SELECTION */}
-            <div className="p-4 sm:p-6 bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl shadow-2xs space-y-3 sm:space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-purple-600 text-white font-black text-xs flex items-center justify-center">
-                  2
-                </div>
-                <h2 className="text-sm sm:text-base font-black text-slate-900">Select Delivery Slot</h2>
+            <section className="checkout-panel" aria-labelledby="delivery-title">
+              <div className="checkout-section-heading">
+                <span className="checkout-step-number">2</span>
+                <div><h2 id="delivery-title">Select Delivery Slot</h2><p>Choose a delivery option that suits you.</p></div>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedSlot(checkoutCfg.expressSlotLabel || '10-20 Min Express')}
-                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
-                    selectedSlot === checkoutCfg.expressSlotLabel
-                      ? 'border-[#7C3AED] bg-purple-50/80 ring-2 ring-purple-200 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
-                >
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-500" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-black text-slate-900">{checkoutCfg.expressSlotLabel}</div>
-                    <div className="text-[11px] font-bold text-emerald-600 mt-0.5">{checkoutCfg.expressSlotSublabel}</div>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedSlot(checkoutCfg.scheduledSlotLabel || 'Scheduled Slot')}
-                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
-                    selectedSlot === checkoutCfg.scheduledSlotLabel
-                      ? 'border-[#7C3AED] bg-purple-50/80 ring-2 ring-purple-200 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
-                >
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
-                    <Truck className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-black text-slate-900">{checkoutCfg.scheduledSlotLabel}</div>
-                    <div className="text-[11px] font-bold text-slate-500 mt-0.5">{checkoutCfg.scheduledSlotSublabel}</div>
-                  </div>
-                </button>
+              <div className="checkout-options" role="radiogroup" aria-label="Delivery option">
+                <label className={`checkout-option ${selectedDelivery === 'express' ? 'is-selected' : ''}`}>
+                  <input type="radio" name="delivery-slot" checked={selectedDelivery === 'express'} onChange={() => setSelectedDelivery('express')} />
+                  <span className="checkout-option-icon"><Zap /></span>
+                  <span className="checkout-option-copy"><strong>{expressLabel}</strong><span>{checkoutCfg.expressSlotSublabel?.trim() || 'Fast doorstep delivery'}</span></span>
+                </label>
+                <label className={`checkout-option ${selectedDelivery === 'scheduled' ? 'is-selected' : ''}`}>
+                  <input type="radio" name="delivery-slot" checked={selectedDelivery === 'scheduled'} onChange={() => setSelectedDelivery('scheduled')} />
+                  <span className="checkout-option-icon"><Truck /></span>
+                  <span className="checkout-option-copy"><strong>{scheduledLabel}</strong><span>{checkoutCfg.scheduledSlotSublabel?.trim() || 'Choose a convenient delivery time'}</span></span>
+                </label>
               </div>
-            </div>
+            </section>
 
-            {/* STEP 3: PAYMENT METHOD SELECTION */}
-            <div className="p-4 sm:p-6 bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl shadow-2xs space-y-3 sm:space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-purple-600 text-white font-black text-xs flex items-center justify-center">
-                    3
-                  </div>
-                  <h2 className="text-sm sm:text-base font-black text-slate-900">Select Payment Method</h2>
-                </div>
-
-                <div className="flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Secured by Razorpay</span>
-                </div>
+            <section className="checkout-panel" aria-labelledby="payment-title">
+              <div className="checkout-section-heading">
+                <span className="checkout-step-number">3</span>
+                <div><h2 id="payment-title">Payment Method</h2><p>Choose a secure payment method to continue.</p></div>
+                <span className="checkout-secured"><LockKeyhole size={15} />Secured by <strong>Razorpay</strong></span>
               </div>
-
-              {/* Payment Error Banner */}
               {paymentError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-2.5 text-rose-700 text-xs animate-in fade-in">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <span className="font-bold block">Payment Notice:</span>
-                    <span className="font-medium text-[11px]">{paymentError}</span>
-                  </div>
-                  <button
-                    onClick={() => setPaymentError(null)}
-                    className="text-xs font-bold text-rose-500 hover:text-rose-800 cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                </div>
+                <div className="checkout-notice" role="alert"><AlertCircle size={20} /><span>{paymentError}</span><button onClick={() => setPaymentError(null)} aria-label="Dismiss payment notice"><X size={17} /></button></div>
               )}
-
-              <div className="space-y-2.5 sm:space-y-3">
-                {/* 1. Razorpay All-in-One Instant Pay */}
-                <div
-                  onClick={() => setPaymentMethod('RAZORPAY')}
-                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all cursor-pointer ${
-                    paymentMethod === 'RAZORPAY'
-                      ? 'border-[#7C3AED] bg-purple-50/70 ring-2 ring-purple-200 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
-                >
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm font-black shrink-0">
-                        ⚡
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-xs font-black text-slate-900">Razorpay All-in-One Checkout</span>
-                          <span className="text-[9px] font-black uppercase tracking-wider text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200">
-                            Recommended
-                          </span>
-                        </div>
-                        <div className="text-[11px] font-medium text-slate-500 truncate mt-0.5">
-                          Google Pay, PhonePe, Paytm, Cards, NetBanking &amp; Wallets
-                        </div>
-                      </div>
-                    </div>
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'RAZORPAY'}
-                      onChange={() => setPaymentMethod('RAZORPAY')}
-                      className="w-4 h-4 text-[#7C3AED] focus:ring-purple-500 shrink-0 ml-2"
-                    />
-                  </label>
-                </div>
-
-                {/* 2. UPI / QR */}
-                <div
-                  onClick={() => setPaymentMethod('UPI')}
-                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all cursor-pointer ${
-                    paymentMethod === 'UPI'
-                      ? 'border-[#7C3AED] bg-purple-50/70 ring-2 ring-purple-200 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
-                >
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <span className="text-2xl shrink-0">📱</span>
-                      <div className="min-w-0">
-                        <div className="text-xs font-black text-slate-900 truncate">UPI / QR Payment (Google Pay / PhonePe / Paytm)</div>
-                        <div className="text-[11px] font-medium text-slate-500 truncate">Instant UPI payment powered by Razorpay</div>
-                      </div>
-                    </div>
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'UPI'}
-                      onChange={() => setPaymentMethod('UPI')}
-                      className="w-4 h-4 text-[#7C3AED] focus:ring-purple-500 shrink-0 ml-2"
-                    />
-                  </label>
-                </div>
-
-                {/* 3. Credit / Debit Card */}
-                <div
-                  onClick={() => setPaymentMethod('CARD')}
-                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all cursor-pointer ${
-                    paymentMethod === 'CARD'
-                      ? 'border-[#7C3AED] bg-purple-50/70 ring-2 ring-purple-200 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
-                >
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <span className="text-2xl shrink-0">💳</span>
-                      <div className="min-w-0">
-                        <div className="text-xs font-black text-slate-900 truncate">Credit / Debit Card</div>
-                        <div className="text-[11px] font-medium text-slate-500 truncate">Visa, Mastercard, RuPay, Maestro &amp; Diners</div>
-                      </div>
-                    </div>
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'CARD'}
-                      onChange={() => setPaymentMethod('CARD')}
-                      className="w-4 h-4 text-[#7C3AED] focus:ring-purple-500 shrink-0 ml-2"
-                    />
-                  </label>
-                </div>
-
-                {/* 4. Net Banking */}
-                <div
-                  onClick={() => setPaymentMethod('NETBANKING')}
-                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all cursor-pointer ${
-                    paymentMethod === 'NETBANKING'
-                      ? 'border-[#7C3AED] bg-purple-50/70 ring-2 ring-purple-200 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
-                >
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <span className="text-2xl shrink-0">🏦</span>
-                      <div className="min-w-0">
-                        <div className="text-xs font-black text-slate-900 truncate">Net Banking</div>
-                        <div className="text-[11px] font-medium text-slate-500 truncate">HDFC, SBI, ICICI, Axis, Kotak &amp; 50+ Banks</div>
-                      </div>
-                    </div>
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'NETBANKING'}
-                      onChange={() => setPaymentMethod('NETBANKING')}
-                      className="w-4 h-4 text-[#7C3AED] focus:ring-purple-500 shrink-0 ml-2"
-                    />
-                  </label>
-                </div>
-
-                {/* 5. Cash on Delivery */}
-                <div
-                  onClick={() => setPaymentMethod('COD')}
-                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all cursor-pointer ${
-                    paymentMethod === 'COD'
-                      ? 'border-[#7C3AED] bg-purple-50/70 ring-2 ring-purple-200 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
-                >
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <span className="text-2xl shrink-0">💵</span>
-                      <div className="min-w-0">
-                        <div className="text-xs font-black text-slate-900 truncate">Cash on Delivery (COD)</div>
-                        <div className="text-[11px] font-medium text-slate-500 truncate">Pay cash or UPI to delivery rider at doorstep</div>
-                      </div>
-                    </div>
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'COD'}
-                      onChange={() => setPaymentMethod('COD')}
-                      className="w-4 h-4 text-[#7C3AED] focus:ring-purple-500 shrink-0 ml-2"
-                    />
-                  </label>
-                </div>
-
+              <div className="checkout-options" role="radiogroup" aria-label="Payment method">
+                <label className={`checkout-option ${paymentMethod === 'UPI' ? 'is-selected' : ''}`}>
+                  <input type="radio" name="payment" checked={paymentMethod === 'UPI'} onChange={() => setPaymentMethod('UPI')} />
+                  <span className="checkout-option-icon"><Smartphone /></span>
+                  <span className="checkout-option-copy"><strong>UPI / QR</strong><span>Google Pay, PhonePe, Paytm &amp; more</span></span>
+                </label>
+                <label className={`checkout-option ${paymentMethod === 'RAZORPAY' ? 'is-selected' : ''}`}>
+                  <input type="radio" name="payment" checked={paymentMethod === 'RAZORPAY'} onChange={() => setPaymentMethod('RAZORPAY')} />
+                  <span className="checkout-option-icon"><CreditCard /></span>
+                  <span className="checkout-option-copy"><strong>Cards, Net Banking &amp; More</strong><span>Cards, bank accounts &amp; wallets via Razorpay</span></span>
+                </label>
               </div>
-            </div>
-
-            {/* STEP 4: DELIVERY NOTES */}
-            <div className="p-4 sm:p-6 bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl shadow-2xs space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-purple-600 text-white font-black text-xs flex items-center justify-center">
-                  4
+              <details className="checkout-extra-methods">
+                <summary>More payment options <ChevronDown size={15} /></summary>
+                <div className="checkout-secondary-options" role="radiogroup" aria-label="Additional payment methods">
+                  {([
+                    { value: 'CARD', label: 'Credit / Debit Card', Icon: CreditCard },
+                    { value: 'NETBANKING', label: 'Net Banking', Icon: Landmark },
+                    { value: 'COD', label: 'Cash on Delivery', Icon: Banknote },
+                  ] as const).map(({ value, label, Icon }) => (
+                    <label key={value} className={`checkout-option ${paymentMethod === value ? 'is-selected' : ''}`}>
+                      <input type="radio" name="payment" checked={paymentMethod === value} onChange={() => setPaymentMethod(value)} /><Icon size={19} /><span>{label}</span>
+                    </label>
+                  ))}
                 </div>
-                <h2 className="text-sm sm:text-base font-black text-slate-900">Delivery Instructions (Optional)</h2>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {(checkoutCfg.deliveryInstructions && checkoutCfg.deliveryInstructions.some(i => i.enabled)
-                  ? checkoutCfg.deliveryInstructions.filter(i => i.enabled).map(i => `${i.icon} ${i.label}`)
-                  : ['🚪 Leave at Door', '🔕 Don\'t Ring Bell', '📞 Call Before Delivery', '🛡️ Hand to Security']
-                ).map((note) => {
-                  const isSelected = deliveryNote.includes(note);
-                  return (
-                    <button
-                      key={note}
-                      type="button"
-                      onClick={() => toggleNote(note)}
-                      className={`px-3 py-1.5 sm:py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
-                        isSelected
-                          ? 'border-[#7C3AED] bg-purple-50 text-[#7C3AED] font-black'
-                          : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                      }`}
-                    >
-                      {note}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
+              </details>
+              <details className="checkout-delivery-notes">
+                <summary>Delivery instructions <span>Optional</span><ChevronDown size={15} /></summary>
+                <div className="checkout-note-options">
+                  {(checkoutCfg.deliveryInstructions?.some((instruction) => instruction.enabled)
+                    ? checkoutCfg.deliveryInstructions.filter((instruction) => instruction.enabled).map((instruction) => `${instruction.icon} ${instruction.label}`)
+                    : ['Leave at Door', "Don't Ring Bell", 'Call Before Delivery', 'Hand to Security']
+                  ).map((note) => (
+                    <button key={note} type="button" aria-pressed={deliveryNote.includes(note)} className={deliveryNote.includes(note) ? 'is-selected' : ''} onClick={() => toggleNote(note)}>{note}</button>
+                  ))}
+                </div>
+              </details>
+            </section>
           </div>
 
-          {/* RIGHT COLUMN: Order Summary & Pay Action (5 cols on lg) */}
-          <div className="lg:col-span-5 space-y-4 sm:space-y-6 lg:sticky lg:top-24">
-            
-            <div className="p-4 sm:p-6 bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl shadow-sm text-left space-y-4 sm:space-y-5">
-              <h2 className="text-sm sm:text-base font-black text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between">
-                <span>Order Items ({cart.reduce((s, i) => s + i.quantity, 0)})</span>
-                <span className="text-xs text-[#7C3AED] font-bold">Farminix Express</span>
-              </h2>
-
-              {/* Items List */}
-              <div className="divide-y divide-slate-100 max-h-60 overflow-y-auto pr-1 space-y-2">
-                {cart.map((item) => (
-                  <div key={`${item.product.id}-${item.selectedWeight}`} className="pt-2 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <img src={item.product.image} alt={item.product.name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain bg-white p-1 rounded-xl border border-slate-100 shrink-0" />
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold text-slate-900 truncate max-w-[140px] xs:max-w-[180px] sm:max-w-[200px]">{item.product.name}</div>
-                        <div className="text-[10px] text-slate-500 font-semibold">{item.selectedWeight} • Qty: {item.quantity}</div>
-                      </div>
-                    </div>
-                    <div className="text-xs font-black text-slate-900 shrink-0">
-                      ₹{item.product.price * item.quantity}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Bill Details */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2 text-xs text-slate-600 font-semibold">
-                <div className="flex justify-between">
-                  <span>Items Subtotal</span>
-                  <span>₹{cartTotal + cartDiscount}</span>
+          <aside className="checkout-panel checkout-summary" aria-labelledby="summary-title">
+            <div className="checkout-summary-heading"><h2 id="summary-title">Order Summary</h2><span>{cart.reduce((sum, item) => sum + item.quantity, 0)} {cart.reduce((sum, item) => sum + item.quantity, 0) === 1 ? 'Item' : 'Items'}</span></div>
+            <div className="checkout-items">
+              {cart.map((item) => (
+                <div className="checkout-item" key={`${item.product.id}-${item.selectedWeight}`}>
+                  <img src={item.product.image} alt={item.product.name} />
+                  <div><h3>{item.product.name}</h3><p>{item.selectedWeight}<span>•</span>Qty: {item.quantity}</p></div>
+                  <strong>{formatMoney(item.product.price * item.quantity)}</strong>
                 </div>
-
-                {publishedConfig.cart?.couponsEnabled !== false && <div className="py-3 space-y-2">
-                  <label htmlFor="checkout-coupon" className="font-bold">Coupon code</label>
-                  <div className="flex gap-2"><input id="checkout-coupon" value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} className="min-w-0 flex-1 p-2 border rounded-xl" placeholder="Enter coupon code"/><button type="button" onClick={() => setCouponError(applyCoupon(couponCode) ? '' : 'Coupon is unavailable, expired, or does not qualify for this cart.')}>Apply</button></div>
-                  {appliedCoupon && <div>{appliedCoupon} {cartDiscount > 0 ? 'applied' : 'no longer eligible'} <button type="button" onClick={() => applyCoupon('')}>Remove</button></div>}
-                  {couponError && <p role="alert" className="text-red-600 text-sm">{couponError}</p>}
-                </div>}
-                {cartDiscount > 0 && (
-                  <div className="flex justify-between text-purple-700 font-bold">
-                    <span>Coupon Discount</span>
-                    <span>-₹{cartDiscount}</span>
-                  </div>
-                )}
-
-                <div className="flex justify-between">
-                  <span>Delivery Fee</span>
-                  <span className="font-extrabold text-emerald-600">
-                    {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span>Handling &amp; Packaging Fee</span>
-                  <span>₹{handlingFee}</span>
-                </div>
-
-                <div className="pt-3 border-t border-slate-200 flex justify-between text-base font-black text-slate-900">
-                  <span>Grand Total</span>
-                  <span className="text-[#7C3AED] text-lg">₹{grandTotal}</span>
-                </div>
-              </div>
-
-              {/* Place Order & Pay Button */}
-              <button
-                onClick={handlePlaceOrder}
-                disabled={isProcessing}
-                className="w-full h-14 bg-[#7C3AED] hover:bg-[#6D28D9] disabled:bg-slate-300 text-white text-base font-black rounded-2xl shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-98"
-              >
-                {!selectedAddress ? (
-                  <>
-                    <MapPin className="w-5 h-5" />
-                    <span>Add Delivery Address to Proceed</span>
-                  </>
-                ) : isProcessing ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Opening Razorpay Gateway...</span>
-                  </div>
-                ) : paymentMethod === 'COD' ? (
-                  <>
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>Place Order (COD) • ₹{grandTotal}</span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="w-5 h-5" />
-                    <span>Pay with Razorpay • ₹{grandTotal}</span>
-                  </>
-                )}
-              </button>
-
-              {/* Security Badges */}
-              <div className="pt-2 flex items-center justify-center gap-4 text-[10px] font-bold text-slate-400 border-t border-slate-100">
-                <span className="flex items-center gap-1">🔒 100% Safe Payments by Razorpay</span>
-                <span className="flex items-center gap-1">⚡ Instant Verification</span>
-              </div>
+              ))}
             </div>
-
-          </div>
-
+            {publishedConfig.cart?.couponsEnabled !== false && (
+              <details className="checkout-coupon" open>
+                <summary><Tag size={20} /><span>Have a coupon code?</span><ChevronDown size={18} /></summary>
+                <form onSubmit={(event) => { event.preventDefault(); setCouponError(applyCoupon(couponCode) ? '' : 'Coupon is unavailable, expired, or does not qualify for this cart.'); }}>
+                  <label htmlFor="checkout-coupon" className="sr-only">Coupon code</label>
+                  <input id="checkout-coupon" value={couponCode} onChange={(event) => { setCouponCode(event.target.value.toUpperCase()); setCouponError(''); }} placeholder="Enter coupon code" />
+                  <button type="submit">Apply</button>
+                </form>
+                {appliedCoupon && <p className="checkout-coupon-applied">{appliedCoupon} {cartDiscount > 0 ? 'applied' : 'no longer eligible'}<button type="button" onClick={() => { applyCoupon(''); setCouponError(''); }}>Remove</button></p>}
+                {couponError && <p role="alert" className="checkout-coupon-error">{couponError}</p>}
+              </details>
+            )}
+            <dl className="checkout-bill">
+              <div><dt>Items Subtotal</dt><dd>{formatMoney(cartTotal + cartDiscount)}</dd></div>
+              {cartDiscount > 0 && <div className="checkout-discount"><dt>Coupon Discount</dt><dd>−{formatMoney(cartDiscount)}</dd></div>}
+              <div><dt>Delivery Fee</dt><dd className={deliveryFee === 0 ? 'checkout-free' : ''}>{deliveryFee === 0 ? 'FREE' : formatMoney(deliveryFee)}</dd></div>
+              <div><dt>Handling &amp; Packaging Fee</dt><dd>{formatMoney(handlingFee)}</dd></div>
+            </dl>
+            <div className="checkout-total"><span>Total Payable</span><strong>{formatMoney(grandTotal)}</strong></div>
+            <button onClick={handlePlaceOrder} disabled={isProcessing} className="checkout-pay-button">
+              {isProcessing ? <Loader2 className="animate-spin" size={21} /> : <LockKeyhole size={21} />}
+              <span>{isProcessing ? 'Processing your order…' : pendingPayment ? 'Retry order confirmation' : !selectedAddress ? 'Add Delivery Address to Proceed' : paymentMethod === 'COD' ? `Place Order (COD) · ${formatMoney(grandTotal)}` : `Pay with Razorpay · ${formatMoney(grandTotal)}`}</span>
+              {!isProcessing && <ChevronRight size={22} />}
+            </button>
+            <p className="checkout-payment-hint" aria-live="polite">{pendingPayment ? 'Your payment was received. Retry to confirm your order.' : paymentMethod === 'COD' ? 'Pay when your order is delivered to your doorstep.' : "You'll review your payment details before confirming."}</p>
+            <div className="checkout-trust-strip">
+              <span><ShieldCheck /><span>Safe &amp; Secure<br />Payments</span></span>
+              <span><Truck /><span>Fast<br />Delivery</span></span>
+              <span><Leaf /><span>Fresh &amp;<br />Quality Products</span></span>
+            </div>
+          </aside>
         </div>
       </div>
-
       {/* ── ADD NEW ADDRESS MODAL ── */}
       {isAddAddressOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-start sm:items-center justify-center p-4">
           <div
             onClick={() => setIsAddAddressOpen(false)}
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-in fade-in"
           />
 
-          <div className="relative bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 border border-slate-100 text-left">
-            <h3 className="text-lg font-black text-slate-900 mb-1">Add New Delivery Address</h3>
+          <div role="dialog" aria-modal="true" aria-labelledby="checkout-address-modal-title" onKeyDown={(event) => { if (event.key === 'Escape') setIsAddAddressOpen(false); }} className="relative bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 border border-slate-100 text-left max-h-[calc(100dvh-2rem)] overflow-y-auto">
+            <button type="button" onClick={() => setIsAddAddressOpen(false)} aria-label="Close address form" className="absolute right-4 top-4 p-2 rounded-lg text-slate-400 hover:bg-purple-50 hover:text-purple-700"><X size={18} /></button>
+            <h3 id="checkout-address-modal-title" className="text-lg font-semibold text-slate-900 mb-1 pr-7">{editingAddressId ? 'Edit Delivery Address' : 'Add New Delivery Address'}</h3>
             <p className="text-xs text-slate-500 mb-4">Enter details or click below to auto-detect your current GPS location.</p>
 
             {/* GPS Location Auto-Fill Button */}
@@ -1047,9 +727,12 @@ export const CheckoutPage: React.FC = () => {
             <form onSubmit={handleSaveAddress} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Full Name</label>
+                  <label htmlFor="checkout-address-name" className="font-bold text-slate-700 block mb-1">Full Name</label>
                   <input
                     type="text"
+                    id="checkout-address-name"
+                    autoComplete="name"
+                    autoFocus
                     required
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
@@ -1058,9 +741,12 @@ export const CheckoutPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Mobile Phone</label>
+                  <label htmlFor="checkout-address-phone" className="font-bold text-slate-700 block mb-1">Mobile Phone</label>
                   <input
                     type="tel"
+                    id="checkout-address-phone"
+                    autoComplete="tel-national"
+                    pattern="[0-9]{10}"
                     required
                     maxLength={10}
                     value={formPhone}
@@ -1072,9 +758,11 @@ export const CheckoutPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Flat / House No / Street / Landmark</label>
+                <label htmlFor="checkout-address-street" className="font-bold text-slate-700 block mb-1">Flat / House No / Street / Landmark</label>
                 <input
                   type="text"
+                  id="checkout-address-street"
+                  autoComplete="street-address"
                   required
                   value={formStreet}
                   onChange={(e) => setFormStreet(e.target.value)}
@@ -1085,9 +773,13 @@ export const CheckoutPage: React.FC = () => {
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Pincode</label>
+                  <label htmlFor="checkout-address-pincode" className="font-bold text-slate-700 block mb-1">Pincode</label>
                   <input
                     type="text"
+                    id="checkout-address-pincode"
+                    autoComplete="postal-code"
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
                     maxLength={6}
                     required
                     value={formPincode}
@@ -1097,9 +789,11 @@ export const CheckoutPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">City</label>
+                  <label htmlFor="checkout-address-city" className="font-bold text-slate-700 block mb-1">City</label>
                   <input
                     type="text"
+                    id="checkout-address-city"
+                    autoComplete="address-level2"
                     required
                     value={formCity}
                     onChange={(e) => setFormCity(e.target.value)}
@@ -1108,9 +802,11 @@ export const CheckoutPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">State</label>
+                  <label htmlFor="checkout-address-state" className="font-bold text-slate-700 block mb-1">State</label>
                   <input
                     type="text"
+                    id="checkout-address-state"
+                    autoComplete="address-level1"
                     required
                     value={formState}
                     onChange={(e) => setFormState(e.target.value)}

@@ -5,7 +5,7 @@ import {
   AlertCircle, Leaf, BarChart3, ClipboardList, ChefHat, Utensils, Microwave
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { getProductSlug } from './ProductListingPage';
+import { getProductSlug } from '../utils/catalog';
 import { ProductReviews } from './ProductReviews';
 import { ProductFeatureIcon } from './ProductFeatureIcon';
 import type { Product } from '../types';
@@ -108,7 +108,7 @@ export const ProductDetailPage: React.FC = () => {
 
   if (!product) {
     return (
-      <div className="w-full min-h-[70vh] bg-white flex flex-col items-center justify-center p-6 text-center">
+      <div className="store-product-not-found w-full min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
         <div className="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center text-[#7C3AED] mb-4 text-3xl font-black">
           🛒
         </div>
@@ -201,7 +201,7 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white text-slate-900 font-sans pb-28 md:pb-16">
+    <div className="store-product-detail w-full text-slate-900 pb-28 md:pb-16">
       
       {/* ── BREADCRUMBS & TOP BAR ── */}
       <div className="border-b border-slate-100 bg-slate-50/60 py-3 sm:py-3.5">
@@ -241,23 +241,20 @@ export const ProductDetailPage: React.FC = () => {
           <div className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-24">
             
             {/* Main Stage Image Container */}
-            <div className="relative w-full aspect-square bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 overflow-hidden flex items-center justify-center p-4 sm:p-6 group shadow-xs">
+            <div className="store-product-gallery relative w-full aspect-square bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 overflow-hidden flex items-center justify-center p-4 sm:p-6 group shadow-xs">
               
               {/* Badges Overlay */}
               <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex flex-col gap-1.5 sm:gap-2 z-10">
                 {discountPct > 0 && (
-                  <span className="bg-[#EA580C] text-white text-[11px] sm:text-xs font-black px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-sm tracking-wide">
-                    ₹{discountAmount.toLocaleString('en-IN')} OFF | {discountPct}% OFF
+                  <span className="store-gallery-savings">
+                    Save {discountPct}%
                   </span>
                 )}
-                {(product.badges?.includes('Bestseller') || product.id === 'r1') && (
+                {product.badges?.includes('Bestseller') && (
                   <span className="bg-[#7C3AED] text-white text-[9px] sm:text-[10px] font-extrabold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-sm tracking-wider uppercase">
                     Bestseller
                   </span>
                 )}
-                <span className="bg-emerald-600 text-white text-[9px] sm:text-[10px] font-extrabold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shadow-sm tracking-wider uppercase">
-                  100% Genuine
-                </span>
               </div>
 
               {/* Wishlist Button */}
@@ -297,7 +294,7 @@ export const ProductDetailPage: React.FC = () => {
           </div>
 
           {/* RIGHT COLUMN: Product Information & Purchase Area (7 cols on lg) */}
-          <div className="lg:col-span-7 flex flex-col text-left space-y-4 sm:space-y-6">
+          <div className="store-product-intro lg:col-span-7 flex flex-col text-left space-y-4 sm:space-y-6">
             
             {/* Category & Brand Header */}
             <div>
@@ -314,7 +311,7 @@ export const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* Price Section */}
-            <div className="p-3.5 sm:p-4 bg-slate-50/80 border border-slate-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
+            <div className="store-product-price-panel p-3.5 sm:p-4 bg-slate-50/80 border border-slate-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
               <div>
                 <div className="flex items-baseline gap-2.5 flex-wrap">
                   <span className="text-2xl sm:text-3xl font-black text-[#7C3AED]">
@@ -390,7 +387,7 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Quantity Stepper + Add to Cart + Buy Now */}
             <div className="space-y-3 pt-2">
-              <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="store-detail-actions flex flex-col sm:flex-row items-center gap-3">
                 {/* Stepper / Add Button */}
                 <div className="w-full sm:flex-1">
                   {!product.inStock ? (
@@ -408,10 +405,11 @@ export const ProductDetailPage: React.FC = () => {
                       <span>Add to Cart • ₹{currentPrice}</span>
                     </button>
                   ) : (
-                    <div className="w-full h-13 bg-[#7C3AED] text-white rounded-2xl flex items-center justify-between px-4 font-extrabold text-sm shadow-md">
+                    <div className="store-detail-quantity w-full h-13 bg-[#7C3AED] text-white rounded-2xl flex items-center justify-between px-4 font-extrabold text-sm shadow-md">
                       <span className="text-xs font-bold text-purple-100">Added ({quantity} in cart)</span>
                       <div className="flex items-center gap-3">
                         <button
+                          aria-label={`Decrease ${product.name} quantity`}
                           onClick={() => updateQuantity(product.id, -1)}
                           className="w-8 h-8 rounded-full bg-purple-800 hover:bg-purple-900 flex items-center justify-center transition-colors cursor-pointer"
                         >
@@ -419,6 +417,7 @@ export const ProductDetailPage: React.FC = () => {
                         </button>
                         <span className="text-base font-black">{quantity}</span>
                         <button
+                          aria-label={`Increase ${product.name} quantity`}
                           onClick={() => updateQuantity(product.id, 1)}
                           className="w-8 h-8 rounded-full bg-purple-800 hover:bg-purple-900 flex items-center justify-center transition-colors cursor-pointer"
                         >
@@ -433,7 +432,7 @@ export const ProductDetailPage: React.FC = () => {
                 <button
                   onClick={handleBuyNow}
                   disabled={!product.inStock}
-                  className="w-full sm:w-44 h-13 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
+                  className="store-detail-buy w-full sm:w-44 h-13 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
                 >
                   <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
                   <span>Buy Now</span>

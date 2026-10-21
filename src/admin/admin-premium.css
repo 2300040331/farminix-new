@@ -1,0 +1,8 @@
+/* Brand continuity at the admin entry and workspace without changing its controls. */
+.admin-shell { --admin-purple: #7c0bea; --admin-ink: #2a1d3f; background: radial-gradient(ellipse at 35% 0%, #f0e6fb, transparent 55%), #faf8fc; }
+.admin-welcome h1 { font-family: 'Times New Roman', Georgia, serif; font-size: clamp(33px, 3vw, 46px); font-weight: 500; letter-spacing: -1px; }
+.admin-auth-story { background-image: linear-gradient(0deg, #241331eb, #34203f8f 65%, #312040d9), url('/home-farm-hero.png'); background-position: 73% center; }
+.admin-auth-story-copy h2 { font-family: 'Times New Roman', Georgia, serif; font-size: clamp(36px, 3.7vw, 59px); line-height: 1.1; letter-spacing: -1.3px; }
+.admin-auth-card > h1 { font-family: 'Times New Roman', Georgia, serif; font-size: 46px; font-weight: 500; letter-spacing: -1.2px; color: #3f2450; }
+.admin-auth-submit { background: linear-gradient(110deg, #9707f9, #6a08dc); border-radius: 28px; }
+@media (max-width: 767px) { .admin-auth-story-copy h2 { font-size: 29px; } .admin-auth-card > h1 { font-size: 39px; } }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { ArrowLeft, Plus, Minus, Heart, SlidersHorizontal, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { SUB_CATEGORIES, SUBCATEGORY_KEYWORDS } from '../data/products';
-import { getProductSlug } from './ProductListingPage';
+import { getProductSlug } from '../utils/catalog';
 import {
   PriceRangeFilter,
   ActiveFilterChip,
@@ -137,7 +137,7 @@ export const CategoryPage: React.FC = () => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-white flex flex-col transition-transform duration-300 ease-out ${
+      className={`store-category-overlay fixed inset-0 z-50 bg-white flex flex-col transition-transform duration-300 ease-out ${
         visible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >

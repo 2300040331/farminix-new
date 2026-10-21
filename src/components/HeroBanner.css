@@ -1,0 +1,157 @@
+.home-hero-carousel { position: relative; width: 100%; color: #100c32; }
+.home-hero-carousel button { cursor: pointer; }
+.home-hero-carousel :is(button, video):focus-visible, .home-site-header button:focus-visible { outline: 3px solid #b588ff; outline-offset: 5px; }
+.farm-hero { font-family: 'Poppins', sans-serif; background: #f5efff; }
+.farm-hero-stage { position: relative; height: clamp(690px, 49.5vw, 870px); overflow: hidden; background: linear-gradient(100deg, #fffcf5 25%, #cee3fa 67%, #b3d5fa); }
+.farm-hero-scene { display: block; position: absolute; inset: 95px 0 0; width: 100%; height: calc(100% - 95px); object-fit: cover; object-position: center top; mask-image: linear-gradient(to bottom, transparent, #000 65px); }
+.farm-hero-copy { position: relative; z-index: 2; width: 48%; padding-top: clamp(145px, 9.7vw, 182px); margin-left: 5.8%; }
+.farm-hero-eyebrow { display: inline-flex; align-items: center; gap: 14px; padding: 9px 17px 9px 12px; background: #fbf6ffd9; border: 1px solid #e6d8ff; border-radius: 30px; font-size: 12px; text-transform: uppercase; letter-spacing: 4px; color: #45209a; line-height: 1.4; }
+.farm-hero-eyebrow > svg { color: #138031; fill: #13803120; flex-shrink: 0; }
+.farm-hero h1 { font-family: 'Times New Roman', Georgia, serif; font-size: clamp(70px, 6vw, 108px); line-height: .94; letter-spacing: -4px; font-weight: 700; margin: 22px 0 11px; white-space: nowrap; }
+.farm-hero h1 > span { color: #8000ef; white-space: nowrap; position: relative; }
+.farm-hero h1 > span > svg { position: absolute; right: -24px; top: 8px; width: 37px; height: 37px; color: #07812c; fill: #07812c; stroke: #fff; stroke-width: 1; transform: rotate(-20deg); }
+.farm-hero-tagline { font-family: 'Times New Roman', Georgia, serif; font-size: clamp(23px, 2.15vw, 38px); line-height: 1.4; letter-spacing: -.8px; margin: 0; white-space: nowrap; }
+.farm-hero-features { display: flex; max-width: 560px; margin: 27px 0 0; }
+.farm-hero-features > div { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; text-align: center; font-size: 12px; color: #231052; line-height: 1.6; }
+.farm-hero-features > div + div::before { content: ''; height: 75%; width: 1px; background: #dbcafa; position: absolute; left: 0; top: 11%; }
+.farm-feature-icon { display: grid; place-items: center; width: 58px; height: 58px; background: radial-gradient(circle at 35% 25%, #fcf9ff, #eedeff); border: 1px solid #e5d2ff; border-radius: 50%; color: #7900ed; margin-bottom: 3px; }
+.farm-feature-icon > svg { width: 30px; height: 30px; stroke-width: 2; }
+.farm-hero-features strong { font-weight: 600; }
+.farm-hero-actions { display: flex; align-items: center; gap: 28px; margin-top: 28px; }
+.farm-shop-button { display: flex; align-items: center; justify-content: center; gap: 22px; background: linear-gradient(110deg, #a600ff, #6600e6); box-shadow: 0 10px 25px #7900ee26; color: white; min-width: 222px; min-height: 63px; padding: 15px 28px; border-radius: 40px; font-size: 19px; font-weight: 600; transition: transform 180ms, box-shadow 180ms; }
+.farm-shop-button:hover { transform: translateY(-2px); box-shadow: 0 12px 28px #7900ee40; }
+.farm-story-button { display: flex; align-items: center; gap: 14px; color: #21104c; font-size: 13px; font-weight: 500; }
+.farm-story-button > span:first-child { display: grid; place-items: center; width: 47px; height: 47px; border: 1.5px solid #8c2cf9; border-radius: 50%; color: #7100da; background: #ffffffa6; transition: background 180ms; }
+.farm-story-button:hover > span:first-child { background: #eee2ff; }
+.farm-story-button > span:last-child { border-bottom: 1px solid #a87bdd; padding-bottom: 5px; }
+.farm-quality-seal { position: absolute; top: 11.5%; right: 8%; display: flex; flex-direction: column; align-items: center; justify-content: center; width: clamp(130px, 10.5vw, 178px); aspect-ratio: 1; border-radius: 50%; border: 8px solid #ffffffd9; outline: 1px solid #ffffffb3; outline-offset: 7px; background: radial-gradient(circle at 50% 30%, #fefaff, #eee3f4); box-shadow: 0 7px 22px #4c3b5840, inset 0 0 0 1px #d9cde9; color: #140937; text-transform: uppercase; text-align: center; font-size: 12px; line-height: 1.5; z-index: 1; }
+.farm-quality-seal > svg:first-child { color: #cea76b; margin-bottom: 7px; }
+.farm-quality-seal strong { font-weight: 700; font-size: 14px; }
+.farm-quality-seal small { font-size: 8px; letter-spacing: .5px; margin: 2px 0 5px; }
+.farm-quality-seal > svg:last-child { color: #16842e; fill: #16842e14; }
+.farm-hero-waves { position: absolute; bottom: -1px; width: 100%; height: clamp(75px, 8.2vw, 140px); pointer-events: none; }
+.farm-benefit-strip { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; padding: 15px 5.8% 28px; min-height: 119px; background: linear-gradient(110deg, #f5efff, #faf6ff 45%, #f3e9ff); }
+.farm-benefit { display: flex; align-items: center; justify-content: center; gap: 19px; position: relative; min-width: 0; }
+.farm-benefit + .farm-benefit::before { content: ''; position: absolute; left: 0; height: 49px; width: 1px; background: #d8c1fb; }
+.farm-benefit-icon { display: grid; place-items: center; width: 65px; height: 65px; flex-shrink: 0; border: 1px solid #dfc5ff; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f8f3ff, #e6d5ff); color: #7900ee; box-shadow: inset 0 0 0 1px #dfc5ff50; }
+.farm-benefit-icon svg { width: 34px; height: 34px; }
+.farm-benefit > span:last-child { display: flex; flex-direction: column; gap: 4px; }
+.farm-benefit strong { font-size: 15px; font-weight: 600; color: #22104e; }
+.farm-benefit > span > span { font-size: 11px; color: #583592; line-height: 1.8; }
+.home-site-header { position: absolute; top: 12px; left: 2.5%; width: 95%; border-radius: 29px; background: #fffffff0; border: 1px solid #ffffffb3; backdrop-filter: blur(20px); box-shadow: 0 7px 35px #453e6012; color: #2c3b55; }
+.home-site-header > div:first-child { max-width: 1600px; height: 80px; padding-inline: 3.2%; }
+.home-site-header img { height: 48px; }
+.home-site-header nav button { font-size: 13px; font-weight: 600; padding-inline: 5px; }
+.home-site-header .home-header-cart { color: white; background: linear-gradient(110deg, #9c00ff, #6500e6); border-radius: 30px; padding: 14px 25px; font-size: 14px; box-shadow: 0 4px 16px #6d00e914; }
+.home-site-header .home-header-cart > svg { width: 23px; height: 23px; }
+.home-site-header .header-cart-count-badge { display: none; }
+.home-site-header > div:nth-child(2) { border-radius: 0 0 26px 26px; }
+.home-custom-banner { position: relative; }
+.home-custom-banner > img { display: block; width: 100%; height: auto; }
+.home-banner-hotspot { position: absolute; inset: 0; width: 100%; }
+.home-banner-action { position: absolute; bottom: 35px; left: 5%; display: flex; align-items: center; gap: 18px; color: white; background: #7c19ed; padding: 14px 25px; border-radius: 30px; font-weight: 600; }
+.home-carousel-controls { display: flex; align-items: center; justify-content: center; gap: 10px; background: #f8f4ff; padding: 14px; }
+.home-carousel-controls > button { color: #6d25b9; border-radius: 20px; padding: 6px; }
+.home-carousel-controls > .home-carousel-dot { width: 9px; height: 9px; padding: 0; background: #d8c0f2; }
+.home-carousel-controls > .home-carousel-dot[aria-current='true'] { width: 25px; background: #8c21f6; }
+.home-carousel-pause { font-size: 11px; }
+.farm-story-backdrop { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 24px; background: #130a29c9; backdrop-filter: blur(8px); }
+.farm-story-dialog { width: min(960px, 100%); background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 30px 100px #0005; }
+.farm-story-dialog > div { display: flex; align-items: center; justify-content: space-between; padding: 16px 22px; }
+.farm-story-dialog h2 { color: #32164e; font-size: 16px; font-weight: 600; }
+.farm-story-dialog button { color: #6d3b9d; padding: 7px; border-radius: 9px; cursor: pointer; }
+.farm-story-dialog button:hover { background: #f4edff; }
+.farm-story-dialog > video { display: block; width: 100%; max-height: 75dvh; background: #111; }
+.farm-story-dialog :is(button, video):focus-visible { outline: 3px solid #a268e5; outline-offset: -3px; }
+@media (min-width: 1800px) { .farm-hero-copy { padding-top: 170px; } .farm-hero-features { margin-top: 35px; } .farm-hero-actions { margin-top: 35px; } }
+@media (max-width: 1250px) {
+  .farm-hero-stage { height: 700px; }
+  .farm-hero-copy { margin-left: 5%; padding-top: 150px; width: 51%; }
+  .farm-hero h1 { font-size: 73px; letter-spacing: -3.5px; }
+  .farm-hero-tagline { font-size: 25px; }
+  .farm-hero-eyebrow { font-size: 10px; letter-spacing: 3px; }
+  .farm-hero-features { max-width: 440px; }
+  .farm-hero-features > div { font-size: 10px; }
+  .farm-feature-icon { width: 49px; height: 49px; }
+  .farm-feature-icon > svg { width: 26px; height: 26px; }
+  .farm-shop-button { min-width: 182px; min-height: 56px; font-size: 16px; }
+  .farm-hero-actions { gap: 20px; }
+  .farm-story-button { gap: 10px; font-size: 11px; }
+  .farm-quality-seal { top: 16%; right: 6%; width: 126px; font-size: 10px; border-width: 5px; }
+  .farm-quality-seal strong { font-size: 12px; }
+  .farm-quality-seal > svg:first-child { width: 19px; height: 19px; margin-bottom: 3px; }
+  .farm-benefit-strip { padding-inline: 3%; }
+  .farm-benefit { gap: 12px; }
+  .farm-benefit-icon { width: 53px; height: 53px; }
+  .farm-benefit-icon svg { width: 28px; height: 28px; }
+  .farm-benefit strong { font-size: 12px; }
+  .farm-benefit > span > span { font-size: 10px; }
+}
+@media (min-width: 768px) and (max-width: 1000px) {
+  .farm-hero-stage { height: 660px; }
+  .farm-hero-copy { width: 58%; padding-top: 145px; }
+  .farm-hero-scene { object-position: 57% center; }
+  .farm-hero h1 { font-size: 64px; }
+  .farm-hero h1 > span > svg { width: 28px; height: 28px; right: -20px; }
+  .farm-hero-tagline { font-size: 21px; }
+  .farm-hero-features { width: 90%; }
+  .farm-hero-actions { gap: 17px; }
+  .farm-shop-button { min-width: 160px; padding: 14px 20px; }
+  .farm-quality-seal { top: 17%; right: 5%; width: 110px; }
+  .farm-quality-seal small { font-size: 7px; }
+  .farm-benefit-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 25px 12px; padding: 10px 5% 26px; }
+  .farm-benefit { justify-content: start; padding-left: 9%; }
+  .farm-benefit:nth-child(3)::before { display: none; }
+}
+@media (max-width: 767px) {
+  .home-site-header { top: 12px; left: 12px; width: calc(100% - 24px); border-radius: 20px; }
+  .home-site-header > div:first-child { height: 65px; padding-inline: 14px; }
+  .home-site-header img { height: 33px; }
+  .home-site-header .home-header-cart { padding: 9px 13px; font-size: 12px; }
+  .home-site-header .home-header-cart > svg { width: 20px; height: 20px; }
+  .farm-hero-stage { height: 950px; background: linear-gradient(160deg, #fff 5%, #fcf8ff 49%, #f0f8db); }
+  .farm-hero-scene { inset: auto 0 0; height: 430px; object-position: 80% center; mask-image: linear-gradient(to bottom, transparent, #000 15%); }
+  .farm-hero-copy { width: calc(100% - 44px); margin-left: 22px; padding-top: 112px; }
+  .farm-hero-eyebrow { font-size: 9px; letter-spacing: 2.5px; padding: 7px 12px; gap: 8px; }
+  .farm-hero-eyebrow > svg { width: 18px; height: 18px; }
+  .farm-hero h1 { font-size: clamp(44px, 14vw, 76px); margin-top: 20px; letter-spacing: -2.7px; line-height: .97; }
+  .farm-hero h1 > span > svg { width: 24px; height: 24px; top: 0; right: -16px; }
+  .farm-hero-tagline { white-space: normal; font-size: 23px; max-width: 430px; line-height: 1.3; letter-spacing: -.5px; }
+  .farm-hero-features { width: 100%; max-width: 440px; margin-top: 23px; }
+  .farm-hero-features > div { font-size: 10px; gap: 3px; }
+  .farm-feature-icon { width: 43px; height: 43px; }
+  .farm-feature-icon > svg { width: 24px; height: 24px; }
+  .farm-hero-actions { gap: 17px; margin-top: 23px; }
+  .farm-shop-button { min-width: 155px; min-height: 52px; padding: 12px 20px; gap: 13px; font-size: 16px; }
+  .farm-shop-button svg { width: 21px; height: 21px; }
+  .farm-story-button { font-size: 10px; gap: 8px; }
+  .farm-story-button > span:first-child { width: 35px; height: 35px; flex-shrink: 0; }
+  .farm-story-button svg { width: 15px; height: 15px; }
+  .farm-quality-seal { display: none; }
+  .farm-quality-seal strong { font-size: 10px; }
+  .farm-quality-seal small { font-size: 6px; margin-block: 2px; }
+  .farm-quality-seal > svg:first-child { width: 15px; height: 15px; margin-bottom: 2px; }
+  .farm-quality-seal > svg:last-child { width: 14px; height: 14px; }
+  .farm-hero-waves { height: 66px; }
+  .farm-benefit-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 23px 14px; padding: 5px 20px 27px; }
+  .farm-benefit { justify-content: start; align-items: start; gap: 9px; }
+  .farm-benefit + .farm-benefit::before { display: none; }
+  .farm-benefit-icon { width: 39px; height: 39px; }
+  .farm-benefit-icon svg { width: 23px; height: 23px; }
+  .farm-benefit > span:last-child { gap: 3px; }
+  .farm-benefit strong { font-size: 10px; line-height: 1.6; }
+  .farm-benefit > span > span { font-size: 9px; line-height: 1.7; }
+  .farm-story-backdrop { padding: 14px; }
+  .farm-story-dialog > div { padding: 13px 15px; }
+  .farm-story-dialog h2 { font-size: 14px; }
+}
+@media (max-width: 359px) {
+  .farm-hero-copy { width: calc(100% - 36px); margin-left: 18px; }
+  .farm-hero-tagline { font-size: 21px; }
+  .farm-hero-actions { gap: 12px; }
+  .farm-shop-button { min-width: 135px; font-size: 14px; padding-inline: 15px; }
+  .farm-story-button { font-size: 9px; gap: 6px; }
+  .farm-benefit-strip { padding-inline: 16px; gap: 18px 10px; }
+  .farm-benefit-icon { width: 32px; height: 32px; }
+}
+@media (prefers-reduced-motion: reduce) { .farm-shop-button, .farm-story-button > span { transition: none; } }

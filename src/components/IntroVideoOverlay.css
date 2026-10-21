@@ -1,0 +1,115 @@
+.harvest-intro {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: #1a301b;
+  color: #fff8e9;
+  opacity: 1;
+  transition: opacity 450ms ease;
+  overscroll-behavior: contain;
+}
+.harvest-intro::backdrop { background: #1a301b; }
+.harvest-intro[data-closing='true'] { opacity: 0; pointer-events: none; }
+.harvest-intro-header {
+  position: absolute;
+  z-index: 3;
+  top: max(30px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+}
+.harvest-intro-logo {
+  padding: 14px 0;
+}
+.harvest-intro-logo img {
+  display: block;
+  width: 175px;
+  height: 58px;
+  object-fit: contain;
+  filter: brightness(0) invert(1) sepia(.22) saturate(1.6);
+}
+.harvest-intro .paddy-harvest-intro { height: 100%; min-height: 0; }
+.harvest-intro .paddy-harvest-content { height: 100%; min-height: 0; padding-bottom: 25px; }
+.harvest-intro .paddy-harvest-copy { width: 470px; max-width: 40%; padding-block: 140px 100px; }
+.harvest-intro .paddy-harvest-copy h2 { font-size: clamp(48px, 5vw, 72px); margin: 22px 0; }
+.harvest-intro .paddy-harvest-copy p { font-size: 13px; }
+.harvest-intro .paddy-harvest-corner-note { display: none; }
+.harvest-intro-footer {
+  position: absolute;
+  z-index: 3;
+  bottom: max(32px, env(safe-area-inset-bottom));
+  left: max(5.5%, env(safe-area-inset-left));
+  right: max(5.5%, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.harvest-intro-welcome { width: 235px; }
+.harvest-intro-welcome > span { display: block; color: #dce0c2; font-size: 8px; letter-spacing: 2.3px; }
+.harvest-intro-progress { margin-top: 14px; height: 2px; overflow: hidden; background: #f1ebce26; }
+.harvest-intro-progress span { display: block; height: 100%; background: #d7deb0; transform: scaleX(0); transform-origin: left; }
+.harvest-intro[data-ready='true'] .harvest-intro-progress span { animation: harvest-intro-progress 6.5s linear forwards; }
+.harvest-intro-enter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 16px 26px;
+  border: 1px solid #e6d7aa;
+  border-radius: 100px;
+  background: #fff6df;
+  color: #203822;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  cursor: pointer;
+  box-shadow: 0 5px 25px #10170920;
+  transition: background 150ms;
+}
+.harvest-intro-enter:hover { background: #e6edcf; }
+.harvest-intro-enter:active { background: #efdfb8; }
+.premium-storefront .harvest-intro .harvest-intro-enter:focus-visible,
+.premium-storefront .harvest-intro .paddy-harvest-control:focus-visible { outline: 2px solid #d7deb0; outline-offset: 5px; }
+.harvest-intro-loading { display: grid; align-content: center; justify-items: center; gap: 16px; height: 100%; background: radial-gradient(ellipse at 70% 30%, #61733577, transparent 70%); }
+.harvest-intro-loading p { color: #fff6df; font: 400 clamp(32px, 6vw, 76px)/1.15 Georgia, serif; }
+.harvest-intro-loading span { color: #d3d7bb; font-size: 12px; letter-spacing: 2px; }
+@keyframes harvest-intro-progress { to { transform: scaleX(1); } }
+@media (max-width: 767px) {
+  .harvest-intro-header { top: max(20px, env(safe-area-inset-top)); }
+  .harvest-intro-logo { padding: 10px 0; }
+  .harvest-intro-logo img { width: 140px; height: 46px; }
+  .harvest-intro .paddy-harvest-content { align-items: start; padding-top: 118px; }
+  .harvest-intro .paddy-harvest-copy { width: 100%; max-width: 100%; padding-block: 0; }
+  .harvest-intro .paddy-harvest-copy h2 { font-size: clamp(39px, 11vw, 58px); margin: 15px 0 12px; }
+  .harvest-intro .paddy-harvest-copy p { display: none; }
+  .harvest-intro .paddy-harvest-control { margin-top: 15px; }
+  .harvest-intro .paddy-harvest-canvas { bottom: 68px; height: calc(100% - 340px); min-height: 160px; }
+  .harvest-intro .paddy-harvest-backdrop { height: 72%; }
+  .harvest-intro .paddy-harvest-fallback { inset: 285px 0 70px; }
+  .harvest-intro-footer { bottom: max(22px, env(safe-area-inset-bottom)); left: 22px; right: 22px; gap: 16px; }
+  .harvest-intro-welcome { width: 130px; }
+  .harvest-intro-welcome > span { font-size: 7px; letter-spacing: 1.1px; line-height: 1.7; }
+  .harvest-intro-enter { padding: 13px 18px; gap: 12px; font-size: 11px; white-space: nowrap; }
+}
+@media (max-height: 600px) and (min-width: 768px) {
+  .harvest-intro-header { top: 16px; }
+  .harvest-intro-logo { padding: 8px 0; }
+  .harvest-intro-logo img { width: 130px; height: 43px; }
+  .harvest-intro .paddy-harvest-copy { padding-block: 90px 70px; }
+  .harvest-intro .paddy-harvest-copy h2 { font-size: 48px; margin: 12px 0; }
+  .harvest-intro .paddy-harvest-copy p, .harvest-intro .paddy-harvest-rule, .harvest-intro .paddy-harvest-caption, .harvest-intro .paddy-harvest-hint { display: none; }
+  .harvest-intro-footer { bottom: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .harvest-intro { transition: none; }
+  .harvest-intro[data-ready='true'] .harvest-intro-progress span { animation: none; transform: scaleX(1); }
+}

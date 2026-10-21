@@ -22,7 +22,7 @@ export const SocialBlogSection: React.FC = () => {
   if (!config?.enabled || entries.length === 0) return null;
 
   return (
-    <section className="w-full py-12 sm:py-16 bg-gradient-to-b from-white via-purple-50/30 to-white" aria-labelledby="farminix-social-blog-title">
+    <section className="store-social-section w-full py-12 sm:py-16 bg-gradient-to-b from-white via-purple-50/30 to-white" aria-labelledby="farminix-social-blog-title">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-8">
           <div>

@@ -56,13 +56,13 @@ export const LocationModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 select-none">
+    <div className="store-modal-layer fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 select-none">
       <div
         onClick={() => setIsLocationOpen(false)}
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-in fade-in"
       />
 
-      <div className="relative bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 border border-slate-100 text-left">
+      <div className="store-modal-surface relative bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 border border-slate-100 text-left">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <img src="/farminix_logo.png" alt="Farminix Logo" className="h-7 w-auto object-contain" />
