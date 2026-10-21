@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: farminix_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: farminix
+      POSTGRES_PASSWORD: farminix_secure_db_pass
+      POSTGRES_DB: farminix_db
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - farminix_pgdata:/var/lib/postgresql/data
+      - ./server/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U farminix -d farminix_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: farminix_app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - DATABASE_URL=postgresql://farminix:farminix_secure_db_pass@postgres:5432/farminix_db
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-Farminix@2026}
+      - ADMIN_SESSION_SECRET=${ADMIN_SESSION_SECRET:-farminix-admin-session-secret-salt-key-2026}
+      - JWT_SECRET=${JWT_SECRET:-farminix-super-jwt-secret-key-2026}
+      - REFRESH_SECRET=${REFRESH_SECRET:-farminix-super-refresh-secret-2026}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-}
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  farminix_pgdata:
