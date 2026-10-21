@@ -52,7 +52,7 @@ export const EpicDealsManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Sparkles className="w-4 h-4 text-yellow-500" />
@@ -88,7 +88,7 @@ export const EpicDealsManager: React.FC = () => {
       </div>
 
       {/* 3D Header Customizer */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           1. 3D Floating Header &amp; Badge Copy
         </h2>
@@ -126,7 +126,7 @@ export const EpicDealsManager: React.FC = () => {
       </div>
 
       {/* Deal Cards List */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <h2 className="text-sm font-bold text-slate-900">
             2. Category Deal Cards ({formData.deals.length})
@@ -146,7 +146,7 @@ export const EpicDealsManager: React.FC = () => {
             return (
               <div
                 key={deal.id}
-                className={`p-4 rounded-2xl border bg-white shadow-2xs space-y-3 flex flex-col justify-between transition-all ${
+                className={`admin-panel p-4 rounded-2xl border bg-white shadow-2xs space-y-3 flex flex-col justify-between transition-all ${
                   isEnabled ? 'border-slate-200' : 'border-slate-200/50 opacity-60 bg-slate-50'
                 }`}
               >

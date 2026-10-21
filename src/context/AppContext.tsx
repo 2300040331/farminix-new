@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { Product, Category, CartItem, UserAddress, User, Order } from '../types';
-import { popularProducts, allProducts as defaultAllProducts, categories as defaultCategories } from '../data/products';
+import { allProducts as defaultAllProducts, categories as defaultCategories } from '../data/products';
 import { detectUserLocation } from '../utils/location';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
@@ -45,7 +45,7 @@ interface AppContextType {
 
   // Orders
   orders: Order[];
-  createOrder: (address: UserAddress, paymentMethod: string, customItems?: CartItem[], customTotal?: number) => Order;
+  createOrder: (address: UserAddress, paymentMethod: string, customItems?: CartItem[], customTotal?: number, payment?: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string; couponCode?: string | null }) => Promise<Order>;
 
   // Modals
   isCartOpen: boolean;
@@ -67,7 +67,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { publishedConfig, updateOrders } = useAdminConfig();
+  const { publishedConfig } = useAdminConfig();
   
   // Filter out products and categories where enabled is explicitly set to false
   const allProducts = (publishedConfig.products 
@@ -252,30 +252,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [user]);
 
-  const [orders, setOrders] = useState<Order[]>([
-    {
-      id: 'ORD-89241',
-      date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-      items: [{ product: popularProducts[0], quantity: 1, selectedWeight: '1 kg' }],
-      totalAmount: 209,
-      discount: 21,
-      deliveryFee: 0,
-      finalAmount: 188,
-      status: 'Out for Delivery',
-      estimatedTime: '8 Mins',
-      deliveryAddress: {
-        id: 'addr-sample',
-        name: 'Customer',
-        street: 'Express Delivery Hub',
-        city: 'Guntur',
-        state: 'Andhra Pradesh',
-        pincode: '522002',
-        phone: '+91 98000 00000',
-        isDefault: true
-      },
-      paymentMethod: 'UPI'
-    }
-  ]);
+  const [orders, setOrders] = useState<Order[]>(() => {
+    try { return JSON.parse(localStorage.getItem('farminix_customer_orders_v1') || '[]'); } catch { return []; }
+  });
+  const pendingOrder = useRef<{ fingerprint: string; id: string } | null>((() => {
+    try { return JSON.parse(sessionStorage.getItem('farminix_pending_order') || 'null'); } catch { return null; }
+  })());
 
   // Modal states
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -357,31 +339,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Order creation
-  const createOrder = (
+  const createOrder = async (
     address: UserAddress,
     paymentMethod: string,
     customItems?: CartItem[],
-    customTotal?: number
-  ): Order => {
+    customTotal?: number,
+    payment?: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string; couponCode?: string | null }
+  ): Promise<Order> => {
     const itemsToUse = customItems && customItems.length > 0 ? customItems : [...cart];
     const totalToUse = customTotal !== undefined ? customTotal : cartTotal;
-    const newOrder: Order = {
-      id: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
-      date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-      items: itemsToUse,
-      totalAmount: totalToUse,
-      discount: cartDiscount,
-      couponCode: cartDiscount > 0 ? appliedCoupon || undefined : undefined,
-      deliveryFee: 0,
-      finalAmount: totalToUse,
-      status: 'Order Received',
-      estimatedTime: '15-20 Mins',
-      deliveryAddress: address,
-      paymentMethod,
-    };
-
-    setOrders(prev => [newOrder, ...prev]);
-    updateOrders([newOrder, ...publishedConfig.orders]);
+    const items = itemsToUse.map(item => ({ productId: item.product.id, quantity: item.quantity, selectedWeight: item.selectedWeight }));
+    const fingerprint = JSON.stringify({ items, address, paymentMethod, totalToUse, appliedCoupon });
+    if (pendingOrder.current?.fingerprint !== fingerprint) pendingOrder.current = { fingerprint, id: crypto.randomUUID() };
+    try { sessionStorage.setItem('farminix_pending_order', JSON.stringify(pendingOrder.current)); } catch {}
+    const response = await fetch('/api/site-config/orders', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requestId: pendingOrder.current.id, items, address, expectedAmount: totalToUse, couponCode: payment && payment.couponCode !== undefined ? payment.couponCode : appliedCoupon, payment: payment ? { method: 'RAZORPAY', ...payment } : { method: 'COD' } }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw Error(data.error || 'Unable to confirm your order. Please retry.');
+    const newOrder: Order = data.order;
+    setOrders(prev => {
+      const next = [newOrder, ...prev.filter(order => order.id !== newOrder.id)];
+      try { localStorage.setItem('farminix_customer_orders_v1', JSON.stringify(next)); } catch {}
+      return next;
+    });
+    pendingOrder.current = null;
+    try { sessionStorage.removeItem('farminix_pending_order'); } catch {}
     clearCart();
     return newOrder;
   };

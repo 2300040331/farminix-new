@@ -30,7 +30,7 @@ export const ManufacturerManager: React.FC = () => {
 
   return (
     <form onSubmit={handleSave} className="space-y-8 text-left pb-16">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200">
         <h1 className="flex items-center gap-3 text-xl font-black text-slate-900"><Factory className="w-6 h-6 text-[#7C3AED]" />Manufacturer Management</h1>
         <div className="flex gap-3">
           <a href="/manufacturer" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold">Preview Page<ExternalLink className="w-4 h-4" /></a>
@@ -40,7 +40,7 @@ export const ManufacturerManager: React.FC = () => {
       {saveSuccess && <p role="status" className="flex items-center gap-2 p-4 rounded-2xl bg-emerald-50 text-emerald-800 text-sm"><CheckCircle2 className="w-4 h-4" />Manufacturer details saved and published.</p>}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {(['manufacturedBy', 'marketedBy'] as const).map(key => (
-          <section key={key} className="bg-white p-6 rounded-3xl border border-slate-200 space-y-5">
+          <section key={key} className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 space-y-5">
             <h2 className="font-black text-slate-900">{key === 'manufacturedBy' ? 'Manufactured By' : 'Marketed By'}</h2>
             {([
               { field: 'name', label: 'Company Name', type: 'text' },

@@ -1,267 +1,88 @@
-import React from 'react';
-import {
-  ShoppingBag,
-  IndianRupee,
-  Layers,
-  TrendingUp,
-  Clock,
-  CheckCircle2,
-  Eye,
-  Sliders,
-  PackageCheck,
-  Factory,
-} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, BarChart3, Boxes, PackagePlus, ClipboardList, Image, LayoutGrid, Leaf, Sprout, Home, MessageCircle, Package, Pencil, Search, ShoppingCart, Tag, Users, IndianRupee, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
+import { useCommerce } from '../context/CommerceContext';
+import type { CustomerEnquiry } from '../types';
+import { customerKey, money, orderLabel } from '../commerceUtils';
+import { OrderBadge } from '../components/OrderBadge';
+import { MetricSparkline } from '../components/MetricSparkline';
 
-export const AdminDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
+export function AdminDashboard({ onNavigate, search = '' }: { onNavigate: (page: string, productId?: string) => void; search?: string }) {
   const { config } = useAdminConfig();
-
-  const totalRevenue = config.orders.reduce((sum, o) => sum + o.finalAmount, 0);
-  const activeOrdersCount = config.orders.filter(
-    (o) => o.status !== 'Delivered'
-  ).length;
-  const totalProductsCount = config.products.length;
-  const totalOrdersCount = config.orders.length;
-
-  const liveModules = [
-    { id: 'header', name: 'Main Header & Logo', status: 'Active', desc: 'Brand logo & navigation links' },
-    { id: 'hero', name: 'Hero Banner', status: 'Active', desc: 'Main Farminix 16:9 banner' },
-    { id: 'categories', name: 'Categories Catalog', status: 'Active', desc: 'Add, hide, edit & delete categories' },
-    { id: 'popularProducts', name: 'Popular Today', status: 'Active', desc: 'Featured product cards' },
-    { id: 'manufacturer', name: 'Manufacturer Page', status: 'Active', desc: 'Manufacturer and marketer contact details' },
-    { id: 'products', name: 'Product Inventory', status: 'Active', desc: 'Catalog & pricing' },
-    { id: 'orders', name: 'Orders & Fulfillment', status: 'Active', desc: 'Real customer orders' },
-    { id: 'footer', name: 'Store Footer', status: 'Active', desc: 'Bottom links & brand' },
+  const { products, orders, loading, error, updatedAt, refresh } = useCommerce();
+  const [stockFilter, setStockFilter] = useState('all');
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(0);
+  const [enquiries, setEnquiries] = useState<CustomerEnquiry[]>([]);
+  const [queryError, setQueryError] = useState('');
+  const [queriesLoading, setQueriesLoading] = useState(true);
+  useEffect(() => {
+    let disposed = false;
+    const load = async () => {
+      try {
+        const response = await fetch('/api/site-config/queries?page=0', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(15000) });
+        const data = await response.json();
+        if (!response.ok) throw Error(data.error || 'Unable to load enquiries.');
+        if (!disposed) { setEnquiries(data.enquiries.slice(0, 3)); setQueryError(''); }
+      } catch { if (!disposed) setQueryError('Enquiries could not be loaded.'); }
+      finally { if (!disposed) setQueriesLoading(false); }
+    };
+    void load(); const timer = window.setInterval(load, 15000);
+    return () => { disposed = true; clearInterval(timer); };
+  }, []);
+  useEffect(() => setPage(0), [query, search, stockFilter]);
+  const filtered = useMemo(() => products.filter(p => {
+    const matches = `${p.name} ${p.category} ${p.id}`.toLowerCase().includes(`${search} ${query}`.trim().toLowerCase());
+    return matches && (stockFilter === 'all' || (stockFilter === 'out' ? p.stockCount <= 0 : p.stockCount > 0 && p.stockCount <= 10));
+  }), [products, query, search, stockFilter]);
+  const activeOrders = orders.filter(o => o.status !== 'Delivered');
+  const recentOrders = orders.filter(o => `${o.id} ${o.deliveryAddress.name} ${o.deliveryAddress.phone}`.toLowerCase().includes(search.toLowerCase())).slice(0, 4);
+  const totalStock = products.reduce((sum, p) => sum + p.stockCount, 0);
+  const lowStock = products.filter(p => p.stockCount > 0 && p.stockCount <= 10).length;
+  const outOfStock = products.filter(p => p.stockCount <= 0).length;
+  const customers = new Set(orders.map(o => customerKey(o.deliveryAddress.phone))).size;
+  const dailyOrders = Array.from({ length: 7 }, (_, index) => {
+    const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - 6 + index);
+    const end = new Date(start); end.setDate(end.getDate() + 1);
+    return orders.filter(order => Date.parse(order.date) >= start.getTime() && Date.parse(order.date) < end.getTime());
+  });
+  const metrics = [
+    { title: 'Total Products', value: products.length.toLocaleString('en-IN'), note: `${totalStock.toLocaleString('en-IN')} units in stock`, icon: Package, color: 'purple', series: products.slice(0, 12).map(p => p.stockCount), chartLabel: 'Available units for the first twelve catalog products' },
+    { title: 'Online Orders', value: updatedAt ? orders.length.toLocaleString('en-IN') : '—', note: `${activeOrders.length} awaiting delivery`, icon: ShoppingCart, color: 'green', series: dailyOrders.map(day => day.length), chartLabel: 'Orders per day over the last seven days' },
+    { title: 'Total Customers', value: updatedAt ? customers.toLocaleString('en-IN') : '—', note: 'Customers who placed orders', icon: Users, color: 'blue', series: dailyOrders.map(day => new Set(day.map(o => customerKey(o.deliveryAddress.phone))).size), chartLabel: 'Unique ordering customers per day over the last seven days' },
+    { title: 'Total Order Value', value: updatedAt ? money(orders.reduce((sum, o) => sum + o.finalAmount, 0)) : '—', note: 'Online payments + COD orders', icon: IndianRupee, color: 'amber', series: dailyOrders.map(day => day.reduce((sum, o) => sum + o.finalAmount, 0)), chartLabel: 'Order value per day over the last seven days' },
   ];
-
-  return (
-    <div className="space-y-6 text-left">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-purple-800/40">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-purple-200 text-xs font-bold uppercase tracking-wider mb-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Farminix Live Control Center</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-2">
-            Store Performance &amp; Live Control
-          </h1>
-          <p className="text-xs sm:text-sm text-purple-200/80 leading-relaxed">
-            Manage your live Farminix product inventory, customer orders, categories, header logo, hero banner, and store footer in real-time.
-          </p>
-          <div className="flex flex-wrap gap-3 mt-5">
-            <button
-              onClick={() => onNavigate('header')}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-            >
-              <Sliders className="w-4 h-4" />
-              <span>Main Header &amp; Logo</span>
-            </button>
-            <button
-              onClick={() => onNavigate('products')}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-            >
-              <PackageCheck className="w-4 h-4" />
-              <span>Manage Products</span>
-            </button>
-            <button
-              onClick={() => onNavigate('categories')}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-            >
-              <Layers className="w-4 h-4" />
-              <span>Manage Categories</span>
-            </button>
-            <button
-              onClick={() => onNavigate('orders')}
-              className="px-4 py-2 bg-purple-500 hover:bg-purple-400 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>View Orders ({activeOrdersCount})</span>
-            </button>
-            <button
-              onClick={() => onNavigate('manufacturer')}
-              className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-            >
-              <Factory className="w-4 h-4" />
-              <span>Manufacturer Page</span>
-            </button>
-            <button
-              onClick={() => onNavigate('hero')}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-white/20"
-            >
-              <Sliders className="w-4 h-4" />
-              <span>Hero Banner</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Real Statistics Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1: Revenue */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Sales</span>
-            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-              <IndianRupee className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="text-2xl font-black text-slate-900">₹{totalRevenue.toLocaleString('en-IN')}</div>
-          <div className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1 mt-1">
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>Store transactions</span>
-          </div>
-        </div>
-
-        {/* Metric 2: Active Orders */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Orders</span>
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-              <ShoppingBag className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="text-2xl font-black text-slate-900">{activeOrdersCount}</div>
-          <div className="text-[11px] font-semibold text-amber-600 flex items-center gap-1 mt-1">
-            <Clock className="w-3.5 h-3.5" />
-            <span>Processing / In transit</span>
-          </div>
-        </div>
-
-        {/* Metric 3: Products */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Product Catalog</span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-              <Layers className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="text-2xl font-black text-slate-900">{totalProductsCount}</div>
-          <div className="text-[11px] font-semibold text-slate-500 mt-1">
-            Live on store catalog
-          </div>
-        </div>
-
-        {/* Metric 4: Total Orders Placed */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Orders</span>
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-              <Eye className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="text-2xl font-black text-slate-900">
-            {totalOrdersCount}
-          </div>
-          <div className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1 mt-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>All completed orders</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Grid: Live Homepage Section Status & Recent Orders */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Live Store Modules */}
-        <div className="lg:col-span-1 bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h2 className="text-sm font-bold text-slate-900">Live Website Modules</h2>
-            <span className="text-xs font-bold text-emerald-600">All Synced</span>
-          </div>
-
-          <div className="space-y-2.5">
-            {liveModules.map((mod, idx) => (
-              <div
-                key={mod.id}
-                className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-slate-100/80 transition-colors"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-extrabold flex items-center justify-center shrink-0">
-                    {idx + 1}
-                  </span>
-                  <div className="min-w-0">
-                    <div className="text-xs font-bold text-slate-800 truncate">{mod.name}</div>
-                    <div className="text-[10px] text-slate-400 font-medium truncate">{mod.desc}</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider bg-emerald-100 text-emerald-700">
-                    {mod.status}
-                  </span>
-                  <button
-                    onClick={() => onNavigate(mod.id)}
-                    className="p-1 text-slate-400 hover:text-purple-600 transition-colors cursor-pointer"
-                    title="Manage Module"
-                  >
-                    <Sliders className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Recent Real Orders */}
-        <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div>
-              <h2 className="text-sm font-bold text-slate-900">Recent Customer Orders</h2>
-              <p className="text-[11px] text-slate-500">Live order fulfillment queue</p>
-            </div>
-            <button
-              onClick={() => onNavigate('orders')}
-              className="text-xs font-bold text-purple-600 hover:text-purple-700 cursor-pointer"
-            >
-              View All Orders ({config.orders.length})
-            </button>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100">
-                  <th className="pb-3">Order ID</th>
-                  <th className="pb-3">Customer</th>
-                  <th className="pb-3">Items</th>
-                  <th className="pb-3">Amount</th>
-                  <th className="pb-3">Status</th>
-                  <th className="pb-3">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {config.orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 font-bold text-purple-700">{order.id}</td>
-                    <td className="py-3 font-semibold text-slate-800">{order.deliveryAddress.name}</td>
-                    <td className="py-3 text-slate-600">{order.items.length} item(s)</td>
-                    <td className="py-3 font-extrabold text-slate-900">₹{order.finalAmount}</td>
-                    <td className="py-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                          order.status === 'Delivered'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="py-3">
-                      <button
-                        onClick={() => onNavigate('orders')}
-                        className="text-xs font-bold text-purple-600 hover:text-purple-800 cursor-pointer"
-                      >
-                        Manage
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+  const actions = [
+    { label: 'Edit Home Page', page: 'home', icon: Home, color: 'purple' },
+    { label: 'Add Product', page: 'add-product', icon: PackagePlus, color: 'green' },
+    { label: 'Categories', page: 'categories', icon: LayoutGrid, color: 'blue' },
+    { label: 'Create Offer', page: 'offers', icon: Tag, color: 'rose' },
+    { label: 'Update Banner', page: 'hero', icon: Image, color: 'teal' },
+    { label: 'View Orders', page: 'orders', icon: ClipboardList, color: 'purple' },
+    { label: 'Enquiries', page: 'queries', icon: MessageCircle, color: 'green' },
+    { label: 'Stock Alerts', page: 'stock', icon: BarChart3, color: 'purple' },
+  ];
+  return <div className="admin-dashboard">
+    <section className="admin-welcome">
+      <div className="admin-welcome-copy"><p className="admin-eyebrow"><span/> WELCOME BACK, ADMIN</p><h1>Manage Your <span>Farminix</span> Store</h1><p>A little care. A lot of growth. Everything your store needs, in one place.</p><div className="admin-welcome-caption"><Leaf size={14}/> From our farms to your family</div></div>
+      <div className="admin-mission"><span className="admin-icon green"><Sprout size={24}/></span><div><strong>Our Mission</strong><p>Pure grains from our farms<br/>to every family in India.</p></div></div>
+    </section>
+    <div className="admin-sync"><span><i className={updatedAt && !error ? 'connected' : ''}/>{loading ? 'Loading online store…' : error ? 'Connection needs attention' : `Updated ${updatedAt?.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} · refreshes every 15s`}</span><button onClick={() => void refresh()} disabled={loading}><RefreshCw size={13}/> Refresh data</button></div>
+    {error && <div role="alert" className="admin-alert">{error} {updatedAt ? 'Showing the last loaded data.' : 'Showing the cached catalog. Current online stock and order totals are unavailable until the connection succeeds.'}</div>}
+    <div className="admin-metrics">{metrics.map(metric => <article className={`admin-card admin-metric admin-metric-${metric.color}`} key={metric.title}><span className={`admin-icon ${metric.color}`}><metric.icon size={25}/></span><div className="admin-metric-content"><p>{metric.title}</p><strong>{metric.value}</strong><small><span/>{metric.note}</small></div><div className={`admin-metric-chart ${metric.color}`}><MetricSparkline values={metric.series} label={metric.chartLabel}/></div></article>)}</div>
+    <div className="admin-dashboard-grid"><div className="admin-primary-column">
+      <section className="admin-card admin-quick-actions"><div className="admin-section-heading"><div><h2>Quick Actions</h2><p>Your everyday essentials, one click away.</p></div><button onClick={() => onNavigate('home')}>Manage Store <ArrowRight size={14}/></button></div><div className="admin-actions">{actions.map(action => <button key={action.label} className={action.color} onClick={() => { if (action.page === 'stock') { setStockFilter('low'); document.getElementById('admin-inventory')?.scrollIntoView({ behavior: 'smooth' }); } else onNavigate(action.page); }}><span className={`admin-icon ${action.color}`}><action.icon size={23}/></span><span>{action.label}</span></button>)}</div></section>
+      <section className="admin-card" id="admin-inventory"><div className="admin-section-heading"><div><h2>Product Inventory</h2><p>All {products.length} products · stock from the published store</p></div><button onClick={() => onNavigate('products')}>Manage Products <ArrowRight size={14}/></button></div>
+        <div className="admin-stock-summary"><span><Boxes size={16}/><b>{totalStock}</b> available units</span><button onClick={() => setStockFilter(stockFilter === 'low' ? 'all' : 'low')}><AlertTriangle size={15}/><b>{lowStock}</b> low stock</button><button onClick={() => setStockFilter(stockFilter === 'out' ? 'all' : 'out')}><b>{outOfStock}</b> out of stock</button></div>
+        <div className="admin-table-tools"><label className="admin-search"><Search size={16}/><input aria-label="Search inventory" placeholder="Search your inventory…" value={query} onChange={e => setQuery(e.target.value)}/></label><select aria-label="Filter stock" value={stockFilter} onChange={e => setStockFilter(e.target.value)}><option value="all">All stock</option><option value="low">Low stock (1–10)</option><option value="out">Out of stock</option></select></div>
+        <div className="admin-table-scroll"><table className="admin-table"><thead><tr><th>#</th><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>{filtered.slice(page * 6, page * 6 + 6).map((product, index) => <tr key={product.id}><td>{page * 6 + index + 1}</td><td><div className="admin-product-cell">{product.image ? <img src={product.image} alt=""/> : <span className="admin-product-placeholder"><Package size={21}/></span>}<div><strong>{product.name}</strong><small>{product.weight}</small></div></div></td><td>{product.category}</td><td><strong>{money(product.price)}</strong>{product.oldPrice > product.price && <del>{money(product.oldPrice)}</del>}</td><td><span className={`admin-badge ${product.stockCount <= 0 ? 'rose' : product.stockCount <= 10 ? 'amber' : 'green'}`}>{product.stockCount <= 0 ? 'Out of stock' : `${product.stockCount} in stock`}</span></td><td><span className={`admin-badge ${product.enabled === false ? 'slate' : 'purple'}`}>{product.enabled === false ? 'Hidden' : 'Visible'}</span></td><td><button className="admin-edit" onClick={() => onNavigate('products', product.id)}><Pencil size={13}/> Edit</button></td></tr>)}</tbody></table></div>
+        {!filtered.length && <div className="admin-empty"><Package size={28}/><strong>No matching products</strong><p>Try another search or stock filter.</p></div>}
+        <div className="admin-pagination"><span>{filtered.length ? `${page * 6 + 1}–${Math.min(page * 6 + 6, filtered.length)} of ${filtered.length} products` : '0 products'}</span><div><button disabled={!page} onClick={() => setPage(p => p - 1)}>Previous</button><button disabled={(page + 1) * 6 >= filtered.length} onClick={() => setPage(p => p + 1)}>Next</button></div></div>
+      </section>
+    </div><div className="admin-secondary-column">
+      <section className="admin-card"><div className="admin-section-heading"><div><h2>Recent Orders</h2><p>The latest from your store.</p></div><button onClick={() => onNavigate('orders')}>View All <ArrowRight size={14}/></button></div>{recentOrders.map(order => <button className="admin-recent-order" key={order.id} onClick={() => onNavigate('orders', order.id)}><span className="admin-icon amber"><Package size={18}/></span><div><strong title={order.id}>{orderLabel(order.id)}</strong><small>{order.items.reduce((sum, item) => sum + item.quantity, 0)} items · {order.deliveryAddress.name}</small></div><div className="admin-order-amount"><strong>{money(order.finalAmount)}</strong><OrderBadge status={order.status}/></div></button>)}{!recentOrders.length && <div className="admin-empty"><span className="admin-empty-icon"><ShoppingCart size={28}/></span><strong>{loading ? 'Loading orders…' : error ? 'Orders unavailable' : search ? 'No matching orders' : 'Your next order starts here'}</strong><p>{error ? 'Refresh to try again.' : 'Confirmed website orders will appear here.'}</p></div>}</section>
+      <section className="admin-card"><div className="admin-section-heading"><h2>Recent Queries</h2><button onClick={() => onNavigate('queries')}>View All <ArrowRight size={14}/></button></div>{queryError ? <p className="admin-query-error">{queryError}</p> : enquiries.length ? enquiries.map(enquiry => <button className="admin-enquiry" key={enquiry.id} onClick={() => onNavigate('queries')}><span className="admin-avatar">{enquiry.name.charAt(0).toUpperCase()}</span><div><strong>{enquiry.name}</strong><p>{enquiry.message}</p></div><div><small>{new Date(enquiry.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</small><span className={`admin-badge ${enquiry.status === 'resolved' ? 'green' : 'purple'}`}>{enquiry.status === 'new' ? 'New' : enquiry.status === 'resolved' ? 'Resolved' : 'In progress'}</span></div></button>) : <div className="admin-empty"><MessageCircle size={26}/><strong>{queriesLoading ? 'Loading enquiries…' : 'No enquiries yet'}</strong><p>Customer messages will appear here.</p></div>}</section>
+      <section className="admin-farm-note"><Leaf size={24}/><h3>Good food. Thoughtfully managed.</h3><p>{config.categories.length} categories connecting your farm to their family.</p><button onClick={() => onNavigate('categories')}>Explore categories <ArrowRight size={14}/></button></section>
+    </div></div>
+  </div>;
+}

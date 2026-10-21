@@ -47,7 +47,7 @@ export const SectionOrderingHub: React.FC<{ onNavigateToSection: (id: string) =>
       { id: 'brandMarquee', name: 'Trusted Brands Marquee', enabled: false, order: 2 },
       { id: 'featureStrip', name: 'Top 5 Feature Strip', enabled: false, order: 3 },
       { id: 'categorySection', name: 'Shop by Category', enabled: false, order: 4 },
-      { id: 'popularProducts', name: 'Popular Today ⚡', enabled: true, order: 5 },
+      { id: 'popularProducts', name: 'Popular Today', enabled: true, order: 5 },
       { id: 'socialBlog', name: 'Instagram & Blog Videos', enabled: false, order: 6 },
       { id: 'epicDeals', name: 'Epic Deals All Day', enabled: false, order: 7 },
       { id: 'futureArrivals', name: 'Future Arrivals', enabled: false, order: 8 },
@@ -66,7 +66,7 @@ export const SectionOrderingHub: React.FC<{ onNavigateToSection: (id: string) =>
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Sliders className="w-4 h-4" />
@@ -98,7 +98,7 @@ export const SectionOrderingHub: React.FC<{ onNavigateToSection: (id: string) =>
       </div>
 
       {/* Sections List */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-3">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-3">
         <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100">
           <span>Section Sequence</span>
           <span>Controls</span>
@@ -108,7 +108,7 @@ export const SectionOrderingHub: React.FC<{ onNavigateToSection: (id: string) =>
           {sections.map((section, index) => (
             <div
               key={section.id}
-              className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
+              className={`admin-panel flex items-center justify-between p-4 rounded-2xl border transition-all ${
                 section.enabled
                   ? 'bg-white border-slate-200 hover:border-purple-300 shadow-2xs'
                   : 'bg-slate-50 border-slate-200/60 opacity-60'

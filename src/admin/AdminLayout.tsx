@@ -1,27 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Save,
-  Home,
-  Package,
-  Heart,
-  MessageCircle,
-  MapPin,
-  BriefcaseBusiness,
-  Factory,
-  ShoppingCart,
-  Layers,
-  Settings,
-  ExternalLink,
-  LogOut,
-  RefreshCw,
-  X,
-  Menu as MenuIcon,
-} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Bell, ChevronDown, Leaf, BriefcaseBusiness, ExternalLink, Factory, Heart, Home, Image, LayoutDashboard, Layers, LogOut, MapPin, Menu, MessageCircle, Package, Save, Search, Settings, ShoppingCart, Tag, Users, X, CreditCard, Camera } from 'lucide-react';
 import { useAdminConfig } from './context/AdminConfigContext';
-
-// The 7 Dedicated Management Pages
+import { CommerceProvider, useCommerce } from './context/CommerceContext';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { HomePageManager } from './pages/HomePageManager';
+import { ProductManager } from './pages/ProductManager';
 import { ProductsPaymentManager } from './pages/ProductsPaymentManager';
+import { OrderManager } from './pages/OrderManager';
+import { OnlineCustomers } from './pages/OnlineCustomers';
+import { CategoryManager } from './pages/CategoryManager';
+import { OffersManager } from './pages/OffersManager';
+import { HeroManager } from './pages/HeroManager';
+import { SocialBlogManager } from './pages/SocialBlogManager';
 import { AboutFarminixManager } from './pages/AboutFarminixManager';
 import { ManufacturerManager } from './pages/ManufacturerManager';
 import { CartManager } from './pages/CartManager';
@@ -30,253 +20,92 @@ import { SettingsManager } from './pages/SettingsManager';
 import { ReachOutManager } from './pages/ReachOutManager';
 import { QueriesManager } from './pages/QueriesManager';
 import { CareersManager } from './pages/CareersManager';
+import './admin.css';
+import './admin-editors.css';
 
-interface NavSection {
-  title: string;
-  items: { id: string; label: string; icon: React.ReactNode; badge?: string }[];
+export function AdminLayout({ onReturnToStore }: { onReturnToStore: () => void }) {
+  return <CommerceProvider><AdminShell onReturnToStore={onReturnToStore}/></CommerceProvider>;
 }
-
-export const AdminLayout: React.FC<{ onReturnToStore: () => void }> = ({ onReturnToStore }) => {
-  const { adminLogout, resetToDefaults, hasChanges, publishConfig, discardDraft, isSaving, saveError, saveSuccess } = useAdminConfig();
-  const [activePage, setActivePage] = useState<string>('home');
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
+function AdminShell({ onReturnToStore }: { onReturnToStore: () => void }) {
+  const { adminLogout, hasChanges, publishConfig, discardDraft, isSaving, saveError, saveSuccess } = useAdminConfig();
+  const { orders, updatedAt } = useCommerce();
+  const pendingOrders = orders.filter(order => order.status !== 'Delivered').length;
+  const [activePage, setActivePage] = useState('dashboard');
+  const [selectedId, setSelectedId] = useState<string>();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+  const menuRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const go = (page: string, id?: string) => { setActivePage(page); setSelectedId(id); setMobileOpen(false); };
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [activePage]);
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [activePage]);
-
-  const navigationSections: NavSection[] = [
-    {
-      title: 'Store Sections',
-      items: [
-        { id: 'home', label: 'Home Page', icon: <Home className="w-4 h-4" /> },
-        { id: 'products', label: 'Products (Payment to Delivery)', icon: <Package className="w-4 h-4" /> },
-        { id: 'about', label: 'About Farminix', icon: <Heart className="w-4 h-4" /> },
-        { id: 'reach-out', label: 'Reach Out Page', icon: <MapPin className="w-4 h-4" /> },
-        { id: 'queries', label: 'Queries & Compliance', icon: <MessageCircle className="w-4 h-4" /> },
-        { id: 'careers', label: 'Careers Page', icon: <BriefcaseBusiness className="w-4 h-4" /> },
-        { id: 'manufacturer', label: 'Manufacturer', icon: <Factory className="w-4 h-4" /> },
-        { id: 'cart', label: 'Cart', icon: <ShoppingCart className="w-4 h-4" /> },
-        { id: 'footer', label: 'Store Footer', icon: <Layers className="w-4 h-4" /> },
-        { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
-      ],
-    },
+    const handle = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); searchRef.current?.focus(); }
+      if (event.key === 'Escape') { setMobileOpen(false); menuRef.current?.focus(); }
+    };
+    window.addEventListener('keydown', handle); return () => window.removeEventListener('keydown', handle);
+  }, []);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    drawerRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
+    const trap = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      const buttons = drawerRef.current?.querySelectorAll<HTMLButtonElement>('button');
+      if (!buttons?.length) return;
+      const first = buttons[0], last = buttons[buttons.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    window.addEventListener('keydown', trap);
+    return () => { document.body.style.overflow = previous; window.removeEventListener('keydown', trap); };
+  }, [mobileOpen]);
+  const sections = [
+    { label: 'Store Management', items: [
+      { id: 'home', label: 'Home Page', icon: Home }, { id: 'products', label: 'Products', icon: Package },
+      { id: 'categories', label: 'Categories', icon: Layers }, { id: 'offers', label: 'Offers & Banners', icon: Tag },
+      { id: 'orders', label: 'Orders', icon: ShoppingCart }, { id: 'customers', label: 'Customers', icon: Users },
+    ] },
+    { label: 'Content Management', items: [
+      { id: 'about', label: 'About Farminix', icon: Heart }, { id: 'reach-out', label: 'Reach Out Page', icon: MapPin },
+      { id: 'queries', label: 'Queries & Compliance', icon: MessageCircle }, { id: 'careers', label: 'Careers Page', icon: BriefcaseBusiness },
+      { id: 'manufacturer', label: 'Manufacturer', icon: Factory }, { id: 'social', label: 'Blog / Instagram', icon: Camera }, { id: 'footer', label: 'Store Footer', icon: Layers },
+    ] },
+    { label: 'Settings', items: [
+      { id: 'settings', label: 'General Settings', icon: Settings }, { id: 'checkout', label: 'Payments & Delivery', icon: CreditCard },
+      { id: 'cart', label: 'Cart & Coupons', icon: ShoppingCart }, { id: 'hero', label: 'Homepage Banners', icon: Image },
+    ] },
   ];
-
-  const renderCurrentPage = () => {
+  const sidebar = <><div className="admin-brand"><img src="/farminix_logo.png" alt="Farminix — from farms to your family"/><span className="admin-brand-tagline">From farms to your family</span><button aria-label="Close navigation" className="admin-mobile-only" onClick={() => { setMobileOpen(false); menuRef.current?.focus(); }}><X size={22}/></button></div><nav aria-label="Admin navigation"><button className={`admin-nav-item ${activePage === 'dashboard' ? 'active' : ''}`} aria-current={activePage === 'dashboard' ? 'page' : undefined} onClick={() => go('dashboard')}><LayoutDashboard size={19}/>Dashboard</button>{sections.map(section => <div className="admin-nav-section" key={section.label}><p>{section.label}</p>{section.items.map(item => <button className={`admin-nav-item ${activePage === item.id || (item.id === 'products' && activePage === 'add-product') ? 'active' : ''}`} aria-current={activePage === item.id ? 'page' : undefined} key={item.id} onClick={() => go(item.id)}><item.icon size={18}/>{item.label}</button>)}</div>)}</nav><div className="admin-sidebar-bottom"><span><LeafMark/> From farms to your family</span><button onClick={adminLogout}><LogOut size={18}/> Logout</button></div></>;
+  const content = () => {
     switch (activePage) {
-      case 'home':
-        return <HomePageManager />;
-      case 'products':
-        return <ProductsPaymentManager />;
-      case 'about':
-        return <AboutFarminixManager />;
-      case 'reach-out':
-        return <ReachOutManager />;
-      case 'queries':
-        return <QueriesManager />;
-      case 'careers':
-        return <CareersManager />;
-      case 'manufacturer':
-        return <ManufacturerManager />;
-      case 'cart':
-        return <CartManager />;
-      case 'footer':
-        return <FooterManager />;
-      case 'settings':
-        return <SettingsManager />;
-      default:
-        return <HomePageManager />;
+      case 'dashboard': return <AdminDashboard onNavigate={go} search={search}/>;
+      case 'home': return <HomePageManager/>;
+      case 'products': case 'add-product': return <ProductManager key={`${activePage}-${selectedId || ''}`} initialProductId={selectedId} startAdding={activePage === 'add-product'}/>;
+      case 'orders': return <OrderManager initialOrderId={selectedId} search={search}/>;
+      case 'customers': return <OnlineCustomers search={search}/>;
+      case 'categories': return <CategoryManager/>;
+      case 'offers': return <OffersManager/>;
+      case 'hero': return <HeroManager/>;
+      case 'social': return <SocialBlogManager/>;
+      case 'about': return <AboutFarminixManager/>;
+      case 'reach-out': return <ReachOutManager/>;
+      case 'queries': return <QueriesManager/>;
+      case 'careers': return <CareersManager/>;
+      case 'manufacturer': return <ManufacturerManager/>;
+      case 'cart': return <CartManager/>;
+      case 'footer': return <FooterManager/>;
+      case 'checkout': return <ProductsPaymentManager initialTab="checkout"/>;
+      default: return <SettingsManager/>;
     }
   };
-
-  const renderSidebarContent = () => (
-    <div className="flex flex-col h-full bg-white text-slate-800 border-r border-purple-100">
-      {/* Admin Header / Logo */}
-      <div className="p-5 border-b border-purple-50 flex items-center justify-between shrink-0 bg-white">
-        <div className="flex items-center gap-3">
-          <img src="/farminix_logo.png" alt="Farminix" className="h-8 w-auto object-contain" />
-          <div>
-            <div className="text-xs font-black text-purple-950 tracking-wide">FARMINIX CRM</div>
-            <div className="text-[10px] text-purple-600 font-bold uppercase tracking-wider">Control Panel</div>
-          </div>
-        </div>
-        <button
-          onClick={() => setMobileSidebarOpen(false)}
-          className="lg:hidden p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg cursor-pointer transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Nav List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 text-left">
-        {navigationSections.map((sec) => (
-          <div key={sec.title} className="space-y-1">
-            <div className="text-[10px] uppercase font-bold text-purple-400 tracking-wider px-3 mb-1">
-              {sec.title}
-            </div>
-            {sec.items.map((item) => {
-              const isActive = activePage === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActivePage(item.id);
-                    setMobileSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
-                      : 'text-slate-600 hover:text-purple-700 hover:bg-purple-50/50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-extrabold border ${
-                      isActive 
-                        ? 'bg-white/20 text-white border-white/30' 
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-
-      {/* User Profile & Actions Footer */}
-      <div className="p-4 border-t border-purple-50 bg-purple-50/10 shrink-0">
-        <div className="flex items-center justify-between px-2 py-1">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-purple-600 text-white text-xs font-black flex items-center justify-center">
-              A
-            </div>
-            <div className="text-left">
-              <div className="text-xs font-bold text-slate-800 leading-none">Admin Storekeeper</div>
-              <div className="text-[10px] text-slate-500 mt-0.5 font-medium">admin@farminix.com</div>
-            </div>
-          </div>
-          <button
-            onClick={adminLogout}
-            className="text-slate-500 hover:text-red-650 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
-            title="Logout"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen w-full bg-slate-100 flex font-sans select-none antialiased text-slate-900 overflow-x-hidden">
-      {/* ── Desktop Fixed Sidebar ── */}
-      <aside className="hidden lg:flex w-72 bg-white text-slate-700 flex-col justify-between shrink-0 border-r border-purple-100 h-screen sticky top-0 overflow-hidden">
-        {renderSidebarContent()}
-      </aside>
-
-      {/* ── Mobile Sidebar Drawer & Backdrop ── */}
-      {mobileSidebarOpen && (
-        <div
-          onClick={() => setMobileSidebarOpen(false)}
-          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
-        />
-      )}
-      <aside
-        className={`lg:hidden fixed top-0 bottom-0 left-0 z-50 w-72 bg-white text-slate-700 flex flex-col justify-between border-r border-purple-100 transition-transform duration-300 ease-in-out ${
-          mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        {renderSidebarContent()}
-      </aside>
-
-      {/* ── Main Content Area ── */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-100 min-h-screen">
-        {/* ── Top Publish Notice Banner ── */}
-        {hasChanges && (
-          <div className="bg-amber-500 text-slate-950 text-xs font-bold px-6 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs shrink-0 select-none border-b border-amber-600/30 animate-in slide-in-from-top duration-300">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-650 animate-ping shrink-0" />
-              <span>You have pending draft customizations! Publish them to update the public storefront in real-time.</span>
-            </div>
-            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-              <button
-                onClick={discardDraft}
-                className="px-3 py-1 bg-amber-600/15 hover:bg-amber-600/30 border border-amber-600/35 text-slate-950 rounded-xl transition-colors cursor-pointer text-[11px] font-extrabold"
-              >
-                Discard Draft
-              </button>
-              <button
-                onClick={() => void publishConfig()}
-                disabled={isSaving}
-                className="px-4 py-1 bg-slate-950 hover:bg-slate-900 text-white rounded-xl transition-colors cursor-pointer text-[11px] font-black shadow-sm"
-              >
-                {isSaving ? 'Publishing…' : 'Publish Changes'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Top Floating App Bar */}
-        <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-6 flex items-center justify-between shrink-0 shadow-2xs">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-              className="lg:hidden p-2 -ml-2 rounded-xl text-slate-600 hover:bg-slate-100 cursor-pointer"
-            >
-              <MenuIcon className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span className="text-[10px] sm:text-xs font-extrabold text-slate-700 uppercase tracking-wider">
-                {isSaving ? 'Publishing changes…' : hasChanges ? 'Unpublished changes' : 'Store administration'}
-              </span>
-            </div>
-          </div>
-
-          {/* Save is available on every management page. */}
-          <div className="flex items-center gap-3">
-            <button onClick={() => void publishConfig()} disabled={isSaving}
-              className="px-4 py-2 bg-purple-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 disabled:opacity-50">
-              <Save className="w-4 h-4" />{isSaving ? 'Saving…' : 'Save Changes'}
-            </button>
-            <button
-              onClick={onReturnToStore}
-              className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">View Public Storefront</span>
-              <span className="sm:hidden">Store</span>
-            </button>
-
-            <button
-              onClick={() => {
-                if (confirm('Reset all site customizations to original production defaults?')) {
-                  resetToDefaults();
-                }
-              }}
-              className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
-              title="Reset System Config"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
-          </div>
-        </header>
-
-        {/* Page Body */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-          {saveError && <div role="alert" className="mb-4 p-4 rounded-xl bg-red-50 text-red-700">{saveError}</div>}
-          {saveSuccess && <div role="status" className="mb-4 p-4 rounded-xl bg-emerald-50 text-emerald-800">Changes saved to the live store. Other devices will receive the update within 15 seconds or on refresh.</div>}
-          {renderCurrentPage()}
-        </main>
-      </div>
-    </div>
-  );
-};
+  return <div className="admin-shell"><aside className="admin-sidebar admin-desktop-sidebar">{sidebar}</aside>{mobileOpen && <><div className="admin-backdrop" onClick={() => setMobileOpen(false)}/><aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="Store navigation" className="admin-sidebar admin-drawer">{sidebar}</aside></>}
+    <div className="admin-workspace"><header className="admin-topbar"><button ref={menuRef} className="admin-mobile-only" aria-label="Open navigation" onClick={() => setMobileOpen(true)}><Menu size={23}/></button><label className="admin-search admin-global-search"><Search size={19}/><input ref={searchRef} aria-label="Search products, orders and customers" placeholder="Search products, orders, customers…" value={search} onChange={e => { setSearch(e.target.value); if (!['dashboard', 'orders', 'customers'].includes(activePage)) go('dashboard'); }}/>{search ? <button aria-label="Clear search" onClick={() => setSearch('')}><X size={15}/></button> : <kbd>Ctrl + K</kbd>}</label><div className="admin-topbar-actions"><button className="admin-view-store" onClick={onReturnToStore}>View Store <ExternalLink size={15}/></button><button className="admin-save" title="Save changes to the live store" aria-label="Save changes to the live store" onClick={() => void publishConfig()} disabled={isSaving || !hasChanges}><Save size={16}/><span>{isSaving ? 'Saving…' : 'Save Changes'}</span></button><button className="admin-notifications" title="View orders awaiting delivery" aria-label="View orders awaiting delivery" onClick={() => go('orders')}><Bell size={19}/>{updatedAt && pendingOrders > 0 && <span>{pendingOrders > 99 ? '99+' : pendingOrders}</span>}</button><button className="admin-profile" title="Open store settings" onClick={() => go('settings')}><span className="admin-avatar">A</span><div><strong>Farminix Admin</strong><small>Store administrator</small></div><ChevronDown size={15}/></button></div></header>
+      {hasChanges && <div className="admin-draft-notice"><span>You have unpublished changes to your store.</span><button onClick={discardDraft} disabled={isSaving}>Discard draft</button></div>}
+      <main className="admin-main">{saveError && <div role="alert" className="admin-alert">{saveError}</div>}{saveSuccess && <div role="status" className="admin-success">Changes saved to the live store.</div>}<div className={activePage === 'dashboard' ? 'admin-dashboard-view' : 'admin-editor'}>{content()}</div></main>
+      <footer className="admin-page-footer"><span>© {new Date().getFullYear()} Farminix</span><span>Grown with care. Managed with purpose.</span></footer>
+    </div></div>;
+}
+function LeafMark() { return <Leaf size={14}/>; }

@@ -54,7 +54,7 @@ export const HomePageManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left pb-16">
       {/* ── TOP BANNER ── */}
-      <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-purple-800/40">
+      <div className="admin-page-heading bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-purple-800/40">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-purple-200 text-xs font-bold uppercase tracking-wider mb-3">
@@ -82,7 +82,7 @@ export const HomePageManager: React.FC = () => {
       </div>
 
       {/* ── SUB-TABS NAVIGATION ── */}
-      <div className="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200 shadow-2xs">
+      <div className="admin-panel admin-tabs flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200 shadow-2xs">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (

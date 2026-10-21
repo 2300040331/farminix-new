@@ -70,7 +70,7 @@ export const NavbarManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Menu className="w-4 h-4" />
@@ -93,7 +93,7 @@ export const NavbarManager: React.FC = () => {
       </div>
 
       {/* Add New Nav Item Card */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           Add Navigation Menu Item
         </h2>
@@ -144,7 +144,7 @@ export const NavbarManager: React.FC = () => {
       </div>
 
       {/* Nav Items List */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-3">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-3">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           Existing Navigation Items ({navItems.length})
         </h2>
@@ -153,7 +153,7 @@ export const NavbarManager: React.FC = () => {
           {navItems.map((item, idx) => (
             <div
               key={item.id}
-              className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${
+              className={`admin-panel flex items-center justify-between p-3 rounded-2xl border transition-all ${
                 item.enabled ? 'bg-white border-slate-200 shadow-2xs' : 'bg-slate-50 border-slate-200/50 opacity-60'
               }`}
             >

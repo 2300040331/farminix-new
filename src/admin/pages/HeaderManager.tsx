@@ -1,3 +1,4 @@
+import { AdminSymbol } from '../components/AdminSymbol';
 import React, { useState, useEffect } from 'react';
 import { Check, Compass } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
@@ -33,7 +34,7 @@ export const HeaderManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Compass className="w-4 h-4" />
@@ -62,7 +63,7 @@ export const HeaderManager: React.FC = () => {
       <div className="bg-purple-50/80 border border-purple-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
         <div className="space-y-1">
           <div className="font-black text-purple-900 flex items-center gap-1.5 flex-wrap">
-            <span>📐 Recommended Header Logo Dimensions:</span>
+            <span><AdminSymbol name="ruler"/> Recommended Header Logo Dimensions:</span>
             <span className="bg-purple-200 text-purple-950 px-2.5 py-0.5 rounded-md font-black">
               300 × 80 px
             </span>
@@ -81,12 +82,12 @@ export const HeaderManager: React.FC = () => {
       {savedSuccess && (
         <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200 shadow-2xs">
           <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>✓ Main Header Changes Saved &amp; Live on the Main Storefront!</span>
+          <span>Main Header Changes Saved &amp; Live on the Main Storefront!</span>
         </div>
       )}
 
       {/* Brand Logo & Header Buttons Configuration */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-5">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-5">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           Brand Logo &amp; Button Text
         </h2>

@@ -500,6 +500,7 @@ export interface CustomerEnquiry {
 }
 
 export interface AdminSiteConfig {
+  inventoryRevision?: number;
   theme: ThemeTokens;
   sectionOrder: SectionOrderItem[];
   topOfferBar: TopOfferBarConfig;

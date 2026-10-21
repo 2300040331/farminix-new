@@ -41,7 +41,7 @@ export const SocialBlogManager: React.FC = () => {
 
   return (
     <div className="space-y-6 text-left pb-16">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1"><Camera className="w-4 h-4" />Social publishing</div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900">Instagram &amp; Blog Videos</h1>
@@ -52,7 +52,7 @@ export const SocialBlogManager: React.FC = () => {
 
       {saved && <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold">Published to the live homepage.</div>}
 
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer"><input type="checkbox" checked={formData.enabled} onChange={(e) => update({ ...formData, enabled: e.target.checked })} className="accent-purple-600" />Show this section when it has published entries</label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <label className="text-xs font-bold text-slate-700">Section title<input value={formData.title} onChange={(e) => update({ ...formData, title: e.target.value })} className="w-full mt-1 h-10 px-3 text-xs font-normal bg-slate-50 border border-slate-200 rounded-xl" /></label>
@@ -62,7 +62,7 @@ export const SocialBlogManager: React.FC = () => {
 
       <div className="space-y-4">
         {formData.entries.map((entry, index) => (
-          <div key={entry.id} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+          <div key={entry.id} className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm font-black text-slate-900">Video {index + 1}</div>
               <div className="flex items-center gap-1">
@@ -81,7 +81,7 @@ export const SocialBlogManager: React.FC = () => {
             {entry.mediaUrl && <a href={entry.mediaUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600"><ExternalLink className="w-3.5 h-3.5" />Open media URL</a>}
           </div>
         ))}
-        {formData.entries.length === 0 && <div className="bg-white p-10 rounded-3xl border border-dashed border-slate-300 text-center text-sm text-slate-500">No Instagram or video posts have been added. Add a real post to show it below Popular Today.</div>}
+        {formData.entries.length === 0 && <div className="admin-panel bg-white p-10 rounded-3xl border border-dashed border-slate-300 text-center text-sm text-slate-500">No Instagram or video posts have been added. Add a real post to show it below Popular Today.</div>}
         <button type="button" onClick={addEntry} className="w-full py-3 rounded-2xl border border-purple-200 bg-purple-50 text-purple-700 text-xs font-black flex items-center justify-center gap-2 cursor-pointer hover:bg-purple-100"><Plus className="w-4 h-4" />Add Instagram/video post</button>
       </div>
     </div>

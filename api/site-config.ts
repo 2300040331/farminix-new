@@ -47,13 +47,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { razorpayKeySecret: _secret, ...payment } = config.checkoutPayment || {};
       config = { ...config, orders: [], users: [], checkoutPayment: payment };
     }
-    const command = req.method === 'GET' ? ['GET', KEY] : ['SET', KEY, JSON.stringify(config)];
+    const command = req.method === 'GET' ? ['GET', KEY] : ['EVAL', "local raw=redis.call('GET',KEYS[1]); if raw then local current=cjson.decode(raw); if (current.inventoryRevision or 0)~=tonumber(ARGV[2]) then return 'CONFLICT' end end; redis.call('SET',KEYS[1],ARGV[1]); return 'OK'", 1, KEY, JSON.stringify(config), Number(config.inventoryRevision) || 0];
     const result = await fetch(url, {
       method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(command), signal: AbortSignal.timeout(15000),
     });
     const data = await result.json();
     if (!result.ok || data.error) throw new Error('Storage request failed');
+    if (data.result === 'CONFLICT') return res.status(409).json({ error: 'Online orders changed the stock while you were editing. Discard this draft to load current stock, then reapply your changes.' });
     return res.status(200).json({ config: req.method === 'GET' ? (data.result ? JSON.parse(data.result) : null) : config });
   } catch {
     return res.status(502).json({ error: 'Unable to reach shared storage. Your changes have not been published; please retry.' });

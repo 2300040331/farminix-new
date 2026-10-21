@@ -126,7 +126,7 @@ export const ThemeManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Palette className="w-4 h-4" />
@@ -158,7 +158,7 @@ export const ThemeManager: React.FC = () => {
       </div>
 
       {/* Preset Palettes */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-amber-500" />
           <h2 className="text-sm font-bold text-slate-900">Curated Farminix Theme Presets</h2>
@@ -201,7 +201,7 @@ export const ThemeManager: React.FC = () => {
       </div>
 
       {/* Brand & Core Global Colors */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           1. Brand &amp; Accent Colors
         </h2>
@@ -214,7 +214,7 @@ export const ThemeManager: React.FC = () => {
       </div>
 
       {/* Header & Navigation Colors */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           2. Header &amp; Navigation Bar
         </h2>
@@ -229,7 +229,7 @@ export const ThemeManager: React.FC = () => {
       </div>
 
       {/* Buttons & Cards */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           3. Buttons &amp; Product Cards
         </h2>
@@ -242,7 +242,7 @@ export const ThemeManager: React.FC = () => {
       </div>
 
       {/* Epic Deals Section & Footer */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           4. Deals Banner &amp; Footer Styling
         </h2>

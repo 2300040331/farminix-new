@@ -1,0 +1,7 @@
+# Admin dashboard artwork
+
+The premium admin uses `public/admin/farm-sunrise.jpg` as its dedicated welcome and sidebar background. This is separate from the storefront hero configuration. The original was generated with the built-in imagegen tool and saved to `public/admin/farm-sunrise.png`; the dashboard uses the optimized JPEG (approximately 309 KB). Brand typography is styled in CSS from the existing Farminix logo. No stock or order data is baked into the artwork.
+
+Final generation prompt:
+
+> Use case: photorealistic-natural. Asset type: panoramic background photograph for a premium Farminix farm-to-family store admin dashboard. Create a beautiful quiet rice farm in Andhra Pradesh, India, during soft golden sunrise, emerald paddy rows in the foreground, a graceful line of coconut palms in the middle distance, warm pale golden sky and distant atmospheric hills. Photoreal editorial landscape photography, rich natural greens and restrained warm gold, polished but believable, no heavy HDR. Wide panoramic composition about 3:1; the left half should be pale atmospheric open mist and low-contrast greenery with room for dark dashboard title text added separately in code; the richer green fields and sunlit palm silhouettes should occupy the right half. A small back-facing farmer in a simple off-white shirt and traditional head cloth at the far right edge surveying the fields, subtle and dignified, not prominent. No text, no letters, no logo, no product bags, no UI, no watermarks. Output one wide image.

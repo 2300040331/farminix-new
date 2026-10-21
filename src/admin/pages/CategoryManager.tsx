@@ -1,3 +1,4 @@
+import { AdminSymbol } from '../components/AdminSymbol';
 import React, { useState } from 'react';
 import { Grid, Plus, Trash2, Check, Eye, EyeOff, Layers } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
@@ -77,7 +78,7 @@ export const CategoryManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Grid className="w-4 h-4" />
@@ -118,7 +119,7 @@ export const CategoryManager: React.FC = () => {
       <div className="bg-purple-50/80 border border-purple-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
         <div className="space-y-1">
           <div className="font-black text-purple-900 flex items-center gap-1.5 flex-wrap">
-            <span>📐 Recommended Category Image Dimensions:</span>
+            <span><AdminSymbol name="ruler"/> Recommended Category Image Dimensions:</span>
             <span className="bg-purple-200 text-purple-950 px-2.5 py-0.5 rounded-md font-black">
               500 × 500 px
             </span>
@@ -137,12 +138,12 @@ export const CategoryManager: React.FC = () => {
       {savedSuccess && (
         <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200 shadow-2xs">
           <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>✓ All Category Changes Saved &amp; Live on the Main Storefront!</span>
+          <span>All Category Changes Saved &amp; Live on the Main Storefront!</span>
         </div>
       )}
 
       {/* Section 1: Title Configuration */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
           <Layers className="w-4 h-4 text-purple-600" />
           <span>1. Section Header Copy</span>
@@ -175,14 +176,14 @@ export const CategoryManager: React.FC = () => {
       </div>
 
       {/* Section 2: Add New Category Form */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
             <Plus className="w-4 h-4 text-purple-600" />
             <span>2. Add New Category</span>
           </h2>
           <span className="text-[11px] font-bold text-purple-600 bg-purple-50 px-2.5 py-1 rounded-lg">
-            📐 Fit Size: 500 × 500 px
+            <AdminSymbol name="ruler"/> Fit Size: 500 × 500 px
           </span>
         </div>
 
@@ -233,7 +234,7 @@ export const CategoryManager: React.FC = () => {
       </div>
 
       {/* Section 3: Existing Categories List with Add, Delete, Hide/Show, and Edit */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
             <h2 className="text-sm font-bold text-slate-900">
@@ -255,7 +256,7 @@ export const CategoryManager: React.FC = () => {
             return (
               <div
                 key={cat.id}
-                className={`p-4 rounded-2xl border bg-white shadow-2xs space-y-3 flex flex-col justify-between transition-all ${
+                className={`admin-panel p-4 rounded-2xl border bg-white shadow-2xs space-y-3 flex flex-col justify-between transition-all ${
                   isEnabled
                     ? 'border-slate-200 opacity-100 ring-1 ring-slate-100'
                     : 'border-amber-200 bg-amber-50/20 opacity-70'

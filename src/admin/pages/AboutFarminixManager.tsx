@@ -1,3 +1,4 @@
+import { AdminSymbol } from '../components/AdminSymbol';
 import React, { useState } from 'react';
 import {
   Heart,
@@ -59,7 +60,7 @@ export const AboutFarminixManager: React.FC = () => {
   return (
     <div className="space-y-8 text-left pb-16">
       {/* ── TOP HEADER & SAVE BAR ── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-8 h-8 rounded-xl bg-purple-100 text-[#7C3AED] flex items-center justify-center font-bold">
@@ -112,7 +113,7 @@ export const AboutFarminixManager: React.FC = () => {
       )}
 
       {/* ── 1. MAIN HEADLINE & QUALITY BADGES ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <Leaf className="w-4 h-4 text-emerald-600" />
           <span>Main Headline &amp; Slogan</span>
@@ -177,7 +178,7 @@ export const AboutFarminixManager: React.FC = () => {
       </div>
 
       {/* ── 2. FOUNDER'S REFLECTION LETTER ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <Quote className="w-4 h-4 text-amber-600" />
           <span>Founder's Reflection &amp; Authentic Letter</span>
@@ -247,10 +248,10 @@ export const AboutFarminixManager: React.FC = () => {
       </div>
 
       {/* ── 3. FROM SOIL TO DINING TABLE (4 STEPS) ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <div>
           <h2 className="text-base font-black text-slate-900">
-            🌾 From Soil to Dining Table (4 Process Steps)
+            <AdminSymbol name="wheat"/> From Soil to Dining Table (4 Process Steps)
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             The farm-to-table journey explaining how Farminix eliminates middlemen and godowns.
@@ -286,10 +287,10 @@ export const AboutFarminixManager: React.FC = () => {
       </div>
 
       {/* ── 4. OPERATING PHILOSOPHY (4 PILLARS) ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <div>
           <h2 className="text-base font-black text-slate-900">
-            🛡️ Our Operating Philosophy (4 Pillars)
+            <AdminSymbol name="shield"/> Our Operating Philosophy (4 Pillars)
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             Dignity, Health, Durable Packaging, and Direct-to-Home pricing.
@@ -335,9 +336,9 @@ export const AboutFarminixManager: React.FC = () => {
       </div>
 
       {/* ── 5. CONTACT & HELPLINE ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-base font-black text-slate-900">
-          📞 Customer Support &amp; Origin
+          <AdminSymbol name="phone"/> Customer Support &amp; Origin
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

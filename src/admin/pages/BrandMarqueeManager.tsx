@@ -56,7 +56,7 @@ export const BrandMarqueeManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Award className="w-4 h-4" />
@@ -92,7 +92,7 @@ export const BrandMarqueeManager: React.FC = () => {
       </div>
 
       {/* Section Headings */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           1. Section Titles &amp; Copy
         </h2>
@@ -131,7 +131,7 @@ export const BrandMarqueeManager: React.FC = () => {
       </div>
 
       {/* Add New Brand */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           2. Add Partner Brand Logo
         </h2>
@@ -167,7 +167,7 @@ export const BrandMarqueeManager: React.FC = () => {
       </div>
 
       {/* Existing Brands Grid */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           3. Existing Brands in Marquee ({(formData.brands || []).length})
         </h2>
@@ -176,7 +176,7 @@ export const BrandMarqueeManager: React.FC = () => {
           {(formData.brands || []).map((brand) => (
             <div
               key={brand.id}
-              className={`p-4 rounded-2xl border flex flex-col justify-between gap-3 transition-all ${
+              className={`admin-panel p-4 rounded-2xl border flex flex-col justify-between gap-3 transition-all ${
                 brand.enabled ? 'bg-white border-slate-200 shadow-2xs' : 'bg-slate-50 border-slate-250 opacity-60'
               }`}
             >

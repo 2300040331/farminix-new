@@ -38,11 +38,16 @@ test('admin publishing requires a server session and stores only confirmed chang
     });
     await t.test('publishes to shared storage and strips private data',async () => {
       let stored;
-      globalThis.fetch = async (_url,opts) => { stored=JSON.parse(JSON.parse(opts.body)[2]);return {ok:true,json:async()=>({result:'OK'})}; };
+      globalThis.fetch = async (_url,opts) => { const command=JSON.parse(opts.body); assert.equal(command[0],'EVAL'); stored=JSON.parse(command[4]);return {ok:true,json:async()=>({result:'OK'})}; };
       const config={products:[],theme:{},orders:[{id:'private'}],users:[{id:'private'}],checkoutPayment:{razorpayKeySecret:'private',razorpayKeyId:'public'}};
       const res=response(); await handler({method:'PUT',cookies:{farminix_admin:cookie},body:{config}},res);
       assert.equal(res.statusCode,200);assert.deepEqual(stored.orders,[]);assert.deepEqual(stored.users,[]);assert.equal(stored.checkoutPayment.razorpayKeySecret,undefined);
       assert.deepEqual(res.body.config,stored);
+    });
+    await t.test('stale catalog drafts cannot overwrite stock reduced by online orders', async () => {
+      globalThis.fetch = async () => ({ok:true,json:async()=>({result:'CONFLICT'})});
+      const res=response(); await handler({method:'PUT',cookies:{farminix_admin:cookie},body:{config:{products:[],theme:{},inventoryRevision:0}}},res);
+      assert.equal(res.statusCode,409); assert.equal(res.body.config,undefined);
     });
     await t.test('storage failure cannot report successful publication',async () => {
       globalThis.fetch=async()=>{throw Error('offline');};

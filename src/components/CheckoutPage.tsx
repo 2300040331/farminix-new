@@ -10,6 +10,15 @@ import { defaultCheckoutPaymentConfig, defaultCartConfig } from '../admin/defaul
 import { detectUserLocation, lookupPincode } from '../utils/location';
 import { loadRazorpayScript, fetchRazorpayKey, createServerOrder, verifyServerPayment } from '../utils/razorpay';
 import type { UserAddress, Order } from '../types';
+import type { CartItem } from '../types';
+
+interface PendingPayment {
+  address: UserAddress;
+  items: CartItem[];
+  total: number;
+  couponCode: string | null;
+  response: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string };
+}
 
 export const CheckoutPage: React.FC = () => {
   const {
@@ -63,13 +72,16 @@ export const CheckoutPage: React.FC = () => {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
   const [razorpayPaymentId, setRazorpayPaymentId] = useState<string | null>(null);
+  const [pendingPayment, setPendingPayment] = useState<PendingPayment | null>(() => {
+    try { return JSON.parse(sessionStorage.getItem('farminix_pending_payment') || 'null'); } catch { return null; }
+  });
 
   // If cart is empty and no order was placed in this session, redirect back to Home immediately
   useEffect(() => {
-    if (cart.length === 0 && !placedOrder) {
+    if (cart.length === 0 && !placedOrder && !pendingPayment) {
       navigate('/', undefined, { replace: true });
     }
-  }, [cart.length, placedOrder]);
+  }, [cart.length, placedOrder, pendingPayment, navigate]);
 
   // Address Modal / Form state
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
@@ -219,18 +231,29 @@ export const CheckoutPage: React.FC = () => {
 
   // Place Order Handler with Razorpay Integration
   const handlePlaceOrder = async () => {
-    if (!selectedAddress) {
+    if (!selectedAddress && !pendingPayment) {
       openAddAddressModal();
       return;
     }
     setPaymentError(null);
     setIsProcessing(true);
 
+    // Retry the already paid order without opening another payment checkout.
+    if (pendingPayment) {
+      try {
+        const order = await createOrder(pendingPayment.address, 'Razorpay', pendingPayment.items, pendingPayment.total, { ...pendingPayment.response, couponCode: pendingPayment.couponCode });
+        setPlacedOrder(order); setPendingPayment(null); sessionStorage.removeItem('farminix_pending_payment');
+      } catch (error) {
+        setPaymentError(`${error instanceof Error ? error.message : 'Unable to confirm the order.'} Payment reference: ${pendingPayment.response.razorpay_payment_id}. Contact support if retry fails.`);
+      } finally { setIsProcessing(false); }
+      return;
+    }
+    if (!selectedAddress) { setIsProcessing(false); return; }
+
     // If COD, place order immediately
     if (paymentMethod === 'COD') {
-      setTimeout(() => {
-        const newOrd = createOrder(selectedAddress, 'Cash on Delivery (COD)', [...cart], grandTotal);
-        setIsProcessing(false);
+      try {
+        const newOrd = await createOrder(selectedAddress, 'Cash on Delivery (COD)', [...cart], grandTotal);
         setPlacedOrder(newOrd);
 
         try {
@@ -241,7 +264,9 @@ export const CheckoutPage: React.FC = () => {
             origin: { y: 0.5 },
           });
         } catch {}
-      }, 800);
+      } catch (error) {
+        setPaymentError(error instanceof Error ? error.message : 'Unable to confirm your order. Please retry.');
+      } finally { setIsProcessing(false); }
       return;
     }
 
@@ -284,20 +309,26 @@ export const CheckoutPage: React.FC = () => {
         image: publishedConfig.header?.logoUrl || '/farminix_logo.png',
         order_id: serverOrder?.orderId,
         handler: async (response: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string }) => {
-          setIsProcessing(false);
+          setIsProcessing(true);
           setRazorpayPaymentId(response.razorpay_payment_id);
-
+          const pending = { address: selectedAddress, items: [...cart], total: grandTotal, couponCode: appliedCoupon, response };
+          setPendingPayment(pending);
+          try { sessionStorage.setItem('farminix_pending_payment', JSON.stringify(pending)); } catch {}
+          try {
           // Verify signature on backend
           await verifyServerPayment(response);
 
           const methodLabel = paymentMethod === 'RAZORPAY' ? 'Razorpay' : `Razorpay (${paymentMethod})`;
-          const newOrd = createOrder(
+          const newOrd = await createOrder(
             selectedAddress,
             `${methodLabel} • Paid (ID: ${response.razorpay_payment_id})`,
             [...cart],
-            grandTotal
+            grandTotal,
+            { ...response, couponCode: appliedCoupon }
           );
           setPlacedOrder(newOrd);
+          setPendingPayment(null);
+          try { sessionStorage.removeItem('farminix_pending_payment'); } catch {}
 
           try {
             window.history.replaceState(null, '', '/');
@@ -307,6 +338,9 @@ export const CheckoutPage: React.FC = () => {
               origin: { y: 0.5 },
             });
           } catch {}
+          } catch (error) {
+            setPaymentError(`${error instanceof Error ? error.message : 'Unable to save your order.'} Payment reference: ${response.razorpay_payment_id}. Keep this reference and contact support if retry fails.`);
+          } finally { setIsProcessing(false); }
         },
         prefill: {
           name: selectedAddress.name || user?.name || '',
@@ -406,6 +440,10 @@ export const CheckoutPage: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  if (pendingPayment) {
+    return <div className="max-w-xl mx-auto my-12 rounded-3xl border border-purple-100 bg-white p-8 text-center space-y-5"><ShieldCheck className="mx-auto text-purple-600" size={40}/><h1 className="font-bold text-2xl">Confirm your paid order</h1><p className="text-slate-600 text-sm">Your payment reference is <strong className="break-all">{pendingPayment.response.razorpay_payment_id}</strong>. Retry order confirmation using this payment.</p>{paymentError && <p role="alert" className="text-red-700 text-sm">{paymentError}</p>}<button disabled={isProcessing} onClick={() => void handlePlaceOrder()} className="bg-purple-600 text-white px-6 py-3 rounded-xl disabled:opacity-50">{isProcessing ? 'Confirming order…' : 'Retry order confirmation'}</button><p className="text-xs text-slate-500">If confirmation continues to fail, contact Farminix support with this payment reference.</p></div>;
   }
 
   if (cart.length === 0) {

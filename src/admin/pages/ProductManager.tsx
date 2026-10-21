@@ -1,3 +1,4 @@
+import { AdminSymbol } from '../components/AdminSymbol';
 import React, { useState, useMemo } from 'react';
 import {
   Package,
@@ -13,12 +14,12 @@ import { useAdminConfig } from '../context/AdminConfigContext';
 import { ProductContentEditor } from '../components/ProductContentEditor';
 import type { Product } from '../../types';
 
-export const ProductManager: React.FC = () => {
+export const ProductManager: React.FC<{ initialProductId?: string; startAdding?: boolean }> = ({ initialProductId, startAdding = false }) => {
   const { config, addProduct, editProduct, deleteProduct, publishConfig, isSaving, saveError } = useAdminConfig();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(startAdding || Boolean(initialProductId && config.products.some(p => p.id === initialProductId)));
+  const [editingProductId, setEditingProductId] = useState<string | null>(initialProductId || null);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   // Form State
@@ -32,7 +33,7 @@ export const ProductManager: React.FC = () => {
     badges: [], highlights: [], benefits: [], specifications: [], howToUse: [], storageInstructions: '', faqs: [],
   };
 
-  const [formData, setFormData] = useState<Product>(initialProductState);
+  const [formData, setFormData] = useState<Product>(() => JSON.parse(JSON.stringify(config.products.find(p => p.id === initialProductId) || initialProductState)));
 
   // Filtered products
   const filteredProducts = useMemo(() => {
@@ -97,7 +98,7 @@ export const ProductManager: React.FC = () => {
     <div className="space-y-6 text-left">
       <div className={isModalOpen ? "hidden" : "space-y-6"}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Package className="w-4 h-4" />
@@ -126,7 +127,7 @@ export const ProductManager: React.FC = () => {
       <div className="bg-purple-50/80 border border-purple-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
         <div className="space-y-1">
           <div className="font-black text-purple-900 flex items-center gap-1.5 flex-wrap">
-            <span>📐 Recommended Product Image Dimensions:</span>
+            <span><AdminSymbol name="ruler"/> Recommended Product Image Dimensions:</span>
             <span className="bg-purple-200 text-purple-950 px-2.5 py-0.5 rounded-md font-black">
               800 × 800 px
             </span>
@@ -150,7 +151,7 @@ export const ProductManager: React.FC = () => {
       )}
 
       {/* Filter & Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="admin-panel bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -179,7 +180,7 @@ export const ProductManager: React.FC = () => {
       </div>
 
       {/* Product Catalog Table */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xs overflow-hidden">
+      <div className="admin-panel bg-white rounded-3xl border border-slate-200 shadow-2xs overflow-hidden">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <span className="text-xs font-bold text-slate-500">
             Showing <strong className="text-slate-900">{filteredProducts.length}</strong> items

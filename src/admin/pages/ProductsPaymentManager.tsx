@@ -1,3 +1,4 @@
+import { AdminSymbol } from '../components/AdminSymbol';
 import React, { useState } from 'react';
 import {
   Package,
@@ -16,9 +17,9 @@ import type { CheckoutPaymentConfig } from '../types';
 
 type ProductTab = 'catalog' | 'checkout' | 'orders';
 
-export const ProductsPaymentManager: React.FC = () => {
+export const ProductsPaymentManager: React.FC<{ initialTab?: ProductTab }> = ({ initialTab = 'catalog' }) => {
   const { config, updateCheckoutPayment, publishConfig } = useAdminConfig();
-  const [activeTab, setActiveTab] = useState<ProductTab>('catalog');
+  const [activeTab, setActiveTab] = useState<ProductTab>(initialTab);
 
   const [checkoutData, setCheckoutData] = useState<CheckoutPaymentConfig>(
     config.checkoutPayment || defaultCheckoutPaymentConfig
@@ -52,7 +53,7 @@ export const ProductsPaymentManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left pb-16">
       {/* ── TOP HEADER ── */}
-      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-purple-950 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-emerald-800/40">
+      <div className="admin-page-heading bg-gradient-to-r from-emerald-950 via-slate-900 to-purple-950 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-emerald-800/40">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 rounded-full text-emerald-200 text-xs font-bold uppercase tracking-wider mb-3">
@@ -69,7 +70,7 @@ export const ProductsPaymentManager: React.FC = () => {
       </div>
 
       {/* ── SUB-TABS ── */}
-      <div className="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200 shadow-2xs">
+      <div className="admin-panel admin-tabs flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200 shadow-2xs">
         <button
           onClick={() => setActiveTab('catalog')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
@@ -115,7 +116,7 @@ export const ProductsPaymentManager: React.FC = () => {
           <div className="space-y-6">
             <CouponEditor />
             {/* Header & Save Button */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+            <div className="admin-panel flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
               <div>
                 <h2 className="text-base sm:text-lg font-black text-slate-900">
                   Checkout &amp; Payment Gateway Settings
@@ -144,7 +145,7 @@ export const ProductsPaymentManager: React.FC = () => {
             </div>
 
             {/* Delivery Slots Configuration */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+            <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
               <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#7C3AED]" />
                 <span>Delivery Slots Offered to Customers</span>
@@ -206,7 +207,7 @@ export const ProductsPaymentManager: React.FC = () => {
             </div>
 
             {/* Razorpay Gateway Configuration */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+            <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-7 h-7 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-black">
@@ -289,7 +290,7 @@ export const ProductsPaymentManager: React.FC = () => {
                       onChange={(e) =>
                         setCheckoutData({ ...checkoutData, razorpayThemeColor: e.target.value })
                       }
-                      className="flex-1 p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold focus:border-[#7C3AED] focus:outline-none"
+                      className="admin-tabs flex-1 p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold focus:border-[#7C3AED] focus:outline-none"
                     />
                   </div>
                 </div>
@@ -297,7 +298,7 @@ export const ProductsPaymentManager: React.FC = () => {
             </div>
 
             {/* Payment Gateways Config */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+            <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
               <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-emerald-600" />
                 <span>Payment Gateways &amp; Options</span>
@@ -312,7 +313,7 @@ export const ProductsPaymentManager: React.FC = () => {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{pm.icon}</span>
+                      <span className="text-2xl"><AdminSymbol name={pm.id}/></span>
                       <div>
                         <div className="text-xs font-black text-slate-900">{pm.name}</div>
                         <div className="text-[11px] text-slate-500 font-medium">{pm.subtitle}</div>
@@ -334,9 +335,9 @@ export const ProductsPaymentManager: React.FC = () => {
             </div>
 
             {/* Delivery Instructions Options */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+            <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
               <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                <span>🚪 Delivery Instructions Chips</span>
+                <span><AdminSymbol name="door"/> Delivery Instructions</span>
               </h3>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -351,7 +352,7 @@ export const ProductsPaymentManager: React.FC = () => {
                         : 'bg-slate-50 border-slate-200 text-slate-400 font-medium'
                     }`}
                   >
-                    <span className="text-xl">{inst.icon}</span>
+                    <span className="text-xl"><AdminSymbol name={inst.id}/></span>
                     <span className="text-xs">{inst.label}</span>
                     <span className="text-[9px] uppercase tracking-wider mt-1 font-bold">
                       {inst.enabled ? 'Enabled' : 'Disabled'}

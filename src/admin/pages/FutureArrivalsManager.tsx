@@ -64,7 +64,7 @@ export const FutureArrivalsManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Clock className="w-4 h-4" />
@@ -100,7 +100,7 @@ export const FutureArrivalsManager: React.FC = () => {
       </div>
 
       {/* Copy Settings */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           1. Section Header Copy
         </h2>
@@ -127,7 +127,7 @@ export const FutureArrivalsManager: React.FC = () => {
       </div>
 
       {/* Add New Future Item */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           2. Add Upcoming Item
         </h2>
@@ -174,7 +174,7 @@ export const FutureArrivalsManager: React.FC = () => {
       </div>
 
       {/* Items List */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           3. Upcoming Items in Carousel ({(formData.items || []).length})
         </h2>
@@ -183,7 +183,7 @@ export const FutureArrivalsManager: React.FC = () => {
           {(formData.items || []).map((item) => (
             <div
               key={item.id}
-              className={`p-4 rounded-2xl border flex flex-col justify-between gap-3 transition-all ${
+              className={`admin-panel p-4 rounded-2xl border flex flex-col justify-between gap-3 transition-all ${
                 item.enabled ? 'bg-white border-slate-200 shadow-2xs' : 'bg-slate-50 border-slate-200/50 opacity-60'
               }`}
             >

@@ -159,6 +159,7 @@ export interface Order {
   totalAmount: number;
   discount: number;
   deliveryFee: number;
+  handlingFee?: number;
   finalAmount: number;
   status: 'Order Received' | 'Packed' | 'Shipped' | 'Out for Delivery' | 'Delivered';
   estimatedTime: string;

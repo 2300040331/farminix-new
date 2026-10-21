@@ -1,3 +1,4 @@
+import { AdminSymbol } from '../components/AdminSymbol';
 import React, { useState } from 'react';
 import {
   ShoppingCart,
@@ -99,7 +100,7 @@ export const CartManager: React.FC = () => {
   return (
     <div className="space-y-8 text-left pb-16">
       {/* ── TOP HEADER & SAVE BAR ── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-8 h-8 rounded-xl bg-purple-100 text-[#7C3AED] flex items-center justify-center font-bold">
@@ -140,7 +141,7 @@ export const CartManager: React.FC = () => {
       )}
 
       {/* ── 1. SUPERFAST DELIVERY BANNER ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
           <span>Superfast Delivery Banner in Cart</span>
@@ -172,7 +173,7 @@ export const CartManager: React.FC = () => {
 
         {/* Live Preview */}
         <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3">
-          <span className="text-xl">⚡</span>
+          <AdminSymbol name="delivery"/>
           <div className="text-xs">
             <span className="font-extrabold text-amber-950">Superfast Delivery! </span>
             <span className="text-amber-800 font-medium">Your order will reach in {formData.deliveryTimeText}.</span>
@@ -181,7 +182,7 @@ export const CartManager: React.FC = () => {
       </div>
 
       {/* ── 2. COUPON & PROMO CODES ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
@@ -251,7 +252,7 @@ export const CartManager: React.FC = () => {
       </div>
 
       {/* ── 3. FEES & DELIVERY CHARGES ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <IndianRupee className="w-4 h-4 text-emerald-600" />
           <span>Fees &amp; Delivery Charges</span>
@@ -296,7 +297,7 @@ export const CartManager: React.FC = () => {
       </div>
 
       {/* ── 4. EMPTY CART SCREEN ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-purple-600" />
           <span>Empty Cart Screen Customization</span>
@@ -338,7 +339,7 @@ export const CartManager: React.FC = () => {
       {/* ── COUPON MODAL ── */}
       {couponModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-left space-y-4">
+          <div className="admin-panel bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-left space-y-4">
             <div className="flex items-center justify-between border-b pb-3 border-slate-100">
               <h3 className="text-base font-black text-slate-900">
                 {editingCouponIndex !== null ? 'Edit Coupon Code' : 'Add New Coupon Code'}

@@ -63,7 +63,7 @@ export const SettingsManager: React.FC = () => {
   return (
     <div className="space-y-8 text-left pb-16">
       {/* ── TOP HEADER & SAVE BAR ── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-8 h-8 rounded-xl bg-purple-100 text-[#7C3AED] flex items-center justify-center font-bold">
@@ -104,7 +104,7 @@ export const SettingsManager: React.FC = () => {
       )}
 
       {/* ── 1. BRAND THEME COLORS ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <Palette className="w-4 h-4 text-[#7C3AED]" />
           <span>Brand Theme Colors</span>
@@ -128,7 +128,7 @@ export const SettingsManager: React.FC = () => {
                 onChange={(e) =>
                   setThemeTokens({ ...themeTokens, colorPrimary: e.target.value })
                 }
-                className="flex-1 p-2 bg-white border border-slate-200 rounded-xl text-xs font-extrabold"
+                className="admin-tabs flex-1 p-2 bg-white border border-slate-200 rounded-xl text-xs font-extrabold"
               />
             </div>
           </div>
@@ -150,7 +150,7 @@ export const SettingsManager: React.FC = () => {
                 onChange={(e) =>
                   setThemeTokens({ ...themeTokens, colorSecondary: e.target.value })
                 }
-                className="flex-1 p-2 bg-white border border-slate-200 rounded-xl text-xs font-extrabold"
+                className="admin-tabs flex-1 p-2 bg-white border border-slate-200 rounded-xl text-xs font-extrabold"
               />
             </div>
           </div>
@@ -172,7 +172,7 @@ export const SettingsManager: React.FC = () => {
                 onChange={(e) =>
                   setThemeTokens({ ...themeTokens, colorAccent: e.target.value })
                 }
-                className="flex-1 p-2 bg-white border border-slate-200 rounded-xl text-xs font-extrabold"
+                className="admin-tabs flex-1 p-2 bg-white border border-slate-200 rounded-xl text-xs font-extrabold"
               />
             </div>
           </div>
@@ -180,7 +180,7 @@ export const SettingsManager: React.FC = () => {
       </div>
 
       {/* ── 2. STATUTORY & REGULATORY CREDENTIALS ── */}
-      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
           <span>Statutory &amp; Regulatory Credentials</span>

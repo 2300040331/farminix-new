@@ -20,7 +20,7 @@ export function CouponEditor({ productId }: { productId?: string }) {
     updateCartConfig({ coupons: [...coupons.filter(c => c.code !== editing), { ...form, code }] });
     setForm(blank()); setEditing(null); setError('');
   };
-  return <section className="bg-white border border-slate-200 rounded-2xl p-6 space-y-5">
+  return <section className="admin-panel bg-white border border-slate-200 rounded-2xl p-6 space-y-5">
     <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-bold text-lg">Coupons {productId ? 'for this product' : '& promotions'}</h2>
       <label className="flex items-center gap-2"><input type="checkbox" checked={config.cart?.couponsEnabled !== false} onChange={e => updateCartConfig({ couponsEnabled: e.target.checked })}/>Enable coupons across the store</label></div>
     <p className="text-sm text-slate-500">Changes are drafts until Save Changes publishes them. Selected-product discounts apply only to eligible items.</p>

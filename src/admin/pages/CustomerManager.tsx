@@ -21,7 +21,7 @@ export const CustomerManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Users className="w-4 h-4" />
@@ -37,7 +37,7 @@ export const CustomerManager: React.FC = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+      <div className="admin-panel bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
         <div className="relative w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -55,7 +55,7 @@ export const CustomerManager: React.FC = () => {
         {filteredUsers.map((user) => (
           <div
             key={user.id}
-            className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4"
+            className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>

@@ -45,14 +45,16 @@ export function AppContent() {
     const isWindows = userAgent.indexOf('windows') !== -1;
     const isMac = userAgent.indexOf('macintosh') !== -1 || userAgent.indexOf('mac os') !== -1;
     
-    if (isWindows) {
+    if (currentRoute.pathname === '/admin') {
+      document.documentElement.style.zoom = '1.0';
+    } else if (isWindows) {
       document.documentElement.style.zoom = '1.25';
     } else if (isMac) {
       document.documentElement.style.zoom = '1.0';
     } else {
       document.documentElement.style.zoom = '1.0';
     }
-  }, []);
+  }, [currentRoute.pathname]);
 
   // Ensure scroll is at the top on every page/route change
   React.useEffect(() => {

@@ -58,7 +58,7 @@ export const FeatureStripManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Zap className="w-4 h-4" />
@@ -94,7 +94,7 @@ export const FeatureStripManager: React.FC = () => {
       </div>
 
       {/* Cards List Header */}
-      <div className="flex items-center justify-between bg-white p-5 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-panel flex items-center justify-between bg-white p-5 rounded-3xl border border-slate-200 shadow-2xs">
         <h2 className="text-sm font-black text-slate-900">
           Feature Cards List ({formData.features.length})
         </h2>
@@ -112,7 +112,7 @@ export const FeatureStripManager: React.FC = () => {
         {formData.features.map((feature, idx) => (
           <div
             key={feature.id}
-            className={`bg-white p-5 rounded-3xl border space-y-3 transition-all ${
+            className={`admin-panel bg-white p-5 rounded-3xl border space-y-3 transition-all ${
               feature.enabled ? 'border-slate-200 shadow-2xs' : 'border-slate-200/50 bg-slate-50 opacity-60'
             }`}
           >

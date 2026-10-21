@@ -51,7 +51,7 @@ export const MediaLibrary: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Image className="w-4 h-4" />
@@ -67,7 +67,7 @@ export const MediaLibrary: React.FC = () => {
       </div>
 
       {/* Add New Media Form */}
-      <form onSubmit={handleAddMedia} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <form onSubmit={handleAddMedia} className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           Upload / Register New Asset
         </h2>
@@ -122,7 +122,7 @@ export const MediaLibrary: React.FC = () => {
       </form>
 
       {/* Filter Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="admin-panel bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -152,7 +152,7 @@ export const MediaLibrary: React.FC = () => {
         {filteredMedia.map((media) => (
           <div
             key={media.id}
-            className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden flex flex-col justify-between group hover:border-purple-300 transition-colors"
+            className="admin-panel bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden flex flex-col justify-between group hover:border-purple-300 transition-colors"
           >
             <div className="w-full aspect-video bg-slate-100 relative overflow-hidden flex items-center justify-center p-2">
               <img src={media.url} alt={media.name} className="max-h-full max-w-full object-contain" />

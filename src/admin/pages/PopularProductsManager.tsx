@@ -53,14 +53,14 @@ export const PopularProductsManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Zap className="w-4 h-4 text-amber-500 fill-amber-400" />
             <span>Homepage Product Showcase</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-            Popular Today (⚡) Management
+            Popular Today Management
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
             Select and reorder high-demand featured products displayed on the homepage spotlight.
@@ -96,12 +96,12 @@ export const PopularProductsManager: React.FC = () => {
       {savedSuccess && (
         <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200 shadow-2xs">
           <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>✓ Popular Products Changes Saved &amp; Live on the Main Storefront!</span>
+          <span>Popular Products Changes Saved &amp; Live on the Main Storefront!</span>
         </div>
       )}
 
       {/* Copy Settings */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           1. Section Header Settings
         </h2>
@@ -128,7 +128,7 @@ export const PopularProductsManager: React.FC = () => {
       </div>
 
       {/* Select Products to Feature */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           2. Add Product to Popular Today Grid
         </h2>
@@ -157,7 +157,7 @@ export const PopularProductsManager: React.FC = () => {
       </div>
 
       {/* Featured Products List */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-3">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-3">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           3. Active Featured Items ({formData.featuredProductIds.length})
         </h2>
@@ -170,7 +170,7 @@ export const PopularProductsManager: React.FC = () => {
             return (
               <div
                 key={pId}
-                className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 bg-white shadow-2xs hover:border-purple-300 transition-colors"
+                className="admin-panel flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 bg-white shadow-2xs hover:border-purple-300 transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 text-xs font-black flex items-center justify-center shrink-0">

@@ -1,119 +1,47 @@
-import React, { useState } from 'react';
-import { Lock, Mail, ArrowRight, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Leaf, LoaderCircle, LockKeyhole, ShieldCheck, UserRound } from 'lucide-react';
 import { useAdminConfig } from './context/AdminConfigContext';
+import './admin.css';
+import './admin-editors.css';
 
-export const AdminAuth: React.FC<{ onBackToStore: () => void }> = ({ onBackToStore }) => {
+export function AdminAuth({ onBackToStore }: { onBackToStore: () => void }) {
   const { adminLogin } = useAdminConfig();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    void adminLogin(email, password).catch((error) => {
-      setError(error instanceof Error ? error.message : 'Unable to sign in. Please retry.');
-    }).finally(() => setIsLoading(false));
+  const submit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault(); setError(''); setIsLoading(true);
+    try { await adminLogin(email, password); }
+    catch (error) { setError(error instanceof Error ? error.message : 'Unable to sign in. Please retry.'); }
+    finally { setIsLoading(false); }
   };
 
-  return (
-    <div className="min-h-screen w-full bg-purple-50/30 flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans select-none">
-      {/* Subtle Background Glows */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-200/50 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative w-full max-w-md bg-white border border-purple-100 rounded-3xl p-8 shadow-xl z-10 text-left">
-        {/* Brand Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center p-3 bg-purple-50 border border-purple-100 rounded-2xl mb-4 shadow-sm">
-            <img src="/farminix_logo.png" alt="Farminix" className="h-10 w-auto object-contain" />
-          </div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50 border border-purple-100 rounded-full text-purple-750 text-[10px] font-extrabold uppercase tracking-widest mb-2">
-            <Sparkles className="w-3 h-3 text-purple-600" />
-            <span>Store Control Center</span>
-          </div>
-          <h1 className="text-2xl font-black text-purple-950 tracking-tight">Farminix Admin Portal</h1>
-          <p className="text-xs text-slate-500 mt-1 font-medium">Pin-to-pin real-time control for Farminix Store</p>
-        </div>
-
-        {error && (
-          <div className="mb-5 p-3 rounded-xl bg-red-50 border border-red-200 text-red-750 text-xs font-semibold flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">Admin Email / Username</label>
-            <div className="relative flex items-center">
-              <Mail className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-              <input
-                type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter admin email..."
-                required
-                className="w-full h-11 pl-10 pr-4 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-50 transition-all placeholder:text-slate-400"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">Admin Password</label>
-            <div className="relative flex items-center">
-              <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full h-11 pl-10 pr-10 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-50 transition-all placeholder:text-slate-400"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 text-slate-400 hover:text-slate-600"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-11 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-md shadow-purple-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98 disabled:opacity-50"
-            >
-              {isLoading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <span>Sign In to Admin Portal</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </div>
+  return <div className="admin-auth">
+    <aside className="admin-auth-story">
+      <div className="admin-auth-brand"><img src="/farminix_logo.png" alt="Farminix"/><span>FROM FARMS TO YOUR FAMILY</span></div>
+      <div className="admin-auth-story-copy"><span><Leaf size={18}/> Grown with care</span><h2>A good harvest.<br/>A thoughtfully<br/>managed store.</h2><p>Every product, every order, every family.<br/>Bring it all together with Farminix.</p></div>
+      <p className="admin-auth-story-footer">Rooted in quality. Growing together.</p>
+    </aside>
+    <main className="admin-auth-main">
+      <button className="admin-auth-back" type="button" onClick={onBackToStore}><ArrowLeft size={16}/> Back to store</button>
+      <div className="admin-auth-card">
+        <span className="admin-auth-lock"><ShieldCheck size={26}/></span>
+        <p className="admin-eyebrow">FARMINIX ADMINISTRATION</p>
+        <h1>Welcome back.</h1>
+        <p className="admin-auth-description">Sign in to take care of your store.</p>
+        <form onSubmit={event => void submit(event)}>
+          <label htmlFor="admin-email">Email or username</label>
+          <div className="admin-auth-field"><UserRound size={18}/><input id="admin-email" name="username" autoComplete="username" placeholder="Enter your admin email" required value={email} onChange={event => setEmail(event.target.value)}/></div>
+          <label htmlFor="admin-password">Password</label>
+          <div className="admin-auth-field"><LockKeyhole size={18}/><input id="admin-password" name="password" autoComplete="current-password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" required value={password} onChange={event => setPassword(event.target.value)}/><button type="button" aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}</button></div>
+          {error && <p role="alert" className="admin-alert">{error}</p>}
+          <button type="submit" disabled={isLoading} className="admin-auth-submit">{isLoading ? <><LoaderCircle size={18} className="animate-spin"/> Signing in…</> : <>Sign in to your store <ArrowRight size={17}/></>}</button>
         </form>
-
-        {/* Back to main website */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={onBackToStore}
-            className="text-xs font-semibold text-slate-500 hover:text-purple-600 transition-colors cursor-pointer"
-          >
-            ← Return to Farminix Public Store
-          </button>
-        </div>
+        <div className="admin-auth-secure"><LockKeyhole size={13}/> Secure access for authorized administrators</div>
       </div>
-    </div>
-  );
-};
+      <footer>© {new Date().getFullYear()} Farminix · From farm to family.</footer>
+    </main>
+  </div>;
+}

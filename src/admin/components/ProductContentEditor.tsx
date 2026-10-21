@@ -14,7 +14,7 @@ export function ProductContentEditor({ product, onChange, onSave, onBack, saving
   const [activeTab, setActiveTab] = useState<string>('details');
   const field = 'w-full min-w-0 rounded-xl border border-slate-300 bg-white p-3 text-sm font-normal text-slate-900';
   const patch = (value: Partial<Product>) => onChange({ ...product, ...value });
-  const section = 'rounded-2xl border border-slate-200 bg-white p-5 sm:p-7 space-y-5 scroll-mt-24';
+  const section = 'admin-panel rounded-2xl border border-slate-200 bg-white p-5 sm:p-7 space-y-5 scroll-mt-24';
   const text = (label: string, key: 'name'|'brand'|'category'|'weight'|'deliveryTime'|'description'|'storageInstructions') => <label className="block text-sm font-semibold">{label}<input className={field} value={product[key] || ''} onChange={e => patch({[key]: e.target.value})}/></label>;
   const lines = (label: string, key: 'benefits'|'ingredients'|'howToUse'|'badges'|'weightOptions') => <label className="block text-sm font-semibold">{label}<textarea rows={4} className={field} value={(product[key] || []).join('\n')} onChange={e => patch({[key]: e.target.value.split('\n')})}/><span className="text-xs font-normal text-slate-500">One entry per line, in display order.</span></label>;
   const save = async () => {
@@ -23,9 +23,9 @@ export function ProductContentEditor({ product, onChange, onSave, onBack, saving
     setValidation(''); await onSave();
   };
   return <div className="space-y-6 text-left pb-12">
-    <header className="flex flex-wrap justify-between gap-4 items-center"><div><button type="button" onClick={onBack} className="text-purple-700">← Back to products</button><h1 className="text-2xl font-bold mt-2">{product.name || 'New product'}</h1><p className="text-sm text-slate-500">Choose a section below to edit. Your changes stay in the draft when you switch sections.</p></div><button type="button" disabled={saving} onClick={() => void save()} className="rounded-xl bg-purple-600 px-5 py-3 font-bold text-white disabled:opacity-50">{saving ? 'Publishing…' : 'Save Changes'}</button></header>
+    <header className="admin-page-heading flex flex-wrap justify-between gap-4 items-center"><div><button type="button" onClick={onBack} className="text-purple-700">← Back to products</button><h1 className="text-2xl font-bold mt-2">{product.name || 'New product'}</h1><p className="text-sm text-slate-500">Choose a section below to edit. Your changes stay in the draft when you switch sections.</p></div><button type="button" disabled={saving} onClick={() => void save()} className="rounded-xl bg-purple-600 px-5 py-3 font-bold text-white disabled:opacity-50">{saving ? 'Publishing…' : 'Save Changes'}</button></header>
     {(error || validation) && <p role="alert" className="rounded-xl bg-red-50 text-red-700 p-4">{error || validation}</p>}
-    <nav role="tablist" aria-label="Product editing sections" className="flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+    <nav role="tablist" aria-label="Product editing sections" className="admin-panel admin-tabs flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
       {tabs.map(label => {
         const id = label.toLowerCase();
         const selected = activeTab === id;

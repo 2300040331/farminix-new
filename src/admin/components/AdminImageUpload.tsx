@@ -1,3 +1,4 @@
+import { AdminSymbol } from '../components/AdminSymbol';
 import React, { useRef, useState } from 'react';
 import { Upload, Image as ImageIcon, Trash2, Grid } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
@@ -90,7 +91,7 @@ export const AdminImageUpload: React.FC<AdminImageUploadProps> = ({
         {label && <label className="block text-xs font-bold text-slate-700">{label}</label>}
         {recommendedDimensions && (
           <span className="text-[11px] font-bold text-purple-700 bg-purple-50 border border-purple-200/80 px-2.5 py-0.5 rounded-md flex items-center gap-1 shadow-2xs">
-            <span>📐 Dimensions:</span>
+            <span><AdminSymbol name="ruler"/> Dimensions:</span>
             <span className="font-extrabold">{recommendedDimensions}</span>
           </span>
         )}
@@ -165,7 +166,7 @@ export const AdminImageUpload: React.FC<AdminImageUploadProps> = ({
       {/* Media Library Selection Modal */}
       {showMediaModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
+          <div className="admin-panel bg-white rounded-3xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
             {/* Header */}
             <div className="p-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50">
               <div>
@@ -190,7 +191,7 @@ export const AdminImageUpload: React.FC<AdminImageUploadProps> = ({
                     onChange(med.url);
                     setShowMediaModal(false);
                   }}
-                  className="bg-white p-2.5 rounded-2xl border border-slate-200 hover:border-purple-500 hover:ring-2 hover:ring-purple-500/20 transition-all cursor-pointer group shadow-2xs"
+                  className="admin-panel bg-white p-2.5 rounded-2xl border border-slate-200 hover:border-purple-500 hover:ring-2 hover:ring-purple-500/20 transition-all cursor-pointer group shadow-2xs"
                 >
                   <div className="w-full aspect-square rounded-xl overflow-hidden bg-slate-50 border border-slate-100 mb-2">
                     <img src={med.url} alt={med.name} className="w-full h-full object-cover" />

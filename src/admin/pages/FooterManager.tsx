@@ -70,7 +70,7 @@ export const FooterManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Layers className="w-4 h-4" />
@@ -99,12 +99,12 @@ export const FooterManager: React.FC = () => {
       {savedSuccess && (
         <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200 shadow-2xs">
           <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>✓ Footer Changes Saved &amp; Live on the Main Storefront!</span>
+          <span>Footer Changes Saved &amp; Live on the Main Storefront!</span>
         </div>
       )}
 
       {/* Brand Bio & Copyright */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           1. Brand Information &amp; Copyright
         </h2>
@@ -147,7 +147,7 @@ export const FooterManager: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2"><MessageCircle className="w-4 h-4 text-emerald-600" />WhatsApp routing</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <label className="text-xs font-bold text-slate-700">WhatsApp number<input value={formData.whatsappPhone} onChange={(e) => handleUpdateField('whatsappPhone', e.target.value)} placeholder="Country code + number" className="w-full mt-1 h-10 px-3 text-xs font-mono font-normal bg-slate-50 border border-slate-200 rounded-xl" /></label>
@@ -156,7 +156,7 @@ export const FooterManager: React.FC = () => {
         <p className="text-[11px] text-slate-500">Saving publishes the number and message used by the floating button, footer button, and support modal.</p>
       </div>
 
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2"><Video className="w-4 h-4 text-purple-600" />Intro videos</h2>
         <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer"><input type="checkbox" checked={videoData.enabled} onChange={(e) => { const next = { ...videoData, enabled: e.target.checked }; setVideoData(next); updateIntroVideo(next); }} className="accent-purple-600" />Show intro video on the home page</label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -166,7 +166,7 @@ export const FooterManager: React.FC = () => {
       </div>
 
       {/* Social Media Links */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           2. Social Media URLs
         </h2>
@@ -214,7 +214,7 @@ export const FooterManager: React.FC = () => {
       {/* Navigation Columns (Company & Help) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Company Links */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+        <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
           <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
             3. Company Column Links
           </h2>
@@ -242,7 +242,7 @@ export const FooterManager: React.FC = () => {
         </div>
 
         {/* Help Links */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+        <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
           <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
             4. Help Column Links
           </h2>
@@ -271,7 +271,7 @@ export const FooterManager: React.FC = () => {
       </div>
 
       {/* Save Changes Bottom Bar */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-xs text-slate-500 font-medium">
           Changes saved here are instantly published and visible on the main website footer.
         </p>

@@ -47,7 +47,7 @@ export const SupportManager: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
+      <div className="admin-page-heading admin-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <MessageSquare className="w-4 h-4" />
@@ -65,7 +65,7 @@ export const SupportManager: React.FC = () => {
       {/* Split Ticket View */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Ticket List */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs space-y-3">
+        <div className="admin-panel bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs space-y-3">
           <div className="text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100">
             Inbox ({tickets.length})
           </div>
@@ -75,7 +75,7 @@ export const SupportManager: React.FC = () => {
               <div
                 key={ticket.id}
                 onClick={() => setSelectedTicketId(ticket.id)}
-                className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                className={`admin-panel p-3.5 rounded-2xl border transition-all cursor-pointer ${
                   selectedTicketId === ticket.id
                     ? 'bg-purple-50/70 border-purple-300 shadow-2xs'
                     : 'bg-white border-slate-200 hover:border-slate-300'
@@ -101,7 +101,7 @@ export const SupportManager: React.FC = () => {
         </div>
 
         {/* Ticket Chat & Reply Box */}
-        <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs flex flex-col justify-between space-y-4">
+        <div className="admin-panel lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs flex flex-col justify-between space-y-4">
           {selectedTicket ? (
             <>
               {/* Ticket Top bar */}
@@ -135,7 +135,7 @@ export const SupportManager: React.FC = () => {
                     className={`flex ${reply.sender === 'agent' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[75%] p-3 rounded-2xl text-xs leading-relaxed ${
+                      className={`admin-panel max-w-[75%] p-3 rounded-2xl text-xs leading-relaxed ${
                         reply.sender === 'agent'
                           ? 'bg-purple-600 text-white rounded-br-none'
                           : 'bg-white text-slate-900 border border-slate-200 rounded-bl-none shadow-2xs'
