@@ -6,7 +6,7 @@
 FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --ignore-scripts
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -14,7 +14,7 @@ RUN npm run build
 FROM node:22-alpine AS server-builder
 WORKDIR /app/server
 COPY server/package*.json ./
-RUN npm ci
+RUN npm install
 COPY server/ ./
 RUN npm run build
 
@@ -26,7 +26,7 @@ ENV PORT=5000
 
 # Install production server dependencies
 COPY server/package*.json ./server/
-RUN cd server && npm ci --omit=dev
+RUN cd server && npm install --omit=dev
 
 # Copy compiled backend
 COPY --from=server-builder /app/server/dist ./server/dist
