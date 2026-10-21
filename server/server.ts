@@ -1177,8 +1177,13 @@ app.get('/api/admin/dashboard', requireAdmin, async (_req: Request, res: Respons
 // ============================================================
 // 8. STATIC FRONTEND PRODUCTION SERVING (KVM2 Unified Deployment)
 // ============================================================
-const distPath = path.resolve(__dirname, '../dist');
-if (fs.existsSync(distPath)) {
+const possibleDistPaths = [
+  path.resolve(__dirname, '../../dist'),
+  path.resolve(__dirname, '../dist'),
+  path.resolve(process.cwd(), 'dist'),
+];
+const distPath = possibleDistPaths.find((p) => fs.existsSync(p));
+if (distPath) {
   console.log(`[FARMINIX SERVER] Serving frontend static assets from: ${distPath}`);
   app.use(express.static(distPath));
 
@@ -1189,6 +1194,8 @@ if (fs.existsSync(distPath)) {
     }
     res.sendFile(path.join(distPath, 'index.html'));
   });
+} else {
+  console.warn(`[FARMINIX SERVER WARNING] Frontend dist folder not found. Looked in:`, possibleDistPaths);
 }
 
 // 404 for unmatched API routes
