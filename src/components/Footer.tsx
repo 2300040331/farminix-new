@@ -82,16 +82,13 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row items-start justify-between gap-10">
           
           {/* Brand & Socials */}
-          <div className="text-left max-w-md">
-            <div onClick={() => navigate('/')} className="inline-block mb-3.5 group select-none cursor-pointer">
-              <div className="inline-flex items-center bg-white px-3.5 py-1.5 rounded-xl shadow-xs transition-transform duration-200 group-hover:scale-105">
-                <img
-                  src={footerConfig.logoUrl ? footerConfig.logoUrl : '/farminix_logo.png?v=2'}
-                  alt="Farminix Logo"
-                  className="h-7 sm:h-8 w-auto object-contain"
-                />
-              </div>
-            </div>
+          <div className="store-footer-brand text-left max-w-md">
+            <button type="button" onClick={() => navigate('/')} className="store-footer-logo" aria-label="Farminix home">
+              <img
+                src={footerConfig.logoUrl ? footerConfig.logoUrl : '/farminix_logo.png?v=2'}
+                alt="Farminix Logo"
+              />
+            </button>
             <p className="text-xs text-slate-400 font-normal max-w-sm mb-5 leading-relaxed">
               {footerConfig.bioText || 'Your trusted partner for premium staples and authentic grains. Pure quality, farm-direct freshness, and reliable doorstep delivery.'}
             </p>

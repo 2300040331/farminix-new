@@ -42,6 +42,8 @@ const PaddyHarvestScene = React.lazy(() => import('./components/PaddyHarvestScen
 export function AppContent() {
   const { currentRoute, navigate } = useApp();
   const { publishedConfig, isAdminLoggedIn } = useAdminConfig();
+  const [hasFinishedIntro, setHasFinishedIntro] = React.useState(false);
+  const finishIntro = React.useCallback(() => setHasFinishedIntro(true), []);
   const isCommercePage = ['/checkout', '/products', '/offers'].includes(currentRoute.pathname) || currentRoute.pathname.startsWith('/product/') || currentRoute.searchParams.has('search') || currentRoute.searchParams.has('category');
 
   // All pages share the same responsive scale across operating systems.
@@ -71,7 +73,7 @@ export function AppContent() {
       .sort((a, b) => a.order - b.order);
 
     const sectionComponentMap: Record<string, React.ReactNode> = {
-      hero: publishedConfig.hero.enabled ? <React.Fragment key="hero"><HeroBanner /><React.Suspense fallback={null}><PaddyHarvestScene /></React.Suspense></React.Fragment> : null,
+      hero: publishedConfig.hero.enabled ? <React.Fragment key="hero"><HeroBanner /><React.Suspense fallback={null}><PaddyHarvestScene suspended={!hasFinishedIntro && publishedConfig.introVideo.enabled} /></React.Suspense></React.Fragment> : null,
       popularProducts: <PopularProducts key="popularProducts" />,
       socialBlog: <SocialBlogSection key="socialBlog" />,
       categorySection: <CategorySection key="categorySection" />,
@@ -153,7 +155,7 @@ export function AppContent() {
       <CategoryPage />
 
       {/* BRANDED HARVEST ANIMATION ON SITE OPEN */}
-      {currentRoute.pathname === '/' && <IntroVideoOverlay />}
+      {currentRoute.pathname === '/' && <IntroVideoOverlay onFinish={finishIntro} />}
 
       {/* FLOATING WHATSAPP BUTTON */}
       {!isCommercePage && <WhatsAppFloatingButton />}

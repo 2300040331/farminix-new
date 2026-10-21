@@ -1,3 +1,5 @@
+import { HARVEST_INTRO_SECONDS } from './harvestTiming';
+
 type Vector = [number, number, number];
 type Rotation = [number, number, number, number];
 type Color = [number, number, number, number];
@@ -184,7 +186,7 @@ function sway(point: Vector, plant: number, time: number): Vector {
   return [point[0] + wind * height ** 1.35, point[1] + wind * 0.1, point[2] + Math.cos(time * 0.44 + plant) * height * 0.015];
 }
 
-export function createHarvestRenderer(canvas: HTMLCanvasElement): HarvestRenderer | null {
+export function createHarvestRenderer(canvas: HTMLCanvasElement, sequence?: { once: boolean; onComplete: () => void }): HarvestRenderer | null {
   const gl = canvas.getContext('webgl2', { alpha: true, antialias: true, premultipliedAlpha: false, powerPreference: 'low-power' });
   if (!gl) return null;
   const shaders: WebGLShader[] = [];
@@ -222,7 +224,7 @@ export function createHarvestRenderer(canvas: HTMLCanvasElement): HarvestRendere
   const solid = geometry(sphere()), foliage = geometry(leaf()), stems = geometry(cylinder());
   const uniforms = { projection: gl.getUniformLocation(program, 'u_projection'), view: gl.getUniformLocation(program, 'u_view'), eye: gl.getUniformLocation(program, 'u_eye'), material: gl.getUniformLocation(program, 'u_material') };
   const model = plants(), data = new Float32Array(1024 * 14);
-  let frame = 0, running = false, disposed = false, elapsed = 2.7, lastTime = 0;
+  let frame = 0, running = false, disposed = false, completed = false, elapsed = sequence?.once ? 0 : 2.7, lastTime = 0;
   let pointer: Vector = [0, 0, 0], smoothPointer: Vector = [0, 0, 0];
   const write = (offset: number, position: Vector, size: Vector, rotation: Rotation, color: Color) => {
     data.set(position, offset); data.set(size, offset + 3); data.set(rotation, offset + 6); data.set(color, offset + 10); return offset + 14;
@@ -256,7 +258,7 @@ export function createHarvestRenderer(canvas: HTMLCanvasElement): HarvestRendere
     drawInstances(foliage, offset, 1); offset = 0;
     let falling = 0;
     for (const grain of model.grains) {
-      const phase = (elapsed + grain.phase) % 10;
+      const phase = sequence?.once ? elapsed + 5 - grain.phase * .3 : (elapsed + grain.phase) % 10;
       let position = sway(grain.position, grain.plant, elapsed), rotation = align(grain.direction), size = grain.size, color = grain.color;
       if (grain.release && phase >= 6.2 && phase < 9.1) {
         const t = phase - 6.2, origin = sway(grain.position, grain.plant, elapsed - t);
@@ -266,7 +268,7 @@ export function createHarvestRenderer(canvas: HTMLCanvasElement): HarvestRendere
         color = [mix(grain.color[0], 0.97, polish), mix(grain.color[1], 0.91, polish), mix(grain.color[2], 0.72, polish), Math.min(1, (2.9 - t) * 2)];
         falling++;
       } else if (grain.release && phase >= 9.1) {
-        const growth = Math.max(0.01, (phase - 9.1) / 0.9);
+        const growth = sequence?.once ? .001 : Math.max(0.01, (phase - 9.1) / 0.9);
         size = grain.size.map((value) => value * growth) as Vector;
       }
       offset = write(offset, position, size, rotation, color);
@@ -278,13 +280,18 @@ export function createHarvestRenderer(canvas: HTMLCanvasElement): HarvestRendere
   const tick = (now: number) => {
     if (!running || disposed) return;
     if (lastTime) elapsed += Math.min((now - lastTime) / 1000, 0.05);
-    lastTime = now; render(); frame = window.requestAnimationFrame(tick);
+    if (sequence?.once) elapsed = Math.min(elapsed, HARVEST_INTRO_SECONDS);
+    lastTime = now; render();
+    if (sequence?.once && elapsed >= HARVEST_INTRO_SECONDS && !completed) {
+      completed = true; running = false; sequence.onComplete(); return;
+    }
+    frame = window.requestAnimationFrame(tick);
   };
   const observer = new ResizeObserver(() => render()); observer.observe(canvas);
   render();
   return {
     setRunning(value) {
-      if (running === value || disposed) return;
+      if (running === value || disposed || completed) return;
       running = value; lastTime = 0;
       if (running) frame = window.requestAnimationFrame(tick);
       else { window.cancelAnimationFrame(frame); frame = 0; }
