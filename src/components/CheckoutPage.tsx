@@ -64,7 +64,7 @@ export const CheckoutPage: React.FC = () => {
   const cartCfg = publishedConfig.cart || defaultCartConfig;
 
   const [selectedSlot, setSelectedSlot] = useState(
-    checkoutCfg.expressSlotLabel || '10 Min Instant Express'
+    checkoutCfg.expressSlotLabel || '10-20 Min Express'
   );
   const [paymentMethod, setPaymentMethod] = useState<'RAZORPAY' | 'UPI' | 'CARD' | 'NETBANKING' | 'COD'>('RAZORPAY');
   const [deliveryNote, setDeliveryNote] = useState<string[]>([]);
@@ -292,13 +292,21 @@ export const CheckoutPage: React.FC = () => {
       const merchantTitle = checkoutCfg.razorpayMerchantName || 'Farminix Fresh Groceries';
       const themeColor = checkoutCfg.razorpayThemeColor || '#7C3AED';
 
-      // Create server-side order
+      // Create server-side order with sanitized notes (Razorpay requires clean UTF-8 strings without emojis)
+      const cleanCustomerName = (selectedAddress.name || user?.name || 'Customer')
+        .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '')
+        .replace(/[^\w\s.-]/g, '')
+        .trim() || 'Customer';
+      const cleanCustomerPhone = (selectedAddress.phone || user?.phone || '')
+        .replace(/[^\d+ -]/g, '')
+        .trim();
+
       const serverOrder = await createServerOrder(grandTotal, {
-        customer_name: selectedAddress.name || user?.name || '',
-        customer_phone: selectedAddress.phone || user?.phone || '',
-        delivery_slot: selectedSlot,
+        customer_name: cleanCustomerName,
+        customer_phone: cleanCustomerPhone,
+        delivery_slot: selectedSlot || '10-20 Min Express',
       }, cart.map(item => ({ productId: item.product.id, quantity: item.quantity })), appliedCoupon);
-      if (!serverOrder?.orderId) throw new Error('Unable to validate this order. Please retry.');
+      if (!serverOrder?.orderId) throw new Error(serverOrder?.error || 'Unable to validate this order. Please retry.');
 
       const options = {
         key: activeKey,
@@ -639,7 +647,7 @@ export const CheckoutPage: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <button
                   type="button"
-                  onClick={() => setSelectedSlot(checkoutCfg.expressSlotLabel)}
+                  onClick={() => setSelectedSlot(checkoutCfg.expressSlotLabel || '10-20 Min Express')}
                   className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
                     selectedSlot === checkoutCfg.expressSlotLabel
                       ? 'border-[#7C3AED] bg-purple-50/80 ring-2 ring-purple-200 shadow-xs'
@@ -657,7 +665,7 @@ export const CheckoutPage: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => setSelectedSlot(checkoutCfg.scheduledSlotLabel)}
+                  onClick={() => setSelectedSlot(checkoutCfg.scheduledSlotLabel || 'Scheduled Slot')}
                   className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
                     selectedSlot === checkoutCfg.scheduledSlotLabel
                       ? 'border-[#7C3AED] bg-purple-50/80 ring-2 ring-purple-200 shadow-xs'

@@ -63,21 +63,22 @@ export const createServerOrder = async (
   notes?: Record<string, string>,
   cart?: { productId: string; quantity: number }[],
   couponCode?: string | null
-): Promise<{ orderId?: string; keyId?: string } | null> => {
+): Promise<{ orderId?: string; keyId?: string; error?: string } | null> => {
   try {
     const res = await fetch('/api/payment/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount, notes, cart, couponCode }),
     });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success && data.order) {
-        return {
-          orderId: data.order.id,
-          keyId: data.keyId,
-        };
-      }
+    const data = await res.json().catch(() => null);
+    if (res.ok && data?.success && data?.order) {
+      return {
+        orderId: data.order.id,
+        keyId: data.keyId,
+      };
+    }
+    if (data?.error) {
+      return { error: data.error };
     }
   } catch (e) {
     console.warn('Backend order creation endpoint unreachable, falling back to direct client checkout', e);

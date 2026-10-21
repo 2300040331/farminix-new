@@ -854,11 +854,34 @@ app.post(['/api/payment/create-order', '/api/payment/create-order/'], async (req
       return;
     }
 
+    // Sanitize notes for Razorpay (max 15 key-value pairs, key max 30 chars, val max 256 chars, UTF-8 clean without emojis)
+    const sanitizedNotes: Record<string, string> = {};
+    if (notes && typeof notes === 'object' && !Array.isArray(notes)) {
+      for (const [rawKey, rawVal] of Object.entries(notes)) {
+        if (rawKey && rawVal !== undefined && rawVal !== null) {
+          const cleanKey = String(rawKey)
+            .replace(/[^\w\s-]/g, '')
+            .trim()
+            .slice(0, 30);
+          const cleanVal = String(rawVal)
+            .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '')
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+            .replace(/[^\x20-\x7E\u0900-\u097F]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 250);
+          if (cleanKey) {
+            sanitizedNotes[cleanKey] = cleanVal;
+          }
+        }
+      }
+    }
+
     const orderOptions = {
       amount: validatedAmount,
       currency: currency || 'INR',
-      receipt: receipt || `farminix_${Date.now()}`,
-      notes: notes || {},
+      receipt: (receipt ? String(receipt) : `farminix_${Date.now()}`).slice(0, 40),
+      notes: sanitizedNotes,
     };
 
     const order = await razorpayClient.orders.create(orderOptions);
@@ -870,9 +893,10 @@ app.post(['/api/payment/create-order', '/api/payment/create-order/'], async (req
     });
   } catch (error: any) {
     console.error('[Razorpay Create Order Error]:', error);
-    res.status(500).json({
+    const errorMsg = error?.error?.description || error?.message || 'Failed to create Razorpay order.';
+    res.status(error?.statusCode || 500).json({
       success: false,
-      error: error.message || 'Failed to create Razorpay order.',
+      error: errorMsg,
     });
   }
 });

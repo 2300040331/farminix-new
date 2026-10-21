@@ -71,11 +71,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       key_secret: keySecret,
     });
 
+    // Sanitize notes for Razorpay (max 15 key-value pairs, key max 30 chars, val max 256 chars, UTF-8 clean without emojis)
+    const sanitizedNotes: Record<string, string> = {};
+    const rawNotes = {
+      ...(typeof notes === 'object' && !Array.isArray(notes) ? notes : {}),
+      coupon_code: discount > 0 ? coupon.code : '',
+      coupon_discount: String(discount),
+    };
+    for (const [rawKey, rawVal] of Object.entries(rawNotes)) {
+      if (rawKey && rawVal !== undefined && rawVal !== null) {
+        const cleanKey = String(rawKey).replace(/[^\w\s-]/g, '').trim().slice(0, 30);
+        const cleanVal = String(rawVal)
+          .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '')
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+          .replace(/[^\x20-\x7E\u0900-\u097F]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 250);
+        if (cleanKey) {
+          sanitizedNotes[cleanKey] = cleanVal;
+        }
+      }
+    }
+
     const order = await razorpay.orders.create({
       amount: validatedAmount, // server-validated amount in paise
       currency: currency || 'INR',
-      receipt: receipt || `farminix_${Date.now()}`,
-      notes: { ...notes, coupon_code: discount > 0 ? coupon.code : '', coupon_discount: String(discount) },
+      receipt: (receipt ? String(receipt) : `farminix_${Date.now()}`).slice(0, 40),
+      notes: sanitizedNotes,
     });
 
     res.status(200).json({
@@ -85,9 +108,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (error: any) {
     console.error('Razorpay Create Order Error:', error);
-    res.status(500).json({
+    const errorMsg = error?.error?.description || error?.message || 'Failed to create Razorpay order';
+    res.status(error?.statusCode || 500).json({
       success: false,
-      error: error.message || 'Failed to create Razorpay order',
+      error: errorMsg,
     });
   }
 }
