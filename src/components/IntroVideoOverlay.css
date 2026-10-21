@@ -13,7 +13,7 @@
   background: #241235;
   color: #fff8e9;
   opacity: 1;
-  transition: opacity 450ms ease;
+  transition: opacity 220ms ease;
   overscroll-behavior: contain;
 }
 .harvest-intro::backdrop { background: #241235; }
@@ -55,6 +55,10 @@
 .harvest-intro-welcome { width: 235px; }
 .harvest-intro-welcome > span { display: block; color: #dfc9f0; font-size: 8px; letter-spacing: 2.3px; }
 .harvest-intro-status { color: #d3bce5; font-size: 10px; font-weight: 300; line-height: 1.6; text-align: right; }
+.harvest-intro-enter { display: inline-flex; align-items: center; justify-content: center; gap: 22px; min-height: 48px; padding: 14px 26px; flex-shrink: 0; border: 1px solid #e8d5f9; border-radius: 100px; background: #fff6df; color: #3d2055; font-family: inherit; font-size: 12px; font-weight: 500; line-height: 1.3; cursor: pointer; }
+.harvest-intro-enter:hover { background: #eedffb; }
+.harvest-intro-enter:active { background: #dfc6f3; }
+.premium-storefront .harvest-intro .harvest-intro-enter:focus-visible,
 .premium-storefront .harvest-intro .paddy-harvest-control:focus-visible { outline: 2px solid #d8b7f8; outline-offset: 5px; }
 .harvest-intro-loading { display: grid; align-content: center; justify-items: center; gap: 16px; height: 100%; background: radial-gradient(ellipse at 70% 30%, #9060b577, transparent 70%); }
 .harvest-intro-loading p { color: #fff6df; font: 400 clamp(32px, 6vw, 76px)/1.15 Georgia, serif; }
@@ -70,7 +74,7 @@
   .harvest-intro .paddy-harvest-copy h2 { font-size: clamp(39px, 11vw, 58px); margin: 15px 0 12px; }
   .harvest-intro .paddy-harvest-copy p { display: none; }
   .harvest-intro .paddy-harvest-control { margin-top: 15px; }
-  .harvest-intro .paddy-harvest-canvas, .harvest-intro .paddy-harvest-fallback { top: 260px; bottom: 230px; height: auto; min-height: 0; }
+  .harvest-intro .paddy-harvest-canvas, .harvest-intro .paddy-harvest-mobile-canvas, .harvest-intro .paddy-harvest-fallback { top: 260px; bottom: auto; height: calc(100% - 490px); min-height: 0; }
   .harvest-intro .paddy-harvest-backdrop { height: 72%; }
   .harvest-intro .paddy-harvest-product { right: 50%; bottom: 96px; width: 180px; }
   .harvest-intro .paddy-harvest-product img { height: 190px; }
@@ -81,6 +85,7 @@
   .harvest-intro-welcome { width: 130px; }
   .harvest-intro-welcome > span { font-size: 7px; letter-spacing: 1.1px; line-height: 1.7; }
   .harvest-intro-status { max-width: 155px; font-size: 9px; }
+  .harvest-intro-enter { min-height: 48px; padding: 13px 20px; gap: 16px; font-size: 12px; }
 }
 @media (max-width: 767px) and (max-height: 700px) {
   .harvest-intro-header { top: 12px; }
@@ -88,7 +93,7 @@
   .harvest-intro .paddy-harvest-content { padding-top: 90px; }
   .harvest-intro .paddy-harvest-copy h2 { font-size: 33px; margin-block: 10px; }
   .harvest-intro .paddy-harvest-control { margin-top: 10px; }
-  .harvest-intro .paddy-harvest-canvas, .harvest-intro .paddy-harvest-fallback { top: 215px; bottom: 155px; }
+  .harvest-intro .paddy-harvest-canvas, .harvest-intro .paddy-harvest-mobile-canvas, .harvest-intro .paddy-harvest-fallback { top: 215px; height: calc(100% - 370px); }
   .harvest-intro .paddy-harvest-product { bottom: 74px; width: 140px; }
   .harvest-intro .paddy-harvest-product img { height: 135px; }
   .harvest-intro .paddy-harvest-product figcaption { display: none; }

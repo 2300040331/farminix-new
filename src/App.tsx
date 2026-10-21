@@ -43,7 +43,17 @@ export function AppContent() {
   const { currentRoute, navigate } = useApp();
   const { publishedConfig, isAdminLoggedIn } = useAdminConfig();
   const [hasFinishedIntro, setHasFinishedIntro] = React.useState(false);
-  const finishIntro = React.useCallback(() => setHasFinishedIntro(true), []);
+  const navigateRef = React.useRef(navigate);
+  React.useEffect(() => { navigateRef.current = navigate; }, [navigate]);
+  const finishIntro = React.useCallback(() => {
+    setHasFinishedIntro(true);
+    navigateRef.current('/', undefined, { replace: true });
+    // Run after the dialog restores focus, so entry always lands on the home hero.
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.querySelector<HTMLElement>('.storefront-main')?.focus({ preventScroll: true });
+    });
+  }, []);
   const isCommercePage = ['/checkout', '/products', '/offers'].includes(currentRoute.pathname) || currentRoute.pathname.startsWith('/product/') || currentRoute.searchParams.has('search') || currentRoute.searchParams.has('category');
 
   // All pages share the same responsive scale across operating systems.
@@ -137,7 +147,7 @@ export function AppContent() {
       <MainHeader />
 
       {/* MAIN CONTENT BODY */}
-      <main className="storefront-main flex-1 w-full">
+      <main className="storefront-main flex-1 w-full" tabIndex={-1}>
         {renderMainContent()}
       </main>
 

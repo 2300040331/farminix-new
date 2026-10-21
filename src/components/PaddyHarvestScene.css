@@ -1,7 +1,9 @@
 .paddy-harvest-scene { position: relative; min-height: 800px; overflow: hidden; isolation: isolate; background: #241235; color: #fff8e9; }
 .paddy-harvest-backdrop { position: absolute; right: -1%; top: -2%; width: 78%; height: 105%; object-fit: cover; object-position: 70% center; filter: blur(11px) grayscale(1) brightness(.65); opacity: .14; mix-blend-mode: luminosity; mask-image: linear-gradient(to right, transparent, #000 40%); pointer-events: none; }
 .paddy-harvest-atmosphere { position: absolute; inset: 0; background: radial-gradient(ellipse at 73% 22%, #9f6bce4d, transparent 58%), radial-gradient(ellipse at 65% 95%, #a46be82e, transparent 40%), linear-gradient(90deg, #241235 10%, #2c1746c9 45%, #44235b45); pointer-events: none; }
-.paddy-harvest-canvas, .paddy-harvest-fallback { position: absolute; right: 0; top: 0; width: 72%; height: calc(100% - 190px); pointer-events: none; }
+.paddy-harvest-canvas, .paddy-harvest-mobile-canvas, .paddy-harvest-fallback { position: absolute; right: 0; top: 0; width: 72%; height: calc(100% - 190px); pointer-events: none; }
+.paddy-harvest-mobile-canvas { contain: layout paint; }
+.paddy-harvest-scene:not([data-renderer='canvas2d']) .paddy-harvest-mobile-canvas { visibility: hidden; }
 .paddy-harvest-content { position: relative; z-index: 2; min-height: 800px; display: flex; align-items: center; pointer-events: none; }
 .paddy-harvest-copy { width: 380px; max-width: 35%; padding-block: 55px; pointer-events: auto; }
 .paddy-harvest-eyebrow { display: inline-flex; align-items: center; gap: 10px; color: #dbc4f1; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 2.5px; }
@@ -48,13 +50,15 @@
   .paddy-harvest-scene, .paddy-harvest-content { min-height: 760px; }
   .paddy-harvest-copy { max-width: 38%; }
   .paddy-harvest-copy h2 { font-size: 44px; }
-  .paddy-harvest-canvas, .paddy-harvest-fallback { width: 70%; }
+  .paddy-harvest-canvas, .paddy-harvest-mobile-canvas, .paddy-harvest-fallback { width: 70%; }
   .paddy-harvest-copy p { font-size: 11px; }
   .paddy-harvest-product { right: 16%; }
 }
 @media (max-width: 767px) {
   .paddy-harvest-scene { min-height: 940px; }
-  .paddy-harvest-backdrop { width: 105%; height: 75%; top: auto; bottom: -3%; object-position: 65% center; mask-image: linear-gradient(to bottom, transparent, #000 30%); }
+  .paddy-harvest-backdrop { display: none; }
+  .paddy-harvest-product::before { background: radial-gradient(ellipse, #c38bf830, transparent 70%); filter: none; }
+  .paddy-harvest-product img { filter: none; }
   .paddy-harvest-content { min-height: 0; align-items: start; }
   .paddy-harvest-copy { width: 100%; max-width: 100%; padding-block: 35px 0; }
   .paddy-harvest-eyebrow { font-size: 8px; letter-spacing: 2px; }
@@ -62,7 +66,7 @@
   .paddy-harvest-copy p { font-size: 11px; max-width: 285px; line-height: 1.9; }
   .paddy-harvest-rule, .paddy-harvest-caption, .paddy-harvest-hint { display: none; }
   .paddy-harvest-control { margin-top: 18px; padding: 8px 13px; font-size: 9px; }
-  .paddy-harvest-canvas, .paddy-harvest-fallback { top: 285px; width: 100%; height: 420px; }
+  .paddy-harvest-canvas, .paddy-harvest-mobile-canvas, .paddy-harvest-fallback { top: 285px; width: 100%; height: 420px; }
   .paddy-harvest-product { right: 50%; transform: translateX(50%); bottom: 38px; width: 210px; }
   .paddy-harvest-product img { height: 285px; }
   .paddy-harvest-corner-note { right: 20px; bottom: 17px; font-size: 7px; }

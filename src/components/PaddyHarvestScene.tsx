@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Leaf, Pause, Play } from 'lucide-react';
 import { createHarvestRenderer } from './paddyHarvestRenderer';
 import type { HarvestRenderer } from './paddyHarvestRenderer';
+import { createMobileHarvestRenderer } from './paddyHarvestMobileRenderer';
 import PaddyHarvestFallback from './PaddyHarvestFallback';
 import './PaddyHarvestScene.css';
 
@@ -16,14 +17,14 @@ export default function PaddyHarvestScene({ variant = 'section', onReady, onComp
   const titleId = useId();
   const rootRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<HarvestRenderer | null>(null);
   const visibleRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(() => variant === 'intro' || !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const [isProductReady, setIsProductReady] = useState(false);
-  const waitingForProduct = variant === 'intro' && !isProductReady;
+  const [isLightweight] = useState(() => window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const onCompleteRef = useRef(onComplete);
   const playingRef = useRef(isPlaying);
-  const [renderer, setRenderer] = useState<'pending' | 'webgl2' | 'svg'>('pending');
+  const [renderer, setRenderer] = useState<'pending' | 'webgl2' | 'canvas2d' | 'svg'>('pending');
 
   useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
 
@@ -32,24 +33,27 @@ export default function PaddyHarvestScene({ variant = 'section', onReady, onComp
   }, [renderer, onReady]);
 
   useEffect(() => {
-    const canvas = canvasRef.current, root = rootRef.current;
-    if (!canvas || !root) return;
+    const canvas = canvasRef.current, mobileCanvas = mobileCanvasRef.current, root = rootRef.current;
+    if (!canvas || !mobileCanvas || !root) return;
     let initialized = false;
+    const sequence = variant === 'intro' ? { once: true, onComplete: () => onCompleteRef.current?.() } : undefined;
+    const initializeMobileRenderer = () => {
+      try { rendererRef.current = createMobileHarvestRenderer(mobileCanvas, sequence); } catch { rendererRef.current = null; }
+      setRenderer(rendererRef.current ? 'canvas2d' : 'svg');
+    };
     const update = () => {
       const rect = canvas.getBoundingClientRect();
       const visible = rect.width > 0 && rect.height > 0 && rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0;
       visibleRef.current = visible;
       root.dataset.visible = String(visible);
-      if (!initialized && visible && !document.hidden && !suspended && !waitingForProduct) {
+      if (!initialized && visible && !document.hidden && !suspended) {
         initialized = true;
-        // Phone playback uses shaded SVG grains, independent of WebGL and video autoplay restrictions.
-        const useVector = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (!useVector) {
-          try { rendererRef.current = createHarvestRenderer(canvas, variant === 'intro' ? { once: true, onComplete: () => onCompleteRef.current?.() } : undefined); } catch { rendererRef.current = null; }
+        if (!isLightweight) {
+          try { rendererRef.current = createHarvestRenderer(canvas, sequence); } catch { rendererRef.current = null; }
         }
-        setRenderer(rendererRef.current ? 'webgl2' : 'svg');
+        if (rendererRef.current) setRenderer('webgl2'); else initializeMobileRenderer();
       }
-      const running = playingRef.current && visible && !document.hidden && !suspended && !waitingForProduct;
+      const running = playingRef.current && visible && !document.hidden && !suspended;
       root.dataset.running = String(running);
       rendererRef.current?.setRunning(running);
     };
@@ -60,7 +64,7 @@ export default function PaddyHarvestScene({ variant = 'section', onReady, onComp
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
     const changePreference = () => { if (variant !== 'intro') setIsPlaying(!preference.matches); };
     const contextLost = (event: Event) => {
-      event.preventDefault(); rendererRef.current?.dispose(); rendererRef.current = null; setRenderer('svg'); update();
+      event.preventDefault(); rendererRef.current?.dispose(); rendererRef.current = null; initializeMobileRenderer(); update();
     };
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update, { passive: true });
@@ -77,14 +81,14 @@ export default function PaddyHarvestScene({ variant = 'section', onReady, onComp
       canvas.removeEventListener('webglcontextlost', contextLost);
       rendererRef.current?.dispose(); rendererRef.current = null;
     };
-  }, [suspended, waitingForProduct, variant]);
+  }, [suspended, variant, isLightweight]);
 
   useEffect(() => {
     playingRef.current = isPlaying;
-    const running = isPlaying && visibleRef.current && !document.hidden && !suspended && !waitingForProduct;
+    const running = isPlaying && visibleRef.current && !document.hidden && !suspended;
     if (rootRef.current) rootRef.current.dataset.running = String(running);
     rendererRef.current?.setRunning(running);
-  }, [isPlaying, suspended, waitingForProduct]);
+  }, [isPlaying, suspended]);
 
   return (
     <section ref={rootRef} className={`paddy-harvest-scene paddy-harvest-${variant}`} aria-labelledby={titleId} data-renderer={renderer} data-playing={isPlaying}
@@ -93,12 +97,13 @@ export default function PaddyHarvestScene({ variant = 'section', onReady, onComp
         const rect = event.currentTarget.getBoundingClientRect();
         rendererRef.current?.setPointer((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height * 2 - 1));
       }} onPointerLeave={() => rendererRef.current?.setPointer(0, 0)}>
-      <img className="paddy-harvest-backdrop" src="/paddy-harvest-reference.png" alt="" aria-hidden="true" loading={variant === 'intro' ? 'eager' : 'lazy'} />
+      {!isLightweight && <img className="paddy-harvest-backdrop" src="/paddy-harvest-reference.png" alt="" aria-hidden="true" loading="lazy" />}
       <div className="paddy-harvest-atmosphere" aria-hidden="true" />
       <canvas ref={canvasRef} className="paddy-harvest-canvas" aria-hidden="true" />
-      {renderer !== 'webgl2' && <div className="paddy-harvest-fallback" aria-hidden="true"><PaddyHarvestFallback once={variant === 'intro'} onComplete={onComplete} /></div>}
+      <canvas ref={mobileCanvasRef} className="paddy-harvest-mobile-canvas" aria-hidden="true" />
+      {renderer === 'svg' && <div className="paddy-harvest-fallback" aria-hidden="true"><PaddyHarvestFallback once={variant === 'intro'} onComplete={onComplete} /></div>}
       <figure className="paddy-harvest-product">
-        <img src="/farminix_rice_front.png" alt="Farminix Family Choice Rice, 26 kg bag" loading={variant === 'intro' ? 'eager' : 'lazy'} onLoad={() => setIsProductReady(true)} onError={() => setIsProductReady(true)} />
+        <img src="/farminix_rice_front.png" alt="Farminix Family Choice Rice, 26 kg bag" loading={variant === 'intro' ? 'eager' : 'lazy'} decoding="async" />
         <figcaption><strong>Farminix Family Choice Rice</strong><span>From our fields to your family · 26 kg</span></figcaption>
       </figure>
       <div className="store-container paddy-harvest-content">
