@@ -12,9 +12,7 @@
 .paddy-harvest-copy p { color: #d3c2df; font-size: 12px; font-weight: 300; line-height: 2; max-width: 300px; }
 .paddy-harvest-rule { height: 1px; width: 52px; background: #c9a2e270; margin: 29px 0 18px; }
 .paddy-harvest-caption { display: block; color: #dfcce9; font-size: 10px; font-weight: 400; letter-spacing: .2px; }
-.paddy-harvest-control { display: flex; align-items: center; gap: 9px; margin-top: 30px; border: 1px solid #dfc4fa55; color: #f1e6fa; background: #ffffff08; padding: 10px 16px; border-radius: 25px; font-size: 10px; font-weight: 400; transition: background 180ms, border-color 180ms; }
-.paddy-harvest-control:hover { background: #e5ccff14; border-color: #dfc4faa0; }
-.paddy-harvest-hint, .paddy-harvest-motion-note { display: block; color: #cdb4de; font-size: 9px; margin-top: 15px; font-weight: 300; }
+.paddy-harvest-hint { display: block; color: #cdb4de; font-size: 9px; margin-top: 15px; font-weight: 300; }
 .paddy-harvest-corner-note { position: absolute; right: 40px; bottom: 24px; color: #e6c8ff8c; font-size: 8px; letter-spacing: 3px; pointer-events: none; }
 .paddy-harvest-product { position: absolute; z-index: 1; right: 20%; bottom: 26px; width: 230px; margin: 0; text-align: center; pointer-events: none; }
 .paddy-harvest-product::before { content: ''; position: absolute; left: 5%; right: 5%; bottom: 34px; height: 34px; border-radius: 50%; background: #c38bf83b; filter: blur(16px); }
@@ -39,8 +37,7 @@
   96%, 100% { transform: translate(var(--fall-drift), 450px) rotate(420deg); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  /* Preserve full harvest playback against the storefront's near-zero duration rule.
-     The opening autoplays as requested; the inline scene still starts paused. */
+  /* Preserve full harvest playback against the storefront's near-zero duration rule. */
   .premium-storefront .paddy-harvest-scene .paddy-vector-stalk { animation: none !important; }
   .premium-storefront .paddy-harvest-scene .paddy-vector-falling { animation-duration: var(--grain-cycle) !important; animation-iteration-count: infinite !important; }
   .premium-storefront .paddy-harvest-scene .paddy-harvest-vector[data-once='true'] .paddy-vector-falling { animation-iteration-count: 2 !important; }
@@ -65,7 +62,6 @@
   .paddy-harvest-copy h2 { font-size: 43px; margin: 17px 0 13px; }
   .paddy-harvest-copy p { font-size: 11px; max-width: 285px; line-height: 1.9; }
   .paddy-harvest-rule, .paddy-harvest-caption, .paddy-harvest-hint { display: none; }
-  .paddy-harvest-control { margin-top: 18px; padding: 8px 13px; font-size: 9px; }
   .paddy-harvest-canvas, .paddy-harvest-mobile-canvas, .paddy-harvest-fallback { top: 285px; width: 100%; height: 420px; }
   .paddy-harvest-product { right: 50%; transform: translateX(50%); bottom: 38px; width: 210px; }
   .paddy-harvest-product img { height: 285px; }
