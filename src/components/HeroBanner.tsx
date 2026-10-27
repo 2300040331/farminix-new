@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { ArrowRight, ChevronLeft, ChevronRight, Leaf, Play, ShieldCheck, Users, Wheat, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowRight, ChevronLeft, ChevronRight, Leaf, ShieldCheck, Users, Wheat } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import './HeroBanner.css';
@@ -31,47 +30,14 @@ export function HeroBanner() {
   const [isPaused, setIsPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [hasFocus, setHasFocus] = useState(false);
-  const [isStoryOpen, setIsStoryOpen] = useState(false);
-  const storyDialogRef = useRef<HTMLDivElement>(null);
-  const storyButtonRef = useRef<HTMLButtonElement>(null);
   const active = slides.length ? index % slides.length : 0;
   const isFarmSlide = (image: string) => /(?:^|\/)hero_banner_original\.jpg(?:\?|$)/i.test(image);
-  const intro = publishedConfig.introVideo;
-  const storySource = (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
-    ? intro.mobileUrl || intro.desktopUrl : intro.desktopUrl);
 
   useEffect(() => {
-    if (!hero.enabled || slides.length < 2 || isPaused || isHovered || hasFocus || isStoryOpen || hero.autoplay === false || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!hero.enabled || slides.length < 2 || isPaused || isHovered || hasFocus || hero.autoplay === false || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const timer = window.setInterval(() => setIndex((previous) => (previous + 1) % slides.length), Math.max(3, hero.intervalSeconds || 5) * 1000);
     return () => window.clearInterval(timer);
-  }, [hero.enabled, hero.autoplay, hero.intervalSeconds, slides.length, isPaused, isHovered, hasFocus, isStoryOpen]);
-
-  useEffect(() => {
-    if (!isStoryOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    const returnFocusElement = storyButtonRef.current;
-    document.body.style.overflow = 'hidden';
-    storyDialogRef.current?.focus();
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsStoryOpen(false);
-      if (event.key === 'Tab') {
-        const focusable = storyDialogRef.current?.querySelectorAll<HTMLElement>('button, video[controls]');
-        const first = focusable?.[0];
-        const last = focusable?.[focusable.length - 1];
-        if (event.shiftKey && (document.activeElement === first || document.activeElement === storyDialogRef.current)) {
-          event.preventDefault(); last?.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault(); first?.focus();
-        }
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener('keydown', onKeyDown);
-      returnFocusElement?.focus();
-    };
-  }, [isStoryOpen]);
+  }, [hero.enabled, hero.autoplay, hero.intervalSeconds, slides.length, isPaused, isHovered, hasFocus]);
 
   if (!hero.enabled || !slides.length) return null;
   const move = (direction: number) => setIndex((previous) => (previous + direction + slides.length) % slides.length);
@@ -101,7 +67,6 @@ export function HeroBanner() {
                   </div>
                   <div className="farm-hero-actions">
                     <button className="farm-shop-button" onClick={() => open(slide.linkUrl || hero.shopNowUrl || '/products')}>{slide.buttonText || 'Shop now'}<ArrowRight size={24} /></button>
-                    <button className="farm-story-button" ref={slideIndex === active ? storyButtonRef : undefined} onClick={() => storySource ? setIsStoryOpen(true) : navigate('/about')}><span><Play size={19} fill="currentColor" /></span><span>Watch Our Story</span></button>
                   </div>
                 </div>
                 <div className="farm-quality-seal" aria-label="Premium quality grains from our farms"><Wheat size={25} /><strong>Premium</strong><span>Quality Grains</span><small>From Our Farms</small><Leaf size={21} /></div>
@@ -123,14 +88,6 @@ export function HeroBanner() {
         </div>
       ))}
       {slides.length > 1 && <div className="home-carousel-controls"><button type="button" aria-label="Previous banner" onClick={() => move(-1)}><ChevronLeft size={19} /></button>{slides.map((slide, slideIndex) => <button key={slide.id} type="button" aria-label={`Show banner ${slideIndex + 1}`} aria-current={slideIndex === active ? 'true' : undefined} className="home-carousel-dot" onClick={() => setIndex(slideIndex)} />)}<button type="button" aria-label="Next banner" onClick={() => move(1)}><ChevronRight size={19} /></button><button type="button" className="home-carousel-pause" onClick={() => setIsPaused((previous) => !previous)}>{isPaused ? 'Play' : 'Pause'}</button></div>}
-      {isStoryOpen && createPortal(
-        <div className="farm-story-backdrop" onClick={(event) => { if (event.target === event.currentTarget) setIsStoryOpen(false); }}>
-          <div ref={storyDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="farm-story-title" className="farm-story-dialog">
-            <div><h2 id="farm-story-title">From Farm to Family</h2><button onClick={() => setIsStoryOpen(false)} aria-label="Close our story"><X size={22} /></button></div>
-            <video src={storySource} controls tabIndex={0} autoPlay playsInline preload="metadata" aria-label="The Farminix story" />
-          </div>
-        </div>, document.body,
-      )}
     </section>
   );
 }
