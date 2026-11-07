@@ -68,7 +68,7 @@ export const BottomFeatureStripManager: React.FC = () => {
             Bottom Benefits Strip Management
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Configure the 4 customer assurance boxes at the bottom: No Min Order, Easy Returns, 24/7 Support, Quality Assured.
+            Configure the 4 customer assurance boxes at the bottom: No Min Order, Easy Returns, Customer Support, Quality Assured.
           </p>
         </div>
 

@@ -1,3 +1,4 @@
+import type { UserAddress } from '../types';
 export interface RazorpayOptions {
   key: string;
   amount: number; // in paise
@@ -62,13 +63,14 @@ export const createServerOrder = async (
   amount: number,
   notes?: Record<string, string>,
   cart?: { productId: string; quantity: number }[],
-  couponCode?: string | null
-): Promise<{ orderId?: string; keyId?: string; error?: string } | null> => {
+  couponCode?: string | null,
+  address?: UserAddress
+): Promise<{ orderId?: string; keyId?: string; error?: string; loginRequired?: boolean } | null> => {
   try {
     const res = await fetch('/api/payment/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount, notes, cart, couponCode }),
+      body: JSON.stringify({ amount, notes, cart, couponCode, address }),
     });
     const data = await res.json().catch(() => null);
     if (res.ok && data?.success && data?.order) {
@@ -78,10 +80,10 @@ export const createServerOrder = async (
       };
     }
     if (data?.error) {
-      return { error: data.error };
+      return { error: data.error, loginRequired: res.status === 401 };
     }
   } catch (e) {
-    console.warn('Backend order creation endpoint unreachable, falling back to direct client checkout', e);
+    console.warn('Backend order creation endpoint unreachable', e);
   }
   return null;
 };

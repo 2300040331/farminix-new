@@ -1,3 +1,4 @@
+import type { DeliveryAreaConfig } from '../../server/delivery-policy';
 import type { Product, Category, DealCard, User, Order } from '../types';
 
 export interface ThemeTokens {
@@ -416,6 +417,7 @@ export interface PaymentMethodItem {
 }
 
 export interface CheckoutPaymentConfig {
+  deliveryArea?: DeliveryAreaConfig;
   expressSlotLabel: string;
   expressSlotSublabel: string;
   scheduledSlotLabel: string;
@@ -487,6 +489,11 @@ export interface QueriesPageConfig {
 }
 
 export interface CustomerEnquiry {
+  source?: 'support' | 'enquiry';
+  customerId?: string;
+  orderId?: string;
+  publicReply?: string;
+  repliedAt?: string;
   id: string;
   name: string;
   mobile: string;

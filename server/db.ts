@@ -30,6 +30,8 @@ interface FallbackStore {
   users: Map<string, any>;
   addresses: Map<string, any>;
   adminSessions: Map<string, { token: string; expiresAt: number }>;
+  customerSessions: Map<string, any>;
+  customerPaymentOrders: Map<string, any>;
 }
 
 const fallback: FallbackStore = {
@@ -42,6 +44,8 @@ const fallback: FallbackStore = {
   users: new Map(),
   addresses: new Map(),
   adminSessions: new Map(),
+  customerSessions: new Map(),
+  customerPaymentOrders: new Map(),
 };
 
 /**
@@ -292,6 +296,21 @@ async function seedPostgresData(client: pg.PoolClient) {
 function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCount: number } {
   const normalized = sql.trim().toUpperCase();
 
+  if (normalized.includes('CUSTOMER_SESSIONS')) {
+    if (normalized.startsWith('INSERT')) { fallback.customerSessions.set(params[0], { token_hash: params[0], user_id: params[1], expires_at: params[2] }); return { rows: [], rowCount: 1 }; }
+    if (normalized.startsWith('DELETE')) { fallback.customerSessions.delete(params[0]); return { rows: [], rowCount: 1 }; }
+    const session = fallback.customerSessions.get(params[0]); return { rows: session ? [session] : [], rowCount: session ? 1 : 0 };
+  }
+  if (normalized.includes('CUSTOMER_PAYMENT_ORDERS')) {
+    if (normalized.startsWith('INSERT')) { fallback.customerPaymentOrders.set(params[0], { id: params[0], user_id: params[1] }); return { rows: [], rowCount: 1 }; }
+    const payment = fallback.customerPaymentOrders.get(params[0]); return { rows: payment ? [payment] : [], rowCount: payment ? 1 : 0 };
+  }
+  if (normalized.startsWith('UPDATE USERS SET SAVED_ADDRESSES')) {
+    const user = fallback.users.get(params[1]);
+    if (user) { user.saved_addresses = JSON.parse(params[0]); return { rows: [user] as any, rowCount: 1 }; }
+    return { rows: [], rowCount: 0 };
+  }
+
   // 1. SELECT site_config
   if (normalized.startsWith('SELECT') && normalized.includes('FROM SITE_CONFIG')) {
     const key = params[0] || 'farminix:site-config:v1';
@@ -362,6 +381,7 @@ function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCo
       customer_name: customerName,
       customer_phone: customerPhone,
       customer_email: customerEmail,
+      user_id: params[16] || null,
       delivery_address: deliveryAddress,
       items,
       total_amount: totalAmount,
@@ -383,6 +403,22 @@ function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCo
 
   // 6. SELECT orders
   if (normalized.startsWith('SELECT') && normalized.includes('FROM ORDERS')) {
+    if (normalized.includes('GROUP BY USER_ID')) {
+      const totals = new Map<string, any>();
+      for (const order of fallback.orders.values()) {
+        if (!order.user_id) continue;
+        const summary = totals.get(order.user_id) || { user_id: order.user_id, order_count: 0, order_value: 0, last_order_at: null };
+        summary.order_count++; summary.order_value += Number(order.final_amount) || 0;
+        if (!summary.last_order_at || new Date(order.created_at) > new Date(summary.last_order_at)) summary.last_order_at = order.created_at;
+        totals.set(order.user_id, summary);
+      }
+      return { rows: [...totals.values()] as any, rowCount: totals.size };
+    }
+    if (normalized.includes('WHERE USER_ID = $1')) {
+      const matches = Array.from(fallback.orders.values()).filter(order => order.user_id === params[0]).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      const list = matches.slice(Number(params[1]) || 0, (Number(params[1]) || 0) + 21);
+      return { rows: list as any, rowCount: list.length };
+    }
     if (normalized.includes('REQUEST_ID = $1')) {
       const match = Array.from(fallback.orders.values()).find((o) => o.request_id === params[0]);
       return { rows: match ? [match] : [] as any, rowCount: match ? 1 : 0 };
@@ -419,6 +455,7 @@ function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCo
     const email = params[3];
     const message = params[4];
     const kind = params[5];
+    if (fallback.enquiries.has(id)) return { rows: [], rowCount: 0 };
     const enquiry = {
       id,
       name,
@@ -426,6 +463,7 @@ function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCo
       email,
       message,
       kind,
+      source: params[6] || 'enquiry', customer_id: params[7] || null, order_id: params[8] || null, public_reply: '', replied_at: null,
       status: 'new',
       admin_notes: '',
       created_at: new Date(),
@@ -438,13 +476,18 @@ function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCo
   // 9. SELECT customer_enquiries
   if (normalized.startsWith('SELECT') && normalized.includes('FROM CUSTOMER_ENQUIRIES')) {
     let list = Array.from(fallback.enquiries.values());
+    if (normalized.includes('WHERE ID = $1')) list = list.filter(row => row.id === params[0]);
+    if (normalized.includes('CUSTOMER_ID = $1')) list = list.filter(row => row.customer_id === params[0]);
     if (normalized.includes('DELETED_AT IS NOT NULL')) {
       list = list.filter((e) => e.deleted_at !== null);
     } else if (normalized.includes('DELETED_AT IS NULL')) {
       list = list.filter((e) => e.deleted_at === null);
     }
-    list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    return { rows: list as any, rowCount: list.length };
+    list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime() || String(b.id).localeCompare(String(a.id)));
+    if (normalized.includes('COUNT(*)')) return { rows: [{ total: list.length }] as any, rowCount: 1 };
+    const total = list.length;
+    if (normalized.includes('LIMIT')) { const start = Number(params[normalized.includes('CUSTOMER_ID = $1') ? 2 : 1]) || 0; list = list.slice(start, start + 25); }
+    return { rows: list as any, rowCount: Math.min(total, list.length) };
   }
 
   // 10. UPDATE customer_enquiries
@@ -459,7 +502,8 @@ function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCo
       }
       if (normalized.includes('STATUS = $1')) {
         e.status = params[0];
-        e.admin_notes = params[1] || e.admin_notes;
+        e.admin_notes = params[1];
+        if (normalized.includes('PUBLIC_REPLY = $3')) { if (e.public_reply !== params[2]) e.replied_at = new Date(); e.public_reply = params[2]; }
       }
       fallback.enquiries.set(id, e);
       return { rows: [e] as any, rowCount: 1 };
@@ -469,6 +513,7 @@ function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCo
 
   // 11. USERS fallback
   if (normalized.startsWith('INSERT INTO USERS')) {
+    if (Array.from(fallback.users.values()).some(user => user.email === params[2] || user.phone === params[3])) throw Object.assign(new Error('Account already exists.'), { code: '23505' });
     const id = params[0];
     const name = params[1];
     const email = params[2];
@@ -489,6 +534,7 @@ function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCo
       reward_points,
       wallet_balance,
       is_verified,
+      saved_addresses: [],
       created_at: new Date(),
       updated_at: new Date(),
     };
@@ -515,7 +561,7 @@ function executeFallbackQuery<T>(sql: string, params: any[]): { rows: T[]; rowCo
       const match = fallback.users.get(params[0]);
       return { rows: match ? [match] : [] as any, rowCount: match ? 1 : 0 };
     }
-    const list = Array.from(fallback.users.values());
+    const list = Array.from(fallback.users.values()).filter(user => !normalized.includes('WHERE ROLE = $1') || user.role === params[0]);
     return { rows: list as any, rowCount: list.length };
   }
 

@@ -68,7 +68,7 @@ export const FeatureStripManager: React.FC = () => {
             Top 5 Feature Strip Management
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Customize the 5 benefit cards: 10 Min Delivery, Quality Assured, Best Prices, Safe &amp; Secure, and 24/7 Support.
+            Customize the 5 benefit cards: 10 Min Delivery, Quality Assured, Best Prices, Safe &amp; Secure, and Customer Support.
           </p>
         </div>
 

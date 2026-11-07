@@ -1,4 +1,3 @@
-import { AdminSymbol } from '../components/AdminSymbol';
 import React, { useState } from 'react';
 import {
   ShoppingCart,
@@ -8,7 +7,6 @@ import {
   Plus,
   Trash2,
   Sparkles,
-  Zap,
   IndianRupee,
   Eye,
   EyeOff,
@@ -111,7 +109,7 @@ export const CartManager: React.FC = () => {
             </h1>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Configure superfast delivery announcement banner, promo codes, handling fees, and empty cart screen.
+            Configure promo codes, handling fees, and the empty cart screen. Delivery pricing is managed under Payments & Delivery.
           </p>
         </div>
 
@@ -140,46 +138,7 @@ export const CartManager: React.FC = () => {
         </div>
       )}
 
-      {/* ── 1. SUPERFAST DELIVERY BANNER ── */}
-      <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
-        <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-          <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
-          <span>Superfast Delivery Banner in Cart</span>
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 uppercase">Banner Announcement Text</label>
-            <input
-              type="text"
-              value={formData.deliveryBannerText}
-              onChange={(e) => setFormData({ ...formData, deliveryBannerText: e.target.value })}
-              className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:border-[#7C3AED] focus:bg-white focus:outline-none"
-              placeholder="Superfast Delivery! Your order will reach in 10 Mins."
-            />
-          </div>
-
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 uppercase">Delivery Time Highlight</label>
-            <input
-              type="text"
-              value={formData.deliveryTimeText}
-              onChange={(e) => setFormData({ ...formData, deliveryTimeText: e.target.value })}
-              className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:border-[#7C3AED] focus:bg-white focus:outline-none"
-              placeholder="10 Mins"
-            />
-          </div>
-        </div>
-
-        {/* Live Preview */}
-        <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3">
-          <AdminSymbol name="delivery"/>
-          <div className="text-xs">
-            <span className="font-extrabold text-amber-950">Superfast Delivery! </span>
-            <span className="text-amber-800 font-medium">Your order will reach in {formData.deliveryTimeText}.</span>
-          </div>
-        </div>
-      </div>
+      <div className="admin-panel bg-purple-50 p-5 rounded-2xl border border-purple-100 text-xs text-purple-900 leading-6">Guntur delivery is free within 10 km of the warehouse. Choose a fixed delivery amount or a charge per kilometre, and manage the warehouse pin under Payments &amp; Delivery. Checkout calculates delivery charges from each customer's confirmed pin.</div>
 
       {/* ── 2. COUPON & PROMO CODES ── */}
       <div className="admin-panel bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
@@ -270,29 +229,7 @@ export const CartManager: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 uppercase">Delivery Fee (₹) [0 for Free]</label>
-            <input
-              type="number"
-              min="0"
-              value={formData.deliveryFee}
-              onChange={(e) => setFormData({ ...formData, deliveryFee: Number(e.target.value) || 0 })}
-              className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:border-[#7C3AED] focus:bg-white focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 uppercase">Free Delivery Above (₹)</label>
-            <input
-              type="number"
-              min="0"
-              value={formData.freeDeliveryThreshold}
-              onChange={(e) =>
-                setFormData({ ...formData, freeDeliveryThreshold: Number(e.target.value) || 0 })
-              }
-              className="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:border-[#7C3AED] focus:bg-white focus:outline-none"
-            />
-          </div>
+          <p className="sm:col-span-2 text-xs text-slate-500 leading-6">Delivery within Guntur is free up to 10 km from the warehouse. Configure fixed or per-kilometre charges for other deliveries under Payments &amp; Delivery. Cart-value delivery thresholds no longer apply.</p>
         </div>
       </div>
 

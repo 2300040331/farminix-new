@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
-  CheckCircle2, Truck, Zap,
-  Plus, Navigation, Loader2, Check, Phone, ShieldCheck, AlertCircle, Trash2, MapPin,
+  CheckCircle2, Truck,
+  Plus, Loader2, Phone, ShieldCheck, AlertCircle, Trash2, MapPin,
   ChevronRight, ChevronDown, House, Building2, Pencil, Leaf, LockKeyhole, Tag, CreditCard, Smartphone, Banknote, Landmark, X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import { defaultCheckoutPaymentConfig, defaultCartConfig } from '../admin/defaultConfig';
-import { detectUserLocation, lookupPincode } from '../utils/location';
+import { checkDelivery, validDeliveryLocation } from '../../server/delivery-policy';
+import type { DeliveryLocation } from '../../server/delivery-policy';
+import { DeliveryPinPicker } from './DeliveryPinPicker';
 import { loadRazorpayScript, fetchRazorpayKey, createServerOrder, verifyServerPayment } from '../utils/razorpay';
 import type { UserAddress, Order } from '../types';
 import type { CartItem } from '../types';
@@ -24,6 +26,7 @@ const addressDetails = (name: string) => {
 };
 
 interface PendingPayment {
+  customerId: string;
   address: UserAddress;
   items: CartItem[];
   total: number;
@@ -40,7 +43,9 @@ export const CheckoutPage: React.FC = () => {
     appliedCoupon,
     applyCoupon,
     user,
-    setUser,
+    saveAddresses,
+    authStatus,
+    requestLogin,
     setLocation,
     createOrder,
   } = useApp();
@@ -73,32 +78,36 @@ export const CheckoutPage: React.FC = () => {
   const { publishedConfig } = useAdminConfig();
   const checkoutCfg = publishedConfig.checkoutPayment || defaultCheckoutPaymentConfig;
   const cartCfg = publishedConfig.cart || defaultCartConfig;
-  const expressLabel = checkoutCfg.expressSlotLabel?.trim() || 'Express Delivery';
   const scheduledLabel = checkoutCfg.scheduledSlotLabel?.trim() || 'Scheduled Delivery';
 
-  const [selectedDelivery, setSelectedDelivery] = useState<'express' | 'scheduled'>('express');
-  const selectedSlot = selectedDelivery === 'express' ? expressLabel : scheduledLabel;
+  const selectedSlot = scheduledLabel;
   const [paymentMethod, setPaymentMethod] = useState<'RAZORPAY' | 'UPI' | 'CARD' | 'NETBANKING' | 'COD'>('RAZORPAY');
   const [deliveryNote, setDeliveryNote] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
   const [razorpayPaymentId, setRazorpayPaymentId] = useState<string | null>(null);
-  const [pendingPayment, setPendingPayment] = useState<PendingPayment | null>(() => {
-    try { return JSON.parse(sessionStorage.getItem('farminix_pending_payment') || 'null'); } catch { return null; }
-  });
+  const [pendingPayment, setPendingPayment] = useState<PendingPayment | null>(null);
+  const [paymentOwnerLoaded, setPaymentOwnerLoaded] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('farminix_pending_payment') || 'null');
+      setPendingPayment(saved?.customerId === user?.id ? saved : null);
+    } catch { setPendingPayment(null); }
+    setPaymentOwnerLoaded(user?.id || null);
+  }, [user?.id]);
+  useEffect(() => { if (authStatus === 'guest') requestLogin('checkout'); }, [authStatus, requestLogin]);
 
   // If cart is empty and no order was placed in this session, redirect back to Home immediately
   useEffect(() => {
-    if (cart.length === 0 && !placedOrder && !pendingPayment) {
+    if (user && authStatus === 'authenticated' && paymentOwnerLoaded === user.id && cart.length === 0 && !placedOrder && !pendingPayment && !isProcessing) {
       navigate('/', undefined, { replace: true });
     }
-  }, [cart.length, placedOrder, pendingPayment, navigate]);
+  }, [cart.length, placedOrder, pendingPayment, navigate, user, authStatus, paymentOwnerLoaded, isProcessing]);
 
   // Address Modal / Form state
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
-  const [isDetectingGps, setIsDetectingGps] = useState(false);
   const [gpsStatus, setGpsStatus] = useState<string | null>(null);
 
   // New Address Form fields - clean and empty by default
@@ -108,10 +117,13 @@ export const CheckoutPage: React.FC = () => {
   const [formCity, setFormCity] = useState('');
   const [formState, setFormState] = useState('');
   const [formPincode, setFormPincode] = useState('');
+  const [formDeliveryLocation, setFormDeliveryLocation] = useState<DeliveryLocation>();
+  const [formPinConfirmed, setFormPinConfirmed] = useState(false);
   const [formTag, setFormTag] = useState<'Home' | 'Work' | 'Other'>('Home');
 
   const openAddAddressModal = () => {
     setEditingAddressId(null);
+    setFormDeliveryLocation(undefined); setFormPinConfirmed(false); setGpsStatus(null);
     setFormName('');
     setFormPhone('');
     setFormStreet('');
@@ -126,6 +138,7 @@ export const CheckoutPage: React.FC = () => {
   const openEditAddressModal = (address: UserAddress) => {
     const details = addressDetails(address.name);
     setEditingAddressId(address.id);
+    setFormDeliveryLocation(address.deliveryLocation); setFormPinConfirmed(false);
     setFormName(details.name);
     setFormPhone(address.phone);
     setFormStreet(address.street);
@@ -140,56 +153,16 @@ export const CheckoutPage: React.FC = () => {
 
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId) || addresses[0];
 
-  // Auto-fill city/state when pincode changes
   const handlePincodeChange = (pin: string) => {
-    const clean = pin.replace(/\D/g, '').slice(0, 6);
-    setFormPincode(clean);
-    if (clean.length === 6) {
-      const resolved = lookupPincode(clean);
-      if (resolved.includes(',')) {
-        const parts = resolved.split(', ');
-        if (parts.length >= 2) {
-          setFormCity(parts[0]);
-          const statePart = parts[1].split(' - ')[0];
-          setFormState(statePart);
-        }
-      }
-    }
-  };
-
-  // GPS Precise Location Auto-fill
-  const handleDetectGpsForAddress = async () => {
-    setIsDetectingGps(true);
-    setGpsStatus('Accessing precise GPS coordinates...');
-    const res = await detectUserLocation();
-    setIsDetectingGps(false);
-
-    if (res.success && res.locationString) {
-      setGpsStatus('✓ Location detected accurately!');
-      setLocation(res.locationString);
-
-      // Parse fields if available
-      if (res.locationString.includes(',')) {
-        const parts = res.locationString.split(', ');
-        setFormStreet(parts[0] || '');
-        if (parts.length >= 2) setFormCity(parts[1]);
-        if (parts.length >= 3) {
-          const statePin = parts[2].split(' - ');
-          setFormState(statePin[0] || '');
-          if (statePin[1]) setFormPincode(statePin[1]);
-        }
-      }
-      setTimeout(() => setGpsStatus(null), 2500);
-    } else {
-      setGpsStatus('Could not access GPS location.');
-    }
+    setFormPincode(pin.replace(/\D/g, '').slice(0, 6)); setFormPinConfirmed(false);
   };
 
   // Save new address handler
-  const handleSaveAddress = (e: React.FormEvent) => {
+  const handleSaveAddress = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim() || !formStreet.trim() || !formCity.trim() || !formState.trim() || formPincode.length !== 6 || formPhone.length !== 10) return;
 
+    if (!validDeliveryLocation(formDeliveryLocation) || !formPinConfirmed) { setGpsStatus('Confirm the correct delivery pin before saving this address.'); return; }
     const isFirst = addresses.length === 0;
     const shouldBeDefault = formIsDefault || isFirst;
 
@@ -203,6 +176,7 @@ export const CheckoutPage: React.FC = () => {
       pincode: formPincode.trim(),
       phone: formPhone.trim(),
       isDefault: shouldBeDefault,
+      deliveryLocation: formDeliveryLocation,
     };
 
     const normalizedAddresses = addresses.map((address) => shouldBeDefault ? { ...address, isDefault: false } : address);
@@ -210,9 +184,8 @@ export const CheckoutPage: React.FC = () => {
       ? normalizedAddresses.map((address) => address.id === editingAddressId ? newAddr : address)
       : [...normalizedAddresses, newAddr];
 
-    if (user) {
-      setUser({ ...user, addresses: updatedAddresses });
-    }
+    try { await saveAddresses(updatedAddresses); }
+    catch (error) { setGpsStatus(error instanceof Error ? error.message : 'Unable to save address. Please retry.'); return; }
     setSelectedAddressId(newAddr.id);
     setLocation(`${newAddr.city}, ${newAddr.state} - ${newAddr.pincode}`);
     setIsAddAddressOpen(false);
@@ -224,27 +197,25 @@ export const CheckoutPage: React.FC = () => {
     setFormPincode('');
   };
 
-  const handleDeleteAddress = (idToDelete: string, e: React.MouseEvent) => {
+  const handleDeleteAddress = async (idToDelete: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const updated = addresses.filter((a) => a.id !== idToDelete);
-    if (user) {
-      setUser({ ...user, addresses: updated });
-    }
+    try { await saveAddresses(updated); }
+    catch (error) { setPaymentError(error instanceof Error ? error.message : 'Unable to save address. Please retry.'); return; }
     if (selectedAddressId === idToDelete) {
       const remainingDef = updated.find((a) => a.isDefault) || updated[0];
       setSelectedAddressId(remainingDef?.id || '');
     }
   };
 
-  const handleSetDefaultAddress = (idToDefault: string, e: React.MouseEvent) => {
+  const handleSetDefaultAddress = async (idToDefault: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const updated = addresses.map((a) => ({
       ...a,
       isDefault: a.id === idToDefault,
     }));
-    if (user) {
-      setUser({ ...user, addresses: updated });
-    }
+    try { await saveAddresses(updated); }
+    catch (error) { setPaymentError(error instanceof Error ? error.message : 'Unable to save address. Please retry.'); return; }
     setSelectedAddressId(idToDefault);
   };
 
@@ -256,15 +227,19 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const handlingFee = cartCfg.handlingFee ?? 3;
-  const deliveryFee = (cartCfg.deliveryFee === 0 || cartTotal >= (cartCfg.freeDeliveryThreshold ?? 500)) ? 0 : (cartCfg.deliveryFee ?? 0);
+  const delivery = checkDelivery(selectedAddress, checkoutCfg.deliveryArea);
+  const deliveryFee = delivery.deliveryFee ?? 0;
   const grandTotal = cartTotal + handlingFee + deliveryFee;
 
   // Place Order Handler with Razorpay Integration
   const handlePlaceOrder = async () => {
+    if (!user || authStatus !== 'authenticated') { requestLogin('checkout'); return; }
     if (!selectedAddress && !pendingPayment) {
       openAddAddressModal();
       return;
     }
+    const eligibility = checkDelivery(pendingPayment?.address || selectedAddress, checkoutCfg.deliveryArea);
+    if (!eligibility.allowed) { setPaymentError(eligibility.message); return; }
     setPaymentError(null);
     setIsProcessing(true);
 
@@ -334,8 +309,9 @@ export const CheckoutPage: React.FC = () => {
       const serverOrder = await createServerOrder(grandTotal, {
         customer_name: cleanCustomerName,
         customer_phone: cleanCustomerPhone,
-        delivery_slot: selectedSlot || '10-20 Min Express',
-      }, cart.map(item => ({ productId: item.product.id, quantity: item.quantity })), appliedCoupon);
+        delivery_slot: selectedSlot,
+      }, cart.map(item => ({ productId: item.product.id, quantity: item.quantity })), appliedCoupon, selectedAddress);
+      if (serverOrder?.loginRequired) requestLogin('checkout');
       if (!serverOrder?.orderId) throw new Error(serverOrder?.error || 'Unable to validate this order. Please retry.');
 
       const options = {
@@ -349,7 +325,7 @@ export const CheckoutPage: React.FC = () => {
         handler: async (response: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string }) => {
           setIsProcessing(true);
           setRazorpayPaymentId(response.razorpay_payment_id);
-          const pending = { address: selectedAddress, items: [...cart], total: grandTotal, couponCode: appliedCoupon, response };
+          const pending = { customerId: user.id, address: selectedAddress, items: [...cart], total: grandTotal, couponCode: appliedCoupon, response };
           setPendingPayment(pending);
           try { sessionStorage.setItem('farminix_pending_payment', JSON.stringify(pending)); } catch {}
           try {
@@ -415,6 +391,9 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
+  if (authStatus === 'loading') return <div className="store-container py-16 flex items-center gap-3" role="status"><Loader2 className="animate-spin" size={20} />Loading your account...</div>;
+  if (!user) return <div className="store-container py-16 text-center space-y-5"><LockKeyhole className="mx-auto text-purple-600" size={35} /><h1 className="text-2xl font-semibold">Log in to place your order</h1><p className="text-slate-500">Use your email and password to continue. New to Farminix? Create an account in the pop-up.</p><button className="store-button mx-auto" onClick={() => requestLogin('checkout')}>Log in / Create account</button></div>;
+
   if (placedOrder) {
     return (
       <div className="store-order-confirmation w-full min-h-[75vh] flex flex-col items-center justify-center p-4 sm:p-6 text-center animate-in zoom-in-95 duration-200">
@@ -425,7 +404,7 @@ export const CheckoutPage: React.FC = () => {
 
           <div className="space-y-1">
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Order Confirmed &amp; Paid
+              Order Confirmed
             </span>
             <h1 className="text-2xl font-black text-slate-900 pt-2">
               Thank You for Your Order!
@@ -464,11 +443,12 @@ export const CheckoutPage: React.FC = () => {
           <div className="p-3.5 bg-purple-50/70 border border-purple-200/80 rounded-2xl flex items-center justify-between text-xs">
             <span className="flex items-center gap-1.5 font-bold text-slate-800">
               <Truck className="w-4 h-4 text-[#7C3AED]" />
-              <span>Arriving In:</span>
+              <span>Order status:</span>
             </span>
-            <span className="font-black text-[#7C3AED] text-sm">15–20 Mins</span>
+            <span className="font-black text-[#7C3AED] text-sm">{placedOrder.status}</span>
           </div>
 
+          <button className="store-button w-full justify-center" onClick={() => navigate('/orders')}>View Order History</button>
           <button
             onClick={() => navigate('/', undefined, { replace: true })}
             className="w-full py-3.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-black rounded-xl shadow-md transition-all cursor-pointer"
@@ -572,22 +552,18 @@ export const CheckoutPage: React.FC = () => {
               )}
             </section>
 
+            {selectedAddress && <div className={`checkout-delivery-check ${delivery.allowed ? 'is-supported' : ''}`} role={delivery.allowed ? 'status' : 'alert'}><MapPin size={19} /><div><strong>{delivery.allowed ? `${delivery.distanceKm!.toFixed(2)} km from our Guntur warehouse` : 'Check delivery availability'}</strong><p>{delivery.message}</p>{delivery.allowed && delivery.pricingMode === 'per-km' && <p>Chargeable distance: {delivery.chargeableKm!.toFixed(2)} km · Rate: {formatMoney(delivery.perKmRate!)}/km · Delivery: {formatMoney(deliveryFee)}</p>}{!selectedAddress.deliveryLocation && <button className="checkout-outline-button" onClick={() => openEditAddressModal(selectedAddress)}>Add delivery pin</button>}</div></div>}
+
             <section className="checkout-panel" aria-labelledby="delivery-title">
               <div className="checkout-section-heading">
                 <span className="checkout-step-number">2</span>
-                <div><h2 id="delivery-title">Select Delivery Slot</h2><p>Choose a delivery option that suits you.</p></div>
+                <div><h2 id="delivery-title">Delivery</h2><p>Delivery is available within and outside Guntur.</p></div>
               </div>
-              <div className="checkout-options" role="radiogroup" aria-label="Delivery option">
-                <label className={`checkout-option ${selectedDelivery === 'express' ? 'is-selected' : ''}`}>
-                  <input type="radio" name="delivery-slot" checked={selectedDelivery === 'express'} onChange={() => setSelectedDelivery('express')} />
-                  <span className="checkout-option-icon"><Zap /></span>
-                  <span className="checkout-option-copy"><strong>{expressLabel}</strong><span>{checkoutCfg.expressSlotSublabel?.trim() || 'Fast doorstep delivery'}</span></span>
-                </label>
-                <label className={`checkout-option ${selectedDelivery === 'scheduled' ? 'is-selected' : ''}`}>
-                  <input type="radio" name="delivery-slot" checked={selectedDelivery === 'scheduled'} onChange={() => setSelectedDelivery('scheduled')} />
+              <div className="checkout-options checkout-options-single">
+                <div className="checkout-option is-selected">
                   <span className="checkout-option-icon"><Truck /></span>
-                  <span className="checkout-option-copy"><strong>{scheduledLabel}</strong><span>{checkoutCfg.scheduledSlotSublabel?.trim() || 'Choose a convenient delivery time'}</span></span>
-                </label>
+                  <span className="checkout-option-copy"><strong>{scheduledLabel}</strong><span>{checkoutCfg.scheduledSlotSublabel?.trim() || 'We will contact you to confirm your delivery time.'}</span></span>
+                </div>
               </div>
             </section>
 
@@ -666,13 +642,13 @@ export const CheckoutPage: React.FC = () => {
             <dl className="checkout-bill">
               <div><dt>Items Subtotal</dt><dd>{formatMoney(cartTotal + cartDiscount)}</dd></div>
               {cartDiscount > 0 && <div className="checkout-discount"><dt>Coupon Discount</dt><dd>−{formatMoney(cartDiscount)}</dd></div>}
-              <div><dt>Delivery Fee</dt><dd className={deliveryFee === 0 ? 'checkout-free' : ''}>{deliveryFee === 0 ? 'FREE' : formatMoney(deliveryFee)}</dd></div>
+              <div><dt>Delivery Fee</dt><dd className={delivery.allowed && deliveryFee === 0 ? 'checkout-free' : ''}>{!delivery.allowed ? 'Check address' : deliveryFee === 0 ? 'FREE' : formatMoney(deliveryFee)}</dd></div>
               <div><dt>Handling &amp; Packaging Fee</dt><dd>{formatMoney(handlingFee)}</dd></div>
             </dl>
-            <div className="checkout-total"><span>Total Payable</span><strong>{formatMoney(grandTotal)}</strong></div>
-            <button onClick={handlePlaceOrder} disabled={isProcessing} className="checkout-pay-button">
+            <div className="checkout-total"><span>{delivery.allowed ? 'Total Payable' : 'Items + handling (delivery pending)'}</span><strong>{formatMoney(grandTotal)}</strong></div>
+            <button onClick={handlePlaceOrder} disabled={isProcessing || Boolean(selectedAddress && !delivery.allowed)} className="checkout-pay-button">
               {isProcessing ? <Loader2 className="animate-spin" size={21} /> : <LockKeyhole size={21} />}
-              <span>{isProcessing ? 'Processing your order…' : pendingPayment ? 'Retry order confirmation' : !selectedAddress ? 'Add Delivery Address to Proceed' : paymentMethod === 'COD' ? `Place Order (COD) · ${formatMoney(grandTotal)}` : `Pay with Razorpay · ${formatMoney(grandTotal)}`}</span>
+              <span>{isProcessing ? 'Processing your order…' : pendingPayment ? 'Retry order confirmation' : !selectedAddress ? 'Add Delivery Address to Proceed' : !delivery.allowed ? 'Delivery unavailable for this address' : paymentMethod === 'COD' ? `Place Order (COD) · ${formatMoney(grandTotal)}` : `Pay with Razorpay · ${formatMoney(grandTotal)}`}</span>
               {!isProcessing && <ChevronRight size={22} />}
             </button>
             <p className="checkout-payment-hint" aria-live="polite">{pendingPayment ? 'Your payment was received. Retry to confirm your order.' : paymentMethod === 'COD' ? 'Pay when your order is delivered to your doorstep.' : "You'll review your payment details before confirming."}</p>
@@ -695,34 +671,9 @@ export const CheckoutPage: React.FC = () => {
           <div role="dialog" aria-modal="true" aria-labelledby="checkout-address-modal-title" onKeyDown={(event) => { if (event.key === 'Escape') setIsAddAddressOpen(false); }} className="relative bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 border border-slate-100 text-left max-h-[calc(100dvh-2rem)] overflow-y-auto">
             <button type="button" onClick={() => setIsAddAddressOpen(false)} aria-label="Close address form" className="absolute right-4 top-4 p-2 rounded-lg text-slate-400 hover:bg-purple-50 hover:text-purple-700"><X size={18} /></button>
             <h3 id="checkout-address-modal-title" className="text-lg font-semibold text-slate-900 mb-1 pr-7">{editingAddressId ? 'Edit Delivery Address' : 'Add New Delivery Address'}</h3>
-            <p className="text-xs text-slate-500 mb-4">Enter details or click below to auto-detect your current GPS location.</p>
+            <p className="text-xs text-slate-500 mb-4">Enter your address and confirm its exact delivery pin.</p>
 
-            {/* GPS Location Auto-Fill Button */}
-            <button
-              type="button"
-              onClick={handleDetectGpsForAddress}
-              disabled={isDetectingGps}
-              className="w-full mb-4 py-3 px-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-[#7C3AED] rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs active:scale-98"
-            >
-              {isDetectingGps ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-[#7C3AED]" />
-                  <span>Detecting current GPS location...</span>
-                </>
-              ) : (
-                <>
-                  <Navigation className="w-4 h-4 fill-[#7C3AED] text-[#7C3AED]" />
-                  <span>🎯 Use GPS Location to Auto-Fill Address</span>
-                </>
-              )}
-            </button>
-
-            {gpsStatus && (
-              <div className="mb-4 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl flex items-center gap-1.5 animate-in fade-in">
-                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{gpsStatus}</span>
-              </div>
-            )}
+            {gpsStatus && <p role="alert" className="checkout-pin-error">{gpsStatus}</p>}
 
             <form onSubmit={handleSaveAddress} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
@@ -765,7 +716,7 @@ export const CheckoutPage: React.FC = () => {
                   autoComplete="street-address"
                   required
                   value={formStreet}
-                  onChange={(e) => setFormStreet(e.target.value)}
+                  onChange={(e) => { setFormStreet(e.target.value); setFormPinConfirmed(false); }}
                   placeholder="House / Flat No., Apartment, Street, Landmark"
                   className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold focus:outline-none focus:border-[#7C3AED]"
                 />
@@ -796,7 +747,7 @@ export const CheckoutPage: React.FC = () => {
                     autoComplete="address-level2"
                     required
                     value={formCity}
-                    onChange={(e) => setFormCity(e.target.value)}
+                    onChange={(e) => { setFormCity(e.target.value); setFormPinConfirmed(false); }}
                     placeholder="City / District"
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold focus:outline-none focus:border-[#7C3AED]"
                   />
@@ -809,12 +760,15 @@ export const CheckoutPage: React.FC = () => {
                     autoComplete="address-level1"
                     required
                     value={formState}
-                    onChange={(e) => setFormState(e.target.value)}
+                    onChange={(e) => { setFormState(e.target.value); setFormPinConfirmed(false); }}
                     placeholder="State"
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold focus:outline-none focus:border-[#7C3AED]"
                   />
                 </div>
               </div>
+
+              <DeliveryPinPicker value={formDeliveryLocation} onChange={point => { setFormDeliveryLocation(point); setFormPinConfirmed(false); setGpsStatus(null); }} />
+              <label className="checkout-pin-confirm"><input type="checkbox" required checked={formPinConfirmed} onChange={event => setFormPinConfirmed(event.target.checked)} />I confirm that the marker shows this delivery address.</label>
 
               <div>
                 <label className="font-bold text-slate-700 block mb-1">Address Tag</label>

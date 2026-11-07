@@ -38,6 +38,7 @@ export const ProductDetailPage: React.FC = () => {
     wishlist,
     toggleWishlist,
     setIsCartOpen,
+    beginCheckout,
   } = useApp();
 
   const [selectedWeight, setSelectedWeight] = useState<string>('');
@@ -197,7 +198,7 @@ export const ProductDetailPage: React.FC = () => {
     if (!inCart) {
       addToCart(product, currentWeight);
     }
-    navigate('/checkout');
+    beginCheckout();
   };
 
   return (

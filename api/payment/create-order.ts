@@ -1,5 +1,8 @@
+import { checkDelivery } from '../../server/delivery-policy.js';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Razorpay from 'razorpay';
+import { authenticatedCustomer, customerSameOrigin } from '../../server/customer-auth.js';
+import { customerRedis, PAYMENT_OWNERS, redisCustomerStore } from '../../server/customer-redis.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
@@ -21,6 +24,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  if (!customerSameOrigin(req)) return res.status(403).json({ error: 'Please pay from the Farminix website.' });
+  let customer;
+  try { customer = await authenticatedCustomer(req, redisCustomerStore); }
+  catch { return res.status(503).json({ error: 'Unable to verify your account. Please try again.' }); }
+  if (!customer) return res.status(401).json({ code: 'LOGIN_REQUIRED', error: 'Please log in before starting payment.' });
+
   const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -33,7 +42,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { amount, currency = 'INR', receipt, notes, cart, couponCode } = req.body;
+    const { amount, currency = 'INR', receipt, notes, cart, couponCode, address } = req.body;
+    if (currency !== 'INR') return res.status(400).json({ error: 'Payments must be made in INR.' });
     const storageUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
     const storageToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
     if (!storageUrl || !storageToken) return res.status(503).json({ error: 'Shared store storage is not configured.' });
@@ -41,6 +51,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const data = await stored.json();
     if (!stored.ok || !data.result) return res.status(503).json({ error: 'Publish the store configuration before accepting payments.' });
     const config = JSON.parse(data.result);
+    const delivery = checkDelivery(address, config.checkoutPayment?.deliveryArea);
+    if (!delivery.allowed) return res.status(delivery.code === 'DELIVERY_NOT_CONFIGURED' ? 503 : 422).json({ code: delivery.code, error: delivery.message });
     if (!Array.isArray(cart) || !cart.length) return res.status(400).json({ error: 'Cart is required.' });
     const quantities = new Map<string, number>();
     for (const item of cart) {
@@ -57,8 +69,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     const discount = coupon && eligible >= (coupon.minimumSpend || 0) ? Math.round(eligible * Math.min(100, Math.max(0, coupon.discountPercentage)) / 100) : 0;
     const total = subtotal - discount;
-    const delivery = total >= (config.cart?.freeDeliveryThreshold || 0) ? 0 : (config.cart?.deliveryFee || 0);
-    const validatedAmount = Math.round((total + delivery + (config.cart?.handlingFee || 0)) * 100);
+    const deliveryFee = delivery.deliveryFee!;
+    const validatedAmount = Math.round((total + deliveryFee + (config.cart?.handlingFee || 0)) * 100);
     if (Math.round(Number(amount) * 100) !== validatedAmount) return res.status(409).json({ error: 'Prices or coupon eligibility changed. Refresh checkout.' });
 
     if (!amount || Number(amount) <= 0) {
@@ -75,6 +87,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const sanitizedNotes: Record<string, string> = {};
     const rawNotes = {
       ...(typeof notes === 'object' && !Array.isArray(notes) ? notes : {}),
+      customer_id: customer.id,
       coupon_code: discount > 0 ? coupon.code : '',
       coupon_discount: String(discount),
     };
@@ -100,6 +113,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       receipt: (receipt ? String(receipt) : `farminix_${Date.now()}`).slice(0, 40),
       notes: sanitizedNotes,
     });
+    await customerRedis(['HSET', PAYMENT_OWNERS, order.id, customer.id]);
 
     res.status(200).json({
       success: true,

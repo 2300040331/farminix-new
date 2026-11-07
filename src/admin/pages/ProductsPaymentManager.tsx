@@ -1,3 +1,5 @@
+import { DeliveryAreaEditor } from '../components/DeliveryAreaEditor';
+import { deliverySettingsError } from '../../../server/delivery-policy';
 import { AdminSymbol } from '../components/AdminSymbol';
 import React, { useState } from 'react';
 import {
@@ -24,9 +26,12 @@ export const ProductsPaymentManager: React.FC<{ initialTab?: ProductTab }> = ({ 
   const [checkoutData, setCheckoutData] = useState<CheckoutPaymentConfig>(
     config.checkoutPayment || defaultCheckoutPaymentConfig
   );
+  const [deliveryError, setDeliveryError] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const handleSaveCheckout = async () => {
+    const validationError = deliverySettingsError(checkoutData.deliveryArea);
+    setDeliveryError(validationError || ''); if (validationError) return;
     updateCheckoutPayment(checkoutData);
     setSavedSuccess(await publishConfig());
     setTimeout(() => setSavedSuccess(false), 2500);
@@ -122,7 +127,7 @@ export const ProductsPaymentManager: React.FC<{ initialTab?: ProductTab }> = ({ 
                   Checkout &amp; Payment Gateway Settings
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Configure delivery slots, active payment methods (UPI, Card, Net Banking, COD), and delivery preferences.
+                  Configure scheduled delivery, active payment methods (UPI, Card, Net Banking, COD), and delivery preferences.
                 </p>
               </div>
 
@@ -144,42 +149,18 @@ export const ProductsPaymentManager: React.FC<{ initialTab?: ProductTab }> = ({ 
               </button>
             </div>
 
+            {deliveryError && <p role="alert" className="admin-alert">{deliveryError}</p>}
+            <DeliveryAreaEditor value={checkoutData.deliveryArea} onChange={deliveryArea => { const next = { ...checkoutData, deliveryArea }; setCheckoutData(next); updateCheckoutPayment(next); }} />
             {/* Delivery Slots Configuration */}
             <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
               <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#7C3AED]" />
-                <span>Delivery Slots Offered to Customers</span>
+                <span>Scheduled Delivery</span>
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 bg-purple-50/60 rounded-2xl border border-purple-100 space-y-2">
-                  <span className="text-[10px] font-bold text-purple-700 uppercase">Slot 1: Instant Express</span>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600">Slot Title</label>
-                    <input
-                      type="text"
-                      value={checkoutData.expressSlotLabel}
-                      onChange={(e) =>
-                        setCheckoutData({ ...checkoutData, expressSlotLabel: e.target.value })
-                      }
-                      className="w-full mt-1 p-2 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:border-[#7C3AED] focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600">Sub-description</label>
-                    <input
-                      type="text"
-                      value={checkoutData.expressSlotSublabel}
-                      onChange={(e) =>
-                        setCheckoutData({ ...checkoutData, expressSlotSublabel: e.target.value })
-                      }
-                      className="w-full mt-1 p-2 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:border-[#7C3AED] focus:outline-none"
-                    />
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 gap-4">
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                  <span className="text-[10px] font-bold text-slate-700 uppercase">Slot 2: Scheduled Delivery</span>
+                  <span className="text-[10px] font-bold text-slate-700 uppercase">Scheduled Delivery</span>
                   <div>
                     <label className="text-[11px] font-bold text-slate-600">Slot Title</label>
                     <input

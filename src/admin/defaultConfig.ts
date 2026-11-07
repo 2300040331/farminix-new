@@ -1,3 +1,5 @@
+import { defaultPolicyLinks } from '../data/policies';
+import { defaultDeliveryArea } from '../../server/delivery-policy';
 import type {
   AdminSiteConfig,
   ReachOutPageConfig,
@@ -9,6 +11,7 @@ import type {
   CareersPageConfig,
 } from './types';
 import { categories, allProducts, epicDeals, brandLogosList } from '../data/products';
+import { officialSocialLinks } from '../data/socialLinks';
 
 export const defaultReachOutPageConfig: ReachOutPageConfig = {
   enabled: true,
@@ -348,10 +351,11 @@ export const defaultCartConfig: CartConfig = {
 };
 
 export const defaultCheckoutPaymentConfig: CheckoutPaymentConfig = {
+  deliveryArea: { ...defaultDeliveryArea },
   expressSlotLabel: '10-20 Min Express',
   expressSlotSublabel: 'Free Instant Doorstep Delivery',
-  scheduledSlotLabel: 'Scheduled Slot',
-  scheduledSlotSublabel: 'Today 6:00 PM - 8:00 PM',
+  scheduledSlotLabel: 'Scheduled Delivery',
+  scheduledSlotSublabel: 'We will contact you to confirm your delivery time.',
   paymentMethods: [
     {
       id: 'razorpay',
@@ -494,7 +498,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
       { id: 2, iconName: 'ShieldCheck', title: 'Quality Assured', subtitle: '100% Genuine', bgColor: 'bg-emerald-100', enabled: true, order: 2 },
       { id: 3, iconName: 'IndianRupee', title: 'Best Prices', subtitle: 'Direct from Brands', bgColor: 'bg-purple-100', enabled: true, order: 3 },
       { id: 4, iconName: 'Lock', title: 'Safe & Secure', subtitle: 'Secure Packaging', bgColor: 'bg-emerald-100', enabled: true, order: 4 },
-      { id: 5, iconName: 'Headset', title: '24/7 Support', subtitle: 'We are here for you', bgColor: 'bg-amber-100', actionType: 'support', enabled: true, order: 5 },
+      { id: 5, iconName: 'Headset', title: 'Customer Support', subtitle: 'Send a request to our team', bgColor: 'bg-amber-100', actionType: 'support', enabled: true, order: 5 },
     ],
   },
   categorySection: {
@@ -538,7 +542,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
     boxes: [
       { id: 1, iconName: 'Package', title: 'No Minimum Order', subtitle: 'Order any quantity', bgColor: 'bg-emerald-100', enabled: true, order: 1 },
       { id: 2, iconName: 'RefreshCw', title: 'Easy Returns & Refunds', subtitle: 'Hassle free returns', bgColor: 'bg-emerald-100', enabled: true, order: 2 },
-      { id: 3, iconName: 'Headset', title: '24/7 Customer Support', subtitle: 'We are here for you', bgColor: 'bg-amber-100', actionType: 'support', enabled: true, order: 3 },
+      { id: 3, iconName: 'Headset', title: 'Customer Support', subtitle: 'Send a request to our team', bgColor: 'bg-amber-100', actionType: 'support', enabled: true, order: 3 },
       { id: 4, iconName: 'ShieldCheck', title: '100% Quality Assured', subtitle: 'Genuine products only', bgColor: 'bg-purple-100', enabled: true, order: 4 },
     ],
   },
@@ -546,12 +550,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
     enabled: true,
     logoUrl: '/farminix_logo.png?v=2',
     bioText: 'Your trusted partner for premium staples and authentic grains. Pure quality, farm-direct freshness, and reliable doorstep delivery.',
-    socialLinks: {
-      instagram: '',
-      facebook: '',
-      twitter: '',
-      youtube: '',
-    },
+    socialLinks: { ...officialSocialLinks },
     whatsappPhone: '917989743595',
     whatsappMessage: 'Hello Farminix! 👋 I would like to know more about your rice & grocery products and place an order.',
     companyLinks: [
@@ -571,12 +570,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
       googlePlayUrl: '#',
       appleAppStoreUrl: '#',
     },
-    legalLinks: [
-      { id: 'l1', label: 'Privacy Policy', url: '#' },
-      { id: 'l2', label: 'Cancellation Policy', url: '#' },
-      { id: 'l3', label: 'Refund Policy', url: '#' },
-      { id: 'l4', label: 'Disclaimer', url: '#' },
-    ],
+    legalLinks: defaultPolicyLinks.map(link => ({ ...link })),
     copyrightText: '',
   },
   socialBlog: defaultSocialBlogConfig,

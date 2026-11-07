@@ -1,3 +1,4 @@
+import { policyPages } from '../../data/policies';
 import React, { useState } from 'react';
 import { Layers, Check, Plus, Trash2, Eye, EyeOff, MessageCircle, Video } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
@@ -170,6 +171,7 @@ export const FooterManager: React.FC = () => {
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           2. Social Media URLs
         </h2>
+        <p className="text-xs text-slate-500">Instagram and Facebook use Farminix's official pages when left blank. X and YouTube appear only when a profile URL is saved.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
@@ -191,7 +193,7 @@ export const FooterManager: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Twitter URL</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">X / Twitter URL</label>
             <input
               type="text"
               value={formData.socialLinks.twitter}
@@ -269,6 +271,8 @@ export const FooterManager: React.FC = () => {
           <button type="button" onClick={() => addLink('helpLinks')} className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-purple-600 cursor-pointer"><Plus className="w-4 h-4" />Add help link</button>
         </div>
       </div>
+
+      <section className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 space-y-4"><h2 className="text-base font-bold text-slate-900">Policies in the footer</h2><p className="text-xs text-slate-500 leading-6">These dedicated pages use the policy wording supplied by Farminix. Each page has a share button and a permanent link.</p><div className="grid gap-3">{policyPages.map(policy => <a key={policy.id} href={policy.path} target="_blank" rel="noopener noreferrer" className="text-sm text-purple-700 underline underline-offset-4">{policy.title} ↗</a>)}</div></section>
 
       {/* Save Changes Bottom Bar */}
       <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">

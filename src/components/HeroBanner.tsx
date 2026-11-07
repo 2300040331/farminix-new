@@ -4,12 +4,6 @@ import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 import './HeroBanner.css';
 
-const heroFeatures = [
-  { Icon: Leaf, title: '100%', subtitle: 'Natural Grains' },
-  { Icon: ShieldCheck, title: 'Carefully', subtitle: 'Processed' },
-  { Icon: Wheat, title: 'Naturally', subtitle: 'Wholesome' },
-  { Icon: Users, title: 'Perfect', subtitle: 'for Families' },
-];
 const farmBenefits = [
   { Icon: Leaf, title: 'Farm Fresh', subtitle: 'Sourced from trusted farms' },
   { Icon: ShieldCheck, title: 'Carefully Processed', subtitle: 'Ensuring purity & safety' },
@@ -55,22 +49,19 @@ export function HeroBanner() {
           {isFarmSlide(slide.image) ? (
             <div className="farm-hero">
               <div className="farm-hero-stage">
-                <img className="farm-hero-scene" src="/home-farm-hero.png" alt="Farminix rice bags with freshly harvested rice, overlooking green fields and mountains" fetchPriority={slideIndex === 0 ? 'high' : 'auto'} loading={slideIndex === 0 ? 'eager' : 'lazy'} />
                 <div className="farm-hero-copy">
-                  <div className="farm-hero-eyebrow"><Leaf size={21} /><span>From Farm to Family</span></div>
-                  <h1>Pure. <span>Natural.<Leaf aria-hidden="true" /></span><br />Healthy.</h1>
-                  <p className="farm-hero-tagline">Goodness of Our Farms, On Your Table.</p>
-                  <div className="farm-hero-features">
-                    {heroFeatures.map(({ Icon, title, subtitle }) => (
-                      <div key={subtitle}><span className="farm-feature-icon"><Icon /></span><strong>{title}</strong><span>{subtitle}</span></div>
-                    ))}
-                  </div>
+                  <div className="farm-hero-eyebrow"><Leaf size={17} /><span>Farminix · Family Choice</span></div>
+                  <h1>Good rice.<br /><span>Great family meals.</span></h1>
+                  <p className="farm-hero-tagline">Carefully selected rice for everyday cooking and the meals your family shares.</p>
                   <div className="farm-hero-actions">
-                    <button className="farm-shop-button" onClick={() => open(slide.linkUrl || hero.shopNowUrl || '/products')}>{slide.buttonText || 'Shop now'}<ArrowRight size={24} /></button>
+                    <button className="farm-shop-button" onClick={() => open(slide.linkUrl || hero.shopNowUrl || '/products')}>{slide.buttonText || 'Shop now'}<ArrowRight size={19} /></button>
                   </div>
                 </div>
-                <div className="farm-quality-seal" aria-label="Premium quality grains from our farms"><Wheat size={25} /><strong>Premium</strong><span>Quality Grains</span><small>From Our Farms</small><Leaf size={21} /></div>
-                <svg className="farm-hero-waves" viewBox="0 0 1600 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12C110 33 170 117 290 68S440 31 560 91 790 136 1000 100 1270 142 1600 88V150H0Z" fill="#c69aff" fillOpacity=".75" /><path d="M0 47C140 47 160 139 340 99S470 67 610 121 900 105 1040 102 1310 134 1600 111V150H0Z" fill="#8d31f5" fillOpacity=".85" /><path d="M0 107C170 143 232 112 382 123S603 156 800 124 1140 116 1280 136 1470 105 1600 124V150H0Z" fill="#f5efff" /></svg>
+                <figure className="farm-hero-product">
+                  <div className="farm-product-halo" aria-hidden="true" />
+                  <img className="farm-hero-pack" src="/farminix_rice_front.png" alt="Farminix Family Choice Rice, 26 kg bag" fetchPriority={slideIndex === 0 ? 'high' : 'auto'} loading={slideIndex === 0 ? 'eager' : 'lazy'} decoding="async" />
+                  <figcaption className="farm-pack-label"><Wheat size={18} aria-hidden="true" /><span><strong>Family Choice Rice</strong><span>26 kg family pack</span></span></figcaption>
+                </figure>
               </div>
               <div className="farm-benefit-strip">
                 {farmBenefits.map(({ Icon, title, subtitle }) => (

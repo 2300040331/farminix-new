@@ -1,13 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import { createRequire } from 'node:module';
-import ts from 'typescript';
-const require = createRequire(import.meta.url);
-const source = ts.transpileModule(fs.readFileSync(new URL('../api/site-config.ts', import.meta.url), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-const exports = {};
-new Function('require', 'exports', source)(require, exports);
-const handler = exports.default;
+import { loadTypeScript } from './helpers/load-typescript.mjs';
+const handler = loadTypeScript(new URL('../api/site-config.ts', import.meta.url)).default;
 const saved = { ...process.env };
 const fetchOriginal = globalThis.fetch;
 function response() {

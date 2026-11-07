@@ -28,6 +28,18 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- 3. USER ADDRESSES TABLE
+ALTER TABLE users ADD COLUMN IF NOT EXISTS saved_addresses JSONB NOT NULL DEFAULT '[]'::jsonb;
+CREATE TABLE IF NOT EXISTS customer_sessions (
+    token_hash VARCHAR(64) PRIMARY KEY,
+    user_id VARCHAR(100) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE INDEX IF NOT EXISTS customer_sessions_expiry ON customer_sessions(expires_at);
+CREATE TABLE IF NOT EXISTS customer_payment_orders (
+    id VARCHAR(100) PRIMARY KEY,
+    user_id VARCHAR(100) NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS user_addresses (
     id VARCHAR(100) PRIMARY KEY,
     user_id VARCHAR(100) REFERENCES users(id) ON DELETE CASCADE,
@@ -100,6 +112,7 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 -- 7. ORDER ITEMS TABLE
+CREATE INDEX IF NOT EXISTS orders_customer_history ON orders(user_id, created_at DESC);
 CREATE TABLE IF NOT EXISTS order_items (
     id SERIAL PRIMARY KEY,
     order_id VARCHAR(100) REFERENCES orders(id) ON DELETE CASCADE,
@@ -123,6 +136,14 @@ CREATE TABLE IF NOT EXISTS customer_enquiries (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
+
+-- Support requests share the private enquiry inbox and customer-visible replies.
+ALTER TABLE customer_enquiries ADD COLUMN IF NOT EXISTS source VARCHAR(20) NOT NULL DEFAULT 'enquiry';
+ALTER TABLE customer_enquiries ADD COLUMN IF NOT EXISTS customer_id VARCHAR(100) REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE customer_enquiries ADD COLUMN IF NOT EXISTS order_id VARCHAR(100);
+ALTER TABLE customer_enquiries ADD COLUMN IF NOT EXISTS public_reply TEXT NOT NULL DEFAULT '';
+ALTER TABLE customer_enquiries ADD COLUMN IF NOT EXISTS replied_at TIMESTAMP WITH TIME ZONE;
+CREATE INDEX IF NOT EXISTS enquiries_customer_history ON customer_enquiries(customer_id, created_at DESC);
 
 -- 9. ADMIN SESSIONS TABLE
 CREATE TABLE IF NOT EXISTS admin_sessions (

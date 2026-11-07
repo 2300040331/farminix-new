@@ -131,6 +131,7 @@ export interface DealCard {
 }
 
 export interface UserAddress {
+  deliveryLocation?: { lat: number; lng: number };
   id: string;
   name: string;
   street: string;
@@ -152,6 +153,7 @@ export interface User {
 }
 
 export interface Order {
+  customerId?: string;
   couponCode?: string;
   id: string;
   date: string;
@@ -161,7 +163,7 @@ export interface Order {
   deliveryFee: number;
   handlingFee?: number;
   finalAmount: number;
-  status: 'Order Received' | 'Packed' | 'Shipped' | 'Out for Delivery' | 'Delivered';
+  status: 'Order Received' | 'Packed' | 'Shipped' | 'Out for Delivery' | 'Delivered' | 'Cancelled';
   estimatedTime: string;
   deliveryAddress: UserAddress;
   paymentMethod: string;

@@ -1,3 +1,4 @@
+import { deliverySettingsError } from '../server/delivery-policy.js';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
@@ -37,6 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Invalid store configuration.' });
     }
   }
+  if (req.method === 'PUT') { const error = deliverySettingsError(req.body?.config?.checkoutPayment?.deliveryArea); if (error) return res.status(400).json({ error }); }
   const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
   if (!url || !token) return res.status(503).json({ error: 'Shared store storage is not configured. Connect Redis to this Vercel project.' });

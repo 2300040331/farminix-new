@@ -1,8 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import type { Product, Category, CartItem, UserAddress, User, Order } from '../types';
 import { allProducts as defaultAllProducts, categories as defaultCategories } from '../data/products';
 import { detectUserLocation } from '../utils/location';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
+import { customerApi, CustomerApiError } from '../utils/customerApi';
+
+type AuthIntent = 'account' | 'checkout' | 'orders' | 'support';
 
 interface AppContextType {
   // Products & Search
@@ -41,10 +44,22 @@ interface AppContextType {
 
   // Auth User
   user: User | null;
-  setUser: (user: User | null) => void;
+  authStatus: 'loading' | 'authenticated' | 'guest';
+  authIntent: AuthIntent;
+  requestLogin: (intent?: AuthIntent, force?: boolean) => void;
+  beginCheckout: () => void;
+  signIn: (email: string, password: string) => Promise<void>;
+  register: (fields: { name: string; email: string; phone: string; password: string }) => Promise<void>;
+  signOut: () => Promise<void>;
+  saveAddresses: (addresses: UserAddress[]) => Promise<void>;
 
   // Orders
   orders: Order[];
+  ordersLoading: boolean;
+  ordersError: string;
+  hasMoreOrders: boolean;
+  refreshOrders: () => Promise<void>;
+  loadMoreOrders: () => Promise<void>;
   createOrder: (address: UserAddress, paymentMethod: string, customItems?: CartItem[], customTotal?: number, payment?: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string; couponCode?: string | null }) => Promise<Order>;
 
   // Modals
@@ -211,57 +226,107 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      localStorage.removeItem('farminix_user_profile');
-      localStorage.removeItem('farminix_user_profile_v2');
-
-      const savedUser = localStorage.getItem('farminix_user_profile_v3');
-      if (savedUser) {
-        const parsed = JSON.parse(savedUser);
-        if (parsed && !parsed.name?.includes('Hitaishi')) {
-          return parsed;
-        }
-      }
-    } catch {}
-
-    const defaultUser = (publishedConfig.users || []).find((u) => u.id === 'usr-1');
-    if (defaultUser && !defaultUser.name?.includes('Hitaishi')) {
-      return {
-        ...defaultUser,
-        addresses: defaultUser.addresses || [],
-      };
-    }
-
-    return {
-      id: 'usr-1',
-      name: '',
-      phone: '',
-      email: '',
-      rewardPoints: 0,
-      walletBalance: 0,
-      addresses: [],
-    };
-  });
-
+  const [user, setUser] = useState<User | null>(null);
+  const [authStatus, setAuthStatus] = useState<'loading' | 'authenticated' | 'guest'>('loading');
+  const [authIntent, setAuthIntent] = useState<AuthIntent>('account');
+  const intentRef = useRef<AuthIntent>('account');
+  const authRequested = useRef(false);
+  const authEpoch = useRef(0);
+  const authInFlight = useRef(false);
+  const navigateRef = useRef(navigate);
+  useEffect(() => { navigateRef.current = navigate; }, [navigate]);
+  const [isAuthOpen, setAuthOpen] = useState(false);
+  const setIsAuthOpen = useCallback((open: boolean) => {
+    setAuthOpen(open);
+    if (!open) { authRequested.current = false; intentRef.current = 'account'; setAuthIntent('account'); }
+  }, []);
+  const requestLogin = useCallback((intent: AuthIntent = 'account', force = false) => {
+    if (force) { ++authEpoch.current; setUser(null); setAuthStatus('guest'); setOrders([]); }
+    intentRef.current = intent; authRequested.current = true; setAuthIntent(intent); setAuthOpen(true);
+  }, []);
+  const commitSession = useCallback((profile: User | null) => {
+    setUser(profile); setAuthStatus(profile ? 'authenticated' : 'guest');
+    if (!profile) return;
+    const destination = authRequested.current ? intentRef.current : 'account';
+    authRequested.current = false; intentRef.current = 'account'; setAuthIntent('account'); setAuthOpen(false);
+    if (destination === 'checkout') navigateRef.current('/checkout');
+    if (destination === 'orders') navigateRef.current('/orders');
+    if (destination === 'support') setIsSupportOpen(true);
+  }, []);
   useEffect(() => {
-    if (user) {
-      try {
-        localStorage.setItem('farminix_user_profile_v3', JSON.stringify(user));
-      } catch {}
+    try {
+      for (const key of ['farminix_user_profile', 'farminix_user_profile_v2', 'farminix_user_profile_v3', 'farminix_user_orders']) localStorage.removeItem(key);
+    } catch {}
+    let cancelled = false; const version = authEpoch.current;
+    customerApi<{ user: User | null }>('/api/customer-auth').then(data => {
+      if (!cancelled && authEpoch.current === version) commitSession(data.user);
+    }).catch(() => { if (!cancelled && authEpoch.current === version) commitSession(null); });
+    return () => { cancelled = true; };
+  }, [commitSession]);
+  const authenticate = async (action: 'login' | 'register', fields: { email: string; password: string; name?: string; phone?: string }) => {
+    if (authInFlight.current) throw new Error('Sign-in is already in progress. Please wait.');
+    authInFlight.current = true;
+    const version = ++authEpoch.current;
+    try {
+      const data = await customerApi<{ user: User }>('/api/customer-auth', { method: 'POST', body: JSON.stringify({ action, ...fields }) });
+      if (version === authEpoch.current) commitSession(data.user);
+    } catch (error) { if (version === authEpoch.current && !user) commitSession(null); throw error; }
+    finally { authInFlight.current = false; }
+  };
+  const signIn = (email: string, password: string) => authenticate('login', { email, password });
+  const register = (fields: { name: string; email: string; phone: string; password: string }) => authenticate('register', fields);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState('');
+  const [ordersCursor, setOrdersCursor] = useState<number | null>(null);
+  const orderRequest = useRef(0);
+  const fetchOrders = useCallback(async (cursor = 0, append = false) => {
+    if (!user?.id) return;
+    const version = authEpoch.current, request = ++orderRequest.current;
+    setOrdersLoading(true); setOrdersError('');
+    try {
+      const data = await customerApi<{ orders: Order[]; nextCursor: number | null }>(`/api/customer-orders?cursor=${cursor}`);
+      if (version !== authEpoch.current || request !== orderRequest.current) return;
+      setOrders(previous => append ? [...previous, ...data.orders.filter(order => !previous.some(existing => existing.id === order.id))] : data.orders);
+      setOrdersCursor(data.nextCursor);
+    } catch (error) {
+      if (version !== authEpoch.current || request !== orderRequest.current) return;
+      if (error instanceof CustomerApiError && error.status === 401) { commitSession(null); setOrders([]); }
+      setOrdersError(error instanceof Error ? error.message : 'Unable to load your orders. Please retry.');
+    } finally { if (version === authEpoch.current && request === orderRequest.current) setOrdersLoading(false); }
+  }, [user?.id, commitSession]);
+  const refreshOrders = useCallback(() => fetchOrders(), [fetchOrders]);
+  const loadMoreOrders = () => ordersCursor !== null ? fetchOrders(ordersCursor, true) : Promise.resolve();
+  useEffect(() => {
+    setOrders([]); setOrdersCursor(null); setOrdersError(''); setOrdersLoading(false);
+    if (user?.id) void fetchOrders();
+  }, [user?.id, fetchOrders]);
+  const signOut = async () => {
+    ++authEpoch.current; setOrders([]); setOrdersCursor(null); setOrdersError(''); setOrdersLoading(false);
+    await customerApi('/api/customer-auth', { method: 'DELETE' });
+    commitSession(null); setIsAuthOpen(false); navigate('/');
+    try { sessionStorage.removeItem('farminix_pending_order'); } catch {}
+  };
+  const saveAddresses = async (addresses: UserAddress[]) => {
+    try {
+      const version = authEpoch.current;
+      const data = await customerApi<{ user: User }>('/api/customer-auth', { method: 'PUT', body: JSON.stringify({ addresses }) });
+      if (version === authEpoch.current) setUser(data.user);
+    } catch (error) {
+      if (error instanceof CustomerApiError && error.status === 401) { commitSession(null); requestLogin('checkout'); }
+      throw error;
     }
-  }, [user]);
-
-  const [orders, setOrders] = useState<Order[]>(() => {
-    try { return JSON.parse(localStorage.getItem('farminix_customer_orders_v1') || '[]'); } catch { return []; }
-  });
+  };
+  const beginCheckout = () => {
+    if (authStatus !== 'authenticated' || !user) { requestLogin('checkout'); return; }
+    navigate('/checkout');
+  };
   const pendingOrder = useRef<{ fingerprint: string; id: string } | null>((() => {
     try { return JSON.parse(sessionStorage.getItem('farminix_pending_order') || 'null'); } catch { return null; }
   })());
 
   // Modal states
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isTrackOrderOpen, setIsTrackOrderOpen] = useState(false);
@@ -346,22 +411,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     customTotal?: number,
     payment?: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string; couponCode?: string | null }
   ): Promise<Order> => {
+    if (!user || authStatus !== 'authenticated') { requestLogin('checkout'); throw new Error('Please log in before placing your order.'); }
+    const owner = user.id, version = authEpoch.current;
     const itemsToUse = customItems && customItems.length > 0 ? customItems : [...cart];
     const totalToUse = customTotal !== undefined ? customTotal : cartTotal;
     const items = itemsToUse.map(item => ({ productId: item.product.id, quantity: item.quantity, selectedWeight: item.selectedWeight }));
-    const fingerprint = JSON.stringify({ items, address, paymentMethod, totalToUse, appliedCoupon });
+    const fingerprint = JSON.stringify({ owner, items, address, paymentMethod, totalToUse, appliedCoupon });
     if (pendingOrder.current?.fingerprint !== fingerprint) pendingOrder.current = { fingerprint, id: crypto.randomUUID() };
     try { sessionStorage.setItem('farminix_pending_order', JSON.stringify(pendingOrder.current)); } catch {}
     const response = await fetch('/api/site-config/orders', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ requestId: pendingOrder.current.id, items, address, expectedAmount: totalToUse, couponCode: payment && payment.couponCode !== undefined ? payment.couponCode : appliedCoupon, payment: payment ? { method: 'RAZORPAY', ...payment } : { method: 'COD' } }),
     });
     const data = await response.json();
-    if (!response.ok) throw Error(data.error || 'Unable to confirm your order. Please retry.');
+    if (version !== authEpoch.current) throw new Error('Your account changed. Log back in to check this order in Order History.');
+    if (!response.ok) {
+      if (response.status === 401) { commitSession(null); setOrders([]); requestLogin('checkout'); }
+      throw Error(data.error || 'Unable to confirm your order. Please retry.');
+    }
     const newOrder: Order = data.order;
     setOrders(prev => {
       const next = [newOrder, ...prev.filter(order => order.id !== newOrder.id)];
-      try { localStorage.setItem('farminix_customer_orders_v1', JSON.stringify(next)); } catch {}
       return next;
     });
     pendingOrder.current = null;
@@ -400,8 +470,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setLocation,
         detectAndSetLocation,
         user,
-        setUser,
+        authStatus,
+        authIntent,
+        requestLogin,
+        beginCheckout,
+        signIn,
+        register,
+        signOut,
+        saveAddresses,
         orders,
+        ordersLoading,
+        ordersError,
+        hasMoreOrders: ordersCursor !== null,
+        refreshOrders,
+        loadMoreOrders,
         createOrder,
         isCartOpen,
         setIsCartOpen,

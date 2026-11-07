@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Menu, X } from 'lucide-react';
+import { ShoppingCart, Menu, X, UserRound } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
 
 export const MainHeader: React.FC = () => {
-  const { cart, setIsCartOpen, navigate, currentRoute } = useApp();
+  const { cart, setIsCartOpen, navigate, currentRoute, user, requestLogin } = useApp();
   const { publishedConfig } = useAdminConfig();
   const headerCfg = publishedConfig.header;
 
@@ -39,7 +39,7 @@ export const MainHeader: React.FC = () => {
   ];
 
   return (
-    <header className={`w-full bg-white border-b border-slate-100 sticky top-0 z-30 select-none shadow-xs ${isCheckout ? 'checkout-site-header' : ''} ${isHomeHero ? 'home-site-header' : 'premium-inner-header'}`}>
+    <header className={`store-site-header w-full border-b border-slate-100 sticky top-0 z-30 select-none shadow-xs ${isCheckout ? 'checkout-site-header' : ''} ${isHomeHero ? 'home-site-header' : 'premium-inner-header'}`}>
       <div className="max-w-7xl mx-auto h-20 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-4 w-full">
         {/* Left: Farminix Logo */}
         <div className="flex items-center shrink-0">
@@ -57,6 +57,7 @@ export const MainHeader: React.FC = () => {
           {navLinks.map((link) => (
             <button
               key={link.label}
+              aria-current={link.isActive ? 'page' : undefined}
               onClick={() => navigate(link.path)}
               className={`relative text-xs sm:text-sm font-extrabold transition-all py-2 px-1 sm:px-2 whitespace-nowrap cursor-pointer flex flex-col items-center justify-center ${
                 link.isActive
@@ -74,6 +75,7 @@ export const MainHeader: React.FC = () => {
 
         {/* Right: Cart Button & Mobile Menu Toggle */}
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <button className="store-header-account" onClick={() => requestLogin('account')} aria-label={user ? 'My account' : 'Log in or create account'}><UserRound size={18} /><span className="hidden sm:inline">{user ? 'My account' : 'Log in'}</span></button>
           <button
             onClick={() => setIsCartOpen(true)}
             className={`relative flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2.5 sm:py-2 text-xs font-bold text-white bg-[#7C3AED] hover:bg-[#6D28D9] border border-transparent rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95 ${isCheckout ? 'checkout-header-cart' : ''} ${isHomeHero ? 'home-header-cart' : ''}`}
@@ -113,10 +115,11 @@ export const MainHeader: React.FC = () => {
 
       {/* Mobile Vertical Navigation Menu */}
       {isMobileMenuOpen && (
-        <div id="store-mobile-navigation" className="xl:hidden bg-white border-t border-slate-100 shadow-xl px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
+        <div id="store-mobile-navigation" className="store-mobile-navigation xl:hidden border-t border-slate-100 shadow-xl px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
           {navLinks.map((link) => (
             <button
               key={link.label}
+              aria-current={link.isActive ? 'page' : undefined}
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 navigate(link.path);
@@ -131,6 +134,7 @@ export const MainHeader: React.FC = () => {
               {link.isActive && <span className="w-2 h-2 rounded-full bg-[#7C3AED]" />}
             </button>
           ))}
+          <button className="w-full px-4 py-3 text-left text-sm font-semibold text-purple-700" onClick={() => { setIsMobileMenuOpen(false); if (user) navigate('/orders'); else requestLogin('orders'); }}>Order History</button>
         </div>
       )}
     </header>

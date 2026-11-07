@@ -221,3 +221,27 @@
   .checkout-site-header > div:first-child { height: 68px; }
   .checkout-site-header .checkout-header-cart { padding: 9px 12px; }
 }
+
+.checkout-options-single { grid-template-columns: minmax(0, 1fr); }
+
+.checkout-delivery-check { display: flex; align-items: flex-start; gap: 12px; padding: 18px; color: #974e56; background: #fff2f0; border: 1px solid #edcbd1; border-radius: 15px; font-size: 12px; }
+.checkout-delivery-check > svg { flex-shrink: 0; margin-top: 3px; }
+.checkout-delivery-check.is-supported { background: #f2f8f0; border-color: #d5e5d0; color: #628253; }
+.checkout-delivery-check strong { display: block; font-weight: 600; }
+.checkout-delivery-check p { margin-top: 7px; line-height: 1.8; }
+.checkout-delivery-check button { margin-top: 12px; }
+.checkout-pay-button:disabled { opacity: .55; cursor: not-allowed; }
+.checkout-pin-picker { display: grid; gap: 13px; padding: 16px; background: #fbf8ff; border: 1px solid #e7d9f6; border-radius: 14px; }
+.checkout-pin-picker h4 { display: flex; gap: 8px; align-items: center; font-weight: 600; color: #75478f; }
+.checkout-pin-picker > p { color: #907aa0; font-size: 12px; line-height: 1.8; }
+.checkout-pin-picker label { display: grid; gap: 7px; color: #6c4f7e; font-size: 12px; }
+.checkout-pin-picker input { width: 100%; min-width: 0; padding: 10px; border: 1px solid #e3d4ed; background: white; color: #513962; border-radius: 9px; font-size: 14px; }
+.checkout-pin-link { display: flex; gap: 8px; }
+.checkout-pin-link button { flex-shrink: 0; padding: 10px; color: #7b41ab; border: 1px solid #d6b9e9; border-radius: 9px; background: #f7eeff; }
+.checkout-pin-coordinates { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
+.checkout-pin-picker iframe { width: 100%; height: 190px; border: 1px solid #e5d8ee; border-radius: 10px; }
+.checkout-pin-picker a { color: #9a7baa; font-size: 10px; text-decoration: underline; }
+.checkout-pin-error { color: #a34b5a !important; background: #fff3f1; border: 1px solid #f0d5d3; padding: 12px; border-radius: 10px; font-size: 12px; line-height: 1.7; }
+.checkout-pin-confirm { display: flex; align-items: flex-start; gap: 10px; color: #78588c; font-size: 12px; line-height: 1.7; padding: 10px 0; }
+.checkout-pin-confirm input { flex-shrink: 0; margin-top: 4px; }
+@media (max-width: 767px) { .checkout-pin-picker input { font-size: 16px; } }

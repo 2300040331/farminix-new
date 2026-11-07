@@ -1,3 +1,6 @@
+import { handleEnquiries } from './enquiries.js';
+import { sqlEnquiries } from './enquiries-sql.js';
+import { checkDelivery, deliverySettingsError } from './delivery-policy.js';
 import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
@@ -10,6 +13,11 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { initDatabase, query, transaction, isUsingPostgres } from './db.js';
+import { authenticatedCustomer, customerSameOrigin, handleCustomerAuth, verifyCustomerPassword } from './customer-auth.js';
+import { sqlCustomerStore } from './customer-sql.js';
+import { handleAdminUsers } from './admin-users.js';
+import { sqlAdminUsers } from './admin-users-sql.js';
+import { sqlCustomerOrder } from './customer-order-view.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,9 +107,26 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction): voi
   });
 };
 
-// Clean helper
-const clean = (val: unknown, maxLen: number): string =>
-  typeof val === 'string' ? val.trim().slice(0, maxLen) : '';
+const requireCustomer = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!customerSameOrigin(req)) { res.status(403).json({ error: 'Please use the Farminix website to place orders.' }); return; }
+    const customer = await authenticatedCustomer(req, sqlCustomerStore);
+    if (!customer) { res.status(401).json({ code: 'LOGIN_REQUIRED', error: 'Please log in before placing an order.' }); return; }
+    (req as any).customer = customer; next();
+  } catch { res.status(503).json({ error: 'Account services are temporarily unavailable. Please try again.' }); }
+};
+app.all('/api/customer-auth', async (req: Request, res: Response): Promise<void> => { await handleCustomerAuth(req, res, sqlCustomerStore); });
+app.all('/api/site-config/users', requireAdmin, async (req: Request, res: Response): Promise<void> => { await handleAdminUsers(req, res, sqlAdminUsers, true); });
+app.get('/api/customer-orders', requireCustomer, async (req: Request, res: Response): Promise<void> => {
+  res.setHeader('Cache-Control', 'private, no-store');
+  const offset = Number(req.query.cursor || 0);
+  if (!Number.isInteger(offset) || offset < 0 || offset > 100000) { res.status(400).json({ error: 'Invalid order-history page.' }); return; }
+  try {
+    const rows = (await query('SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC LIMIT 21 OFFSET $2', [(req as any).customer.id, offset])).rows;
+    const orders = rows.slice(0, 20).map(sqlCustomerOrder);
+    res.json({ orders, nextCursor: rows.length > 20 ? offset + 20 : null });
+  } catch { res.status(503).json({ error: 'Unable to load your order history. Please try again.' }); }
+});
 
 // ============================================================
 // 1. HEALTH & STATUS ENDPOINT
@@ -191,6 +216,8 @@ app.put('/api/site-config', requireAdmin, async (req: Request, res: Response): P
   }
 
   try {
+    const deliveryError = deliverySettingsError(incomingConfig.checkoutPayment?.deliveryArea);
+    if (deliveryError) { res.status(400).json({ error: deliveryError }); return; }
     // Strip private credentials and orders before saving
     const { razorpayKeySecret: _secret, ...paymentSettings } = incomingConfig.checkoutPayment || {};
     const sanitizedConfig = {
@@ -325,7 +352,7 @@ app.get('/api/site-config/orders', requireAdmin, async (_req: Request, res: Resp
 });
 
 // 3.2 Place Online Order (Customer Checkout)
-app.post('/api/site-config/orders', async (req: Request, res: Response): Promise<void> => {
+app.post('/api/site-config/orders', requireCustomer, async (req: Request, res: Response): Promise<void> => {
   res.setHeader('Cache-Control', 'private, no-store');
 
   const { requestId, items, address, payment, couponCode, expectedAmount } = req.body || {};
@@ -361,6 +388,7 @@ app.post('/api/site-config/orders', async (req: Request, res: Response): Promise
     const existingResult = await query('SELECT * FROM orders WHERE request_id = $1', [requestId]);
     if (existingResult.rowCount > 0) {
       const existing = existingResult.rows[0];
+      if (existing.user_id !== (req as any).customer.id) { res.status(409).json({ error: 'This order request belongs to another account.' }); return; }
       res.json({
         order: {
           id: existing.id,
@@ -385,6 +413,10 @@ app.post('/api/site-config/orders', async (req: Request, res: Response): Promise
 
   // Payment Verification for Razorpay
   if (payment.method === 'RAZORPAY') {
+    try {
+      const owner = await query('SELECT * FROM customer_payment_orders WHERE id = $1', [payment.razorpay_order_id]);
+      if (owner.rows[0]?.user_id !== (req as any).customer.id) { res.status(403).json({ error: 'This payment belongs to another account.' }); return; }
+    } catch { res.status(503).json({ error: 'Unable to validate this payment. Please retry.' }); return; }
     if (!payment.razorpay_payment_id || !payment.razorpay_order_id || !payment.razorpay_signature) {
       res.status(400).json({ error: 'Razorpay payment confirmation details are missing.' });
       return;
@@ -414,6 +446,9 @@ app.post('/api/site-config/orders', async (req: Request, res: Response): Promise
     const config = typeof configResult.rows[0].config === 'string'
       ? JSON.parse(configResult.rows[0].config)
       : configResult.rows[0].config;
+
+    const delivery = checkDelivery(address, config.checkoutPayment?.deliveryArea);
+    if (!delivery.allowed) { res.status(delivery.code === 'DELIVERY_NOT_CONFIGURED' ? 503 : 422).json({ code: delivery.code, error: delivery.message }); return; }
 
     const catalogProducts: any[] = config.products || [];
 
@@ -473,20 +508,28 @@ app.post('/api/site-config/orders', async (req: Request, res: Response): Promise
     }
 
     const discountedTotal = Math.max(0, subtotal - discount);
-    const freeThreshold = Number(config.cart?.freeDeliveryThreshold) || 500;
-    const deliveryFee = discountedTotal >= freeThreshold ? 0 : (Number(config.cart?.deliveryFee) || 0);
+    const deliveryFee = delivery.deliveryFee!;
     const handlingFee = Number(config.cart?.handlingFee) || 0;
     const computedFinalAmount = discountedTotal + deliveryFee + handlingFee;
 
-    if (expectedAmount !== undefined && Math.abs(expectedAmount - computedFinalAmount) > 1) {
+    if (!Number.isFinite(expectedAmount) || Math.round(expectedAmount * 100) !== Math.round(computedFinalAmount * 100)) {
       res.status(409).json({ error: 'Order total mismatch due to price or fee changes. Please refresh checkout.' });
       return;
+    }
+
+    if (payment.method === 'RAZORPAY') {
+      if (!razorpayClient) { res.status(503).json({ error: 'Payment verification is unavailable. Please contact support.' }); return; }
+      const verified = await razorpayClient.payments.fetch(payment.razorpay_payment_id);
+      if (verified.order_id !== payment.razorpay_order_id || !['authorized', 'captured'].includes(verified.status) || verified.currency !== 'INR' || Number(verified.amount) !== Math.round(computedFinalAmount * 100)) {
+        res.status(409).json({ error: 'The payment does not match the order and delivery charges. Please contact support with your payment reference.' }); return;
+      }
     }
 
     const orderId = `ORD-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const newOrder = {
       id: orderId,
+      customerId: (req as any).customer.id,
       date: new Date().toISOString(),
       items: validatedCartItems,
       totalAmount: subtotal,
@@ -535,14 +578,14 @@ app.post('/api/site-config/orders', async (req: Request, res: Response): Promise
 
       // 3. Insert order record into orders table
       await client.query(
-        `INSERT INTO orders (id, request_id, customer_name, customer_phone, customer_email, delivery_address, items, total_amount, discount_amount, delivery_fee, handling_fee, final_amount, coupon_code, status, payment_method, payment_details, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW(), NOW())`,
+        `INSERT INTO orders (id, request_id, customer_name, customer_phone, customer_email, delivery_address, items, total_amount, discount_amount, delivery_fee, handling_fee, final_amount, coupon_code, status, payment_method, payment_details, user_id, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW(), NOW())`,
         [
           orderId,
           requestId,
           address.name,
           cleanPhone,
-          address.email || null,
+          (req as any).customer.email,
           JSON.stringify(address),
           JSON.stringify(validatedCartItems),
           subtotal,
@@ -554,6 +597,7 @@ app.post('/api/site-config/orders', async (req: Request, res: Response): Promise
           'Order Received',
           payment.method,
           payment.method === 'RAZORPAY' ? JSON.stringify(payment) : null,
+          (req as any).customer.id,
         ]
       );
 
@@ -622,170 +666,7 @@ app.patch('/api/site-config/orders', requireAdmin, async (req: Request, res: Res
 // 4. CUSTOMER ENQUIRIES / SUPPORT QUERIES MODULE (/api/site-config/queries)
 // ============================================================
 
-// 4.1 Submit Customer Enquiry (Public)
-app.post('/api/site-config/queries', async (req: Request, res: Response): Promise<void> => {
-  res.setHeader('Cache-Control', 'private, no-store');
-  const { name, mobile, email, message, kind, website, requestId } = req.body || {};
-
-  if (website) {
-    res.status(400).json({ error: 'Spam detected.' });
-    return;
-  }
-
-  if (!name || name.trim().length < 2 || name.length > 120) {
-    res.status(400).json({ error: 'Please enter your name.' });
-    return;
-  }
-
-  if (!message || message.trim().length < 5 || message.length > 5000) {
-    res.status(400).json({ error: 'Please enter a message between 5 and 5,000 characters.' });
-    return;
-  }
-
-  const cleanMobile = String(mobile || '').replace(/\D/g, '');
-  if (cleanMobile.length < 10 || cleanMobile.length > 15) {
-    res.status(400).json({ error: 'Enter a valid 10-digit mobile number.' });
-    return;
-  }
-
-  if (!['query', 'complaint', 'compliance'].includes(kind)) {
-    res.status(400).json({ error: 'Select an enquiry topic.' });
-    return;
-  }
-
-  const enquiryId = requestId || `ENQ-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
-
-  try {
-    await query(
-      `INSERT INTO customer_enquiries (id, name, mobile, email, message, kind, status, admin_notes, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, 'new', '', NOW())
-       ON CONFLICT (id) DO NOTHING`,
-      [enquiryId, clean(name, 120), clean(mobile, 24), clean(email, 254), clean(message, 5000), kind]
-    );
-
-    res.status(201).json({ id: enquiryId });
-  } catch (error: any) {
-    console.error('[POST /api/site-config/queries error]:', error);
-    res.status(500).json({ error: 'Failed to record enquiry. Please try again.' });
-  }
-});
-
-// 4.2 List Enquiries (Admin Only)
-app.get('/api/site-config/queries', requireAdmin, async (req: Request, res: Response): Promise<void> => {
-  res.setHeader('Cache-Control', 'private, no-store');
-  const page = Math.max(0, Math.floor(Number(req.query.page) || 0));
-  const isTrash = req.query.trash === '1';
-  const limit = 25;
-  const offset = page * limit;
-
-  try {
-    const listQuery = isTrash
-      ? `SELECT * FROM customer_enquiries WHERE deleted_at IS NOT NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2`
-      : `SELECT * FROM customer_enquiries WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2`;
-
-    const countQuery = isTrash
-      ? `SELECT COUNT(*) as total FROM customer_enquiries WHERE deleted_at IS NOT NULL`
-      : `SELECT COUNT(*) as total FROM customer_enquiries WHERE deleted_at IS NULL`;
-
-    const rowsRes = await query(listQuery, [limit, offset]);
-    const countRes = await query(countQuery);
-    const total = parseInt(countRes.rows[0]?.total || '0', 10);
-
-    const enquiries = rowsRes.rows.map((r: any) => ({
-      id: r.id,
-      name: r.name,
-      mobile: r.mobile,
-      email: r.email,
-      message: r.message,
-      kind: r.kind,
-      status: r.status,
-      adminNotes: r.admin_notes || '',
-      createdAt: r.created_at ? new Date(r.created_at).toISOString() : new Date().toISOString(),
-      deletedAt: r.deleted_at ? new Date(r.deleted_at).toISOString() : undefined,
-    }));
-
-    res.json({ enquiries, total, page });
-  } catch (error: any) {
-    console.error('[GET /api/site-config/queries error]:', error);
-    res.status(500).json({ error: 'Failed to load enquiries.' });
-  }
-});
-
-// 4.3 Update Enquiry Status / Notes (Admin Only)
-app.patch('/api/site-config/queries', requireAdmin, async (req: Request, res: Response): Promise<void> => {
-  res.setHeader('Cache-Control', 'private, no-store');
-  const { id, status, adminNotes } = req.body || {};
-
-  if (!id || !['new', 'in-progress', 'resolved'].includes(status)) {
-    res.status(400).json({ error: 'Valid enquiry ID and status required.' });
-    return;
-  }
-
-  try {
-    const result = await query(
-      `UPDATE customer_enquiries 
-       SET status = $1, admin_notes = $2 
-       WHERE id = $3 
-       RETURNING *`,
-      [status, clean(adminNotes, 5000), id]
-    );
-
-    if (result.rowCount === 0) {
-      res.status(404).json({ error: 'Enquiry not found.' });
-      return;
-    }
-
-    const row = result.rows[0];
-    res.json({
-      enquiry: {
-        id: row.id,
-        name: row.name,
-        mobile: row.mobile,
-        email: row.email,
-        message: row.message,
-        kind: row.kind,
-        status: row.status,
-        adminNotes: row.admin_notes,
-        createdAt: row.created_at,
-      },
-    });
-  } catch (error: any) {
-    console.error('[PATCH /api/site-config/queries error]:', error);
-    res.status(500).json({ error: 'Failed to update enquiry.' });
-  }
-});
-
-// 4.4 Soft-Delete or Restore Enquiry (Admin Only)
-app.delete('/api/site-config/queries', requireAdmin, async (req: Request, res: Response): Promise<void> => {
-  res.setHeader('Cache-Control', 'private, no-store');
-  const { id, action } = req.body || {};
-
-  if (!id) {
-    res.status(400).json({ error: 'Enquiry ID required.' });
-    return;
-  }
-
-  try {
-    const isRestore = action === 'restore';
-    const updateSql = isRestore
-      ? `UPDATE customer_enquiries SET deleted_at = NULL WHERE id = $1 RETURNING *`
-      : `UPDATE customer_enquiries SET deleted_at = NOW() WHERE id = $1 RETURNING *`;
-
-    const result = await query(updateSql, [id]);
-    if (result.rowCount === 0) {
-      res.status(404).json({ error: 'Enquiry not found.' });
-      return;
-    }
-
-    res.json({
-      enquiry: result.rows[0],
-      deleted: !isRestore,
-    });
-  } catch (error: any) {
-    console.error('[DELETE /api/site-config/queries error]:', error);
-    res.status(500).json({ error: 'Failed to delete/restore enquiry.' });
-  }
-});
+app.all('/api/site-config/queries', async (req: Request, res: Response): Promise<void> => { await handleEnquiries(req, res, sqlEnquiries, sqlCustomerStore, verifyAdminSession(req)); });
 
 // ============================================================
 // 5. PAYMENT MODULE (/api/payment/*)
@@ -801,58 +682,32 @@ app.get(['/api/payment/razorpay-key', '/api/payment/razorpay-key/'], (_req: Requ
 });
 
 // 5.2 Create Server-Validated Razorpay Order
-app.post(['/api/payment/create-order', '/api/payment/create-order/'], async (req: Request, res: Response): Promise<void> => {
+app.post(['/api/payment/create-order', '/api/payment/create-order/'], requireCustomer, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { amount, currency = 'INR', receipt, notes, cart, couponCode } = req.body;
-
-    if (!razorpayClient) {
-      res.status(500).json({
-        success: false,
-        error: 'Razorpay is not configured on the server. Please set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env',
-      });
-      return;
+    const { amount, currency = 'INR', receipt, notes, cart, couponCode, address } = req.body || {};
+    const configRes = await query('SELECT config FROM site_config WHERE key = $1', ['farminix:site-config:v1']);
+    if (!configRes.rows[0]) { res.status(503).json({ error: 'Store configuration is unavailable.' }); return; }
+    const config = typeof configRes.rows[0].config === 'string' ? JSON.parse(configRes.rows[0].config) : configRes.rows[0].config;
+    const delivery = checkDelivery(address, config.checkoutPayment?.deliveryArea);
+    if (!delivery.allowed) { res.status(delivery.code === 'DELIVERY_NOT_CONFIGURED' ? 503 : 422).json({ code: delivery.code, error: delivery.message }); return; }
+    if (currency !== 'INR' || !Array.isArray(cart) || !cart.length || cart.length > 100) { res.status(400).json({ error: 'A valid cart and INR payment are required.' }); return; }
+    const quantities = new Map<string, number>();
+    for (const item of cart) {
+      if (!item || typeof item.productId !== 'string' || !Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 10000) { res.status(400).json({ error: 'Invalid cart quantity.' }); return; }
+      quantities.set(item.productId, (quantities.get(item.productId) || 0) + item.quantity);
     }
-
-    let validatedAmount = Math.round(Number(amount) * 100);
-
-    // If cart is supplied, re-validate price on the server against SQL products
-    if (Array.isArray(cart) && cart.length > 0) {
-      const configRes = await query('SELECT config FROM site_config WHERE key = $1', ['farminix:site-config:v1']);
-      if (configRes.rowCount > 0) {
-        const config = typeof configRes.rows[0].config === 'string'
-          ? JSON.parse(configRes.rows[0].config)
-          : configRes.rows[0].config;
-
-        let subtotal = 0;
-        for (const item of cart) {
-          const prod = (config.products || []).find((p: any) => p.id === item.productId && p.enabled !== false);
-          if (prod) {
-            subtotal += prod.price * Number(item.quantity);
-          }
-        }
-
-        let discount = 0;
-        if (couponCode && config.cart?.couponsEnabled !== false && Array.isArray(config.cart?.coupons)) {
-          const coupon = config.cart.coupons.find(
-            (c: any) => c.enabled && String(c.code).toUpperCase() === String(couponCode).toUpperCase()
-          );
-          if (coupon && subtotal >= (coupon.minimumSpend || 0)) {
-            discount = Math.round((subtotal * Math.min(100, Math.max(0, coupon.discountPercentage))) / 100);
-          }
-        }
-
-        const discountedTotal = Math.max(0, subtotal - discount);
-        const freeDeliveryThreshold = Number(config.cart?.freeDeliveryThreshold) || 500;
-        const deliveryFee = discountedTotal >= freeDeliveryThreshold ? 0 : (Number(config.cart?.deliveryFee) || 0);
-        const handlingFee = Number(config.cart?.handlingFee) || 0;
-        validatedAmount = Math.round((discountedTotal + deliveryFee + handlingFee) * 100);
-      }
+    const coupon = config.cart?.couponsEnabled !== false ? config.cart?.coupons?.find((item: any) => item.enabled && String(item.code).toUpperCase() === String(couponCode || '').toUpperCase() && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now())) : null;
+    let subtotal = 0, eligible = 0;
+    for (const [id, quantity] of quantities) {
+      const product = (config.products || []).find((item: any) => item.id === id && item.enabled !== false);
+      if (!product || !product.inStock || quantity > product.stockCount) { res.status(409).json({ error: 'An item is unavailable or exceeds the remaining stock.' }); return; }
+      subtotal += product.price * quantity;
+      if (coupon && (!coupon.productIds?.length || coupon.productIds.includes(id))) eligible += product.price * quantity;
     }
-
-    if (!validatedAmount || validatedAmount <= 0) {
-      res.status(400).json({ success: false, error: 'A valid payment amount is required.' });
-      return;
-    }
+    const discount = coupon && eligible >= (coupon.minimumSpend || 0) ? Math.round(eligible * Math.min(100, Math.max(0, coupon.discountPercentage)) / 100) : 0;
+    const validatedAmount = Math.round((subtotal - discount + delivery.deliveryFee! + (config.cart?.handlingFee || 0)) * 100);
+    if (!Number.isFinite(validatedAmount) || validatedAmount <= 0 || Math.round(Number(amount) * 100) !== validatedAmount) { res.status(409).json({ error: 'Order prices or delivery charges changed. Refresh checkout before paying.' }); return; }
+    if (!razorpayClient) { res.status(503).json({ error: 'Online payments are not configured.' }); return; }
 
     // Sanitize notes for Razorpay (max 15 key-value pairs, key max 30 chars, val max 256 chars, UTF-8 clean without emojis)
     const sanitizedNotes: Record<string, string> = {};
@@ -881,10 +736,11 @@ app.post(['/api/payment/create-order', '/api/payment/create-order/'], async (req
       amount: validatedAmount,
       currency: currency || 'INR',
       receipt: (receipt ? String(receipt) : `farminix_${Date.now()}`).slice(0, 40),
-      notes: sanitizedNotes,
+      notes: { ...sanitizedNotes, customer_id: (req as any).customer.id },
     };
 
     const order = await razorpayClient.orders.create(orderOptions);
+    await query('INSERT INTO customer_payment_orders (id, user_id) VALUES ($1, $2)', [order.id, (req as any).customer.id]);
 
     res.json({
       success: true,
@@ -1024,7 +880,7 @@ app.post('/api/auth/login', async (req: Request, res: Response): Promise<void> =
     }
 
     const user = result.rows[0];
-    if (!bcrypt.compareSync(password, user.password_hash)) {
+    if (!await verifyCustomerPassword(password, user.password_hash, async (value, hash) => bcrypt.compare(value, hash))) {
       res.status(401).json({ error: 'Invalid email or password.' });
       return;
     }
@@ -1050,47 +906,9 @@ app.post('/api/auth/login', async (req: Request, res: Response): Promise<void> =
   }
 });
 
-// 6.3 OTP Simulation
-app.post('/api/auth/otp-send', (req: Request, res: Response): void => {
-  const { phone } = req.body;
-  if (!phone) {
-    res.status(400).json({ error: 'Phone number is required.' });
-    return;
-  }
-  res.json({ message: `OTP sent successfully to ${phone}`, mockOtp: '123456' });
-});
-
-app.post('/api/auth/otp-verify', async (req: Request, res: Response): Promise<void> => {
-  const { phone, otp } = req.body;
-  if (otp !== '123456') {
-    res.status(400).json({ error: 'Invalid verification OTP.' });
-    return;
-  }
-
-  try {
-    let userResult = await query('SELECT * FROM users WHERE phone = $1', [phone.trim()]);
-    let user = userResult.rows[0];
-
-    if (!user) {
-      const userId = `usr-${Date.now()}`;
-      await query(
-        `INSERT INTO users (id, name, email, phone, password_hash, role, reward_points, wallet_balance, is_verified, created_at, updated_at)
-         VALUES ($1, 'Customer', $2, $3, '', 'CUSTOMER', 50, 0.00, true, NOW(), NOW())`,
-        [userId, `${Date.now()}@farminix.in`, phone.trim()]
-      );
-      userResult = await query('SELECT * FROM users WHERE id = $1', [userId]);
-      user = userResult.rows[0];
-    }
-
-    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '15m' });
-    res.json({
-      token,
-      user: { id: user.id, name: user.name, phone: user.phone, rewardPoints: user.reward_points },
-    });
-  } catch (error: any) {
-    console.error('[OTP verify error]:', error);
-    res.status(500).json({ error: 'Verification failed.' });
-  }
+// Retire the old demonstration OTP endpoints; customers use real credentials.
+app.post(['/api/auth/otp-send', '/api/auth/otp-verify'], (_req: Request, res: Response): void => {
+  res.status(410).json({ error: 'Please sign in with your email and password or create an account.' });
 });
 
 // 6.4 User Profile
@@ -1154,27 +972,9 @@ app.post('/api/addresses', authenticateToken, async (req: Request, res: Response
 // ============================================================
 // 7. SUPPORT CHATBOT & ADMIN DASHBOARD STATS
 // ============================================================
-app.post('/api/support/chat', (req: Request, res: Response): void => {
-  const { message } = req.body;
-  if (!message) {
-    res.status(400).json({ error: 'Message required.' });
-    return;
-  }
-
-  const msg = message.toLowerCase();
-  let reply = 'I am your Farminix Shopping Assistant. How can I assist you with your groceries today?';
-
-  if (msg.includes('order') || msg.includes('track')) {
-    reply = 'You can track live orders under "Track Order" in the top navigation bar.';
-  } else if (msg.includes('discount') || msg.includes('coupon') || msg.includes('offer')) {
-    reply = 'Use the promo coupon "FARM10" at checkout for instant savings!';
-  } else if (msg.includes('rice') || msg.includes('bag')) {
-    reply = 'Farminix Family Choice Rice 26 Kg bag is available with direct mill freshness and fast doorstep delivery.';
-  } else if (msg.includes('return') || msg.includes('refund')) {
-    reply = 'For returns or replacements, write to us under "Any Queries?" and our support team will resolve it quickly.';
-  }
-
-  res.json({ reply });
+// The previous demonstration chatbot did not create support requests.
+app.post('/api/support/chat', (_req: Request, res: Response): void => {
+  res.status(410).json({ error: 'Use the Support request form to send your issue to the Farminix team.' });
 });
 
 // Admin Dashboard Stats

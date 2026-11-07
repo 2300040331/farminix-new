@@ -19,6 +19,9 @@ import { AboutPage } from './components/AboutPage';
 import { ReachOutPage } from './components/ReachOutPage';
 import { QueriesPage } from './components/QueriesPage';
 import { CareersPage } from './components/CareersPage';
+import { OrderHistoryPage } from './components/OrderHistoryPage';
+import { PolicyPage } from './components/PolicyPage';
+import { policyForPath } from './data/policies';
 
 // Admin CRM Components
 import { AdminLayout } from './admin/AdminLayout';
@@ -32,29 +35,14 @@ import { AuthModal } from './modals/AuthModal';
 import { ProductModal } from './modals/ProductModal';
 import { TrackOrderModal } from './modals/TrackOrderModal';
 import { SupportModal } from './modals/SupportModal';
-import { IntroVideoOverlay } from './components/IntroVideoOverlay';
 import { WhatsAppFloatingButton } from './components/WhatsAppButton';
 import './storefront.css';
 import './admin/admin-premium.css';
 
-const PaddyHarvestScene = React.lazy(() => import('./components/PaddyHarvestScene'));
-
 export function AppContent() {
   const { currentRoute, navigate } = useApp();
   const { publishedConfig, isAdminLoggedIn } = useAdminConfig();
-  const [hasFinishedIntro, setHasFinishedIntro] = React.useState(false);
-  const navigateRef = React.useRef(navigate);
-  React.useEffect(() => { navigateRef.current = navigate; }, [navigate]);
-  const finishIntro = React.useCallback(() => {
-    setHasFinishedIntro(true);
-    navigateRef.current('/', undefined, { replace: true });
-    // Run after the dialog restores focus, so entry always lands on the home hero.
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      document.querySelector<HTMLElement>('.storefront-main')?.focus({ preventScroll: true });
-    });
-  }, []);
-  const isCommercePage = ['/checkout', '/products', '/offers'].includes(currentRoute.pathname) || currentRoute.pathname.startsWith('/product/') || currentRoute.searchParams.has('search') || currentRoute.searchParams.has('category');
+  const isCommercePage = ['/checkout', '/orders', '/products', '/offers'].includes(currentRoute.pathname) || currentRoute.pathname.startsWith('/product/') || currentRoute.searchParams.has('search') || currentRoute.searchParams.has('category');
 
   // All pages share the same responsive scale across operating systems.
   React.useEffect(() => {
@@ -83,7 +71,7 @@ export function AppContent() {
       .sort((a, b) => a.order - b.order);
 
     const sectionComponentMap: Record<string, React.ReactNode> = {
-      hero: publishedConfig.hero.enabled ? <React.Fragment key="hero"><HeroBanner /><React.Suspense fallback={null}><PaddyHarvestScene suspended={!hasFinishedIntro && publishedConfig.introVideo.enabled} /></React.Suspense></React.Fragment> : null,
+      hero: publishedConfig.hero.enabled ? <HeroBanner key="hero" /> : null,
       popularProducts: <PopularProducts key="popularProducts" />,
       socialBlog: <SocialBlogSection key="socialBlog" />,
       categorySection: <CategorySection key="categorySection" />,
@@ -98,6 +86,8 @@ export function AppContent() {
   };
 
   const renderMainContent = () => {
+    const policy = policyForPath(currentRoute.pathname);
+    if (policy) return <PolicyPage key={policy.id} policy={policy} />;
     const isSearchPage = currentRoute.pathname === '/products' || currentRoute.searchParams.has('search') || currentRoute.searchParams.has('category');
     const isDetailPage = currentRoute.pathname.startsWith('/product/');
     const isOffersPage = currentRoute.pathname === '/offers';
@@ -113,6 +103,7 @@ export function AppContent() {
     if (isCheckoutPage) {
       return <CheckoutPage />;
     }
+    if (currentRoute.pathname === '/orders') return <OrderHistoryPage />;
 
     if (isManufacturerPage) {
       return <ManufacturerPage />;
@@ -163,9 +154,6 @@ export function AppContent() {
       <TrackOrderModal />
       <SupportModal />
       <CategoryPage />
-
-      {/* BRANDED HARVEST ANIMATION ON SITE OPEN */}
-      {currentRoute.pathname === '/' && <IntroVideoOverlay onFinish={finishIntro} />}
 
       {/* FLOATING WHATSAPP BUTTON */}
       {!isCommercePage && <WhatsAppFloatingButton />}

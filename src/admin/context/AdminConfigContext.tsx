@@ -1,3 +1,4 @@
+import { footerPolicyLinks } from '../../data/policies';
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type {
   AdminSiteConfig,
@@ -176,7 +177,7 @@ const sanitizeFooter = (raw: any): FooterConfig => {
     companyLinks: cleanLinks(raw?.companyLinks, defaultSiteConfig.footer.companyLinks),
     helpLinks: legacyHelp ? defaultSiteConfig.footer.helpLinks : rawHelpLinks,
     downloadApp: { googlePlayUrl: '', appleAppStoreUrl: '' },
-    legalLinks: [],
+    legalLinks: footerPolicyLinks(raw?.legalLinks),
   };
 };
 

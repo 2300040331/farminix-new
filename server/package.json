@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node -e \"require('node:fs').copyFileSync('schema.sql','dist/schema.sql')\"",
     "start": "node dist/server.js",
     "dev": "tsx watch server.ts"
   },

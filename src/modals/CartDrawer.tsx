@@ -15,7 +15,7 @@ export const CartDrawer: React.FC = () => {
     cartDiscount,
     appliedCoupon,
     applyCoupon,
-    navigate,
+    beginCheckout,
   } = useApp();
 
   const { publishedConfig } = useAdminConfig();
@@ -101,8 +101,8 @@ export const CartDrawer: React.FC = () => {
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-3">
                   <div className="text-lg">⚡</div>
                   <div className="text-xs">
-                    <span className="font-bold text-amber-900">{cartCfg.deliveryBannerText || 'Superfast Delivery!'} </span>
-                    <span className="text-amber-800">Your order will reach in {cartCfg.deliveryTimeText || '10 Mins'}.</span>
+                    <span className="font-bold text-amber-900">Local & outstation delivery </span>
+                    <span className="text-amber-800">Free for Guntur addresses within 10 km of our warehouse. Other delivery charges are calculated at checkout.</span>
                   </div>
                 </div>
 
@@ -211,11 +211,11 @@ export const CartDrawer: React.FC = () => {
                 <div className="flex justify-between items-center">
                   <span>Delivery Charge</span>
                   <span className="font-bold text-[#7C3AED]">
-                    {cartCfg.deliveryFee === 0 || rawTotal >= (cartCfg.freeDeliveryThreshold || 500) ? 'FREE' : `₹${cartCfg.deliveryFee}`}
+                    Calculated at checkout
                   </span>
                 </div>
                 <div className="pt-2 border-t border-gray-200 flex justify-between items-center text-sm font-extrabold text-gray-900">
-                  <span>Grand Total</span>
+                  <span>Items Total</span>
                   <span className="text-[#7C3AED]">₹{cartTotal}</span>
                 </div>
               </div>
@@ -223,7 +223,7 @@ export const CartDrawer: React.FC = () => {
               <button
                 onClick={() => {
                   setIsCartOpen(false);
-                  navigate('/checkout');
+                  beginCheckout();
                 }}
                 className="w-full h-12 bg-[#7C3AED] hover:bg-purple-800 text-white text-sm font-bold rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-colors cursor-pointer"
               >
