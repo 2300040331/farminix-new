@@ -8,6 +8,8 @@ import { SocialBlogSection } from './components/SocialBlogSection';
 import { Footer } from './components/Footer';
 import { CategorySection } from './components/CategorySection';
 import { CategoryPage } from './components/CategoryPage';
+import { FeatureStrip } from './components/FeatureStrip';
+import { BrandMarquee } from './components/BrandMarquee';
 
 // Pages
 import { ProductListingPage } from './components/ProductListingPage';
@@ -67,11 +69,13 @@ export function AppContent() {
 
   const renderDynamicHomepageSections = () => {
     const sortedSections = [...publishedConfig.sectionOrder]
-      .filter((s) => s.enabled)
+      .filter((s) => s.enabled || s.id === 'featureStrip' || s.id === 'brandMarquee')
       .sort((a, b) => a.order - b.order);
 
     const sectionComponentMap: Record<string, React.ReactNode> = {
       hero: publishedConfig.hero.enabled ? <HeroBanner key="hero" /> : null,
+      featureStrip: <FeatureStrip key="featureStrip" />,
+      brandMarquee: <BrandMarquee key="brandMarquee" />,
       popularProducts: <PopularProducts key="popularProducts" />,
       socialBlog: <SocialBlogSection key="socialBlog" />,
       categorySection: <CategorySection key="categorySection" />,

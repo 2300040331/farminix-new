@@ -159,6 +159,7 @@ export interface FeatureCard {
 
 export interface FeatureStripConfig {
   enabled: boolean;
+  speedSeconds?: number;
   features: FeatureCard[];
 }
 

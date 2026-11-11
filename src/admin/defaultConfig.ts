@@ -418,8 +418,8 @@ export const defaultSiteConfig: AdminSiteConfig = {
   checkoutPayment: defaultCheckoutPaymentConfig,
   sectionOrder: [
     { id: 'hero', name: 'Hero Banner', enabled: true, order: 1 },
-    { id: 'brandMarquee', name: 'Trusted Brands Marquee', enabled: false, order: 2 },
-    { id: 'featureStrip', name: 'Top 5 Feature Strip', enabled: false, order: 3 },
+    { id: 'featureStrip', name: 'Home Benefits Marquee', enabled: true, order: 2 },
+    { id: 'brandMarquee', name: 'Trusted Brands Marquee', enabled: true, order: 5 },
     { id: 'categorySection', name: 'Shop by Category', enabled: false, order: 4 },
     { id: 'popularProducts', name: 'Popular Today ⚡', enabled: true, order: 5 },
     { id: 'socialBlog', name: 'Instagram & Blog Videos', enabled: false, order: 6 },
@@ -499,12 +499,13 @@ export const defaultSiteConfig: AdminSiteConfig = {
   },
   featureStrip: {
     enabled: true,
+    speedSeconds: 28,
     features: [
-      { id: 1, iconName: 'Zap', title: '10 Min Delivery', subtitle: 'Super Fast', bgColor: 'bg-purple-100', enabled: true, order: 1 },
-      { id: 2, iconName: 'ShieldCheck', title: 'Quality Assured', subtitle: '100% Genuine', bgColor: 'bg-emerald-100', enabled: true, order: 2 },
-      { id: 3, iconName: 'IndianRupee', title: 'Best Prices', subtitle: 'Direct from Brands', bgColor: 'bg-purple-100', enabled: true, order: 3 },
-      { id: 4, iconName: 'Lock', title: 'Safe & Secure', subtitle: 'Secure Packaging', bgColor: 'bg-emerald-100', enabled: true, order: 4 },
-      { id: 5, iconName: 'Headset', title: 'Customer Support', subtitle: 'Send a request to our team', bgColor: 'bg-amber-100', actionType: 'support', enabled: true, order: 5 },
+      { id: 1, iconName: 'Zap', title: 'Family Choice Rice', subtitle: 'Explore the Farminix rice range', bgColor: 'bg-purple-100', enabled: true, order: 1 },
+      { id: 2, iconName: 'ShieldCheck', title: 'Rice & Grains', subtitle: 'Browse products available on Farminix', bgColor: 'bg-emerald-100', enabled: true, order: 2 },
+      { id: 3, iconName: 'IndianRupee', title: 'Dals & Pulses', subtitle: 'Shop pantry staples', bgColor: 'bg-purple-100', enabled: true, order: 3 },
+      { id: 4, iconName: 'Lock', title: 'From Farm to Family', subtitle: 'The Farminix story', bgColor: 'bg-emerald-100', enabled: true, order: 4 },
+      { id: 5, iconName: 'Headset', title: 'Questions about an order?', subtitle: 'Reach out to our team', bgColor: 'bg-amber-100', actionType: 'support', enabled: true, order: 5 },
     ],
   },
   categorySection: {

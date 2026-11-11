@@ -27,7 +27,7 @@
 .farm-benefit > span:last-child { display: grid; gap: 4px; }
 .farm-benefit strong { color: #4b325c; font-size: 11px; font-weight: 600; }
 .farm-benefit > span > span { color: #96839e; font-size: 10px; line-height: 1.4; }
-.home-site-header { position: absolute; top: 12px; left: 2.5%; width: 95%; border-radius: 29px; background: #fffffff0; border: 1px solid #ffffffb3; backdrop-filter: blur(20px); box-shadow: 0 7px 35px #453e6012; color: #2c3b55; }
+.home-site-header { position: relative; top: auto; left: auto; width: 95%; margin: 12px auto; border-radius: 29px; background: #fffffff0; border: 1px solid #ffffffb3; backdrop-filter: blur(20px); box-shadow: 0 7px 35px #453e6012; color: #2c3b55; }
 .home-site-header > div:first-child { max-width: 1600px; height: 80px; padding-inline: 3.2%; }
 .home-site-header img { height: 48px; }
 .home-site-header nav button { font-size: 13px; font-weight: 600; padding-inline: 5px; }
@@ -35,8 +35,8 @@
 .home-site-header .home-header-cart > svg { width: 23px; height: 23px; }
 .home-site-header .header-cart-count-badge { display: none; }
 .home-site-header > div:nth-child(2) { border-radius: 0 0 26px 26px; }
-.home-custom-banner { position: relative; min-height: clamp(360px, 46vw, 650px); height: clamp(360px, 46vw, 650px); overflow: hidden; background: #f5effa; isolation: isolate; }
-.home-custom-banner > img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 900ms cubic-bezier(.2,.7,.2,1); }
+.home-custom-banner { position: relative; width: 100%; aspect-ratio: 1678 / 937; overflow: hidden; background: #f5effa; isolation: isolate; }
+.home-custom-banner > img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; transition: transform 900ms cubic-bezier(.2,.7,.2,1); }
 .home-hero-carousel [role="group"]:not([hidden]) .home-custom-banner > img { animation: banner-arrive 850ms cubic-bezier(.2,.7,.2,1) both; }
 .home-banner-copy { position: absolute; z-index: 1; left: clamp(24px, 8vw, 130px); top: 50%; width: min(42%, 540px); transform: translateY(-50%); padding: clamp(20px, 3vw, 42px); border-radius: 28px; background: color-mix(in srgb, var(--banner-accent) 8%, transparent); backdrop-filter: blur(3px); }
 .home-banner-eyebrow { display: block; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 15px; color: var(--banner-accent); }
@@ -64,7 +64,7 @@
   .farm-benefit > span > span { font-size: 9px; }
 }
 @media (max-width: 767px) {
-  .home-site-header { top: 12px; left: 12px; width: calc(100% - 24px); border-radius: 20px; }
+  .home-site-header { width: calc(100% - 24px); border-radius: 20px; }
   .home-site-header > div:first-child { height: 65px; padding-inline: 14px; }
   .home-site-header img { height: 33px; }
   .home-site-header .home-header-cart { padding: 9px 13px; font-size: 12px; }
@@ -87,7 +87,7 @@
   .farm-benefit-icon svg { width: 16px; height: 16px; }
   .farm-benefit strong { font-size: 10px; line-height: 1.3; }
   .farm-benefit > span > span { font-size: 9px; }
-  .home-custom-banner { min-height: 360px; height: 112vw; max-height: 600px; }
+  .home-custom-banner { aspect-ratio: 1678 / 937; min-height: 0; height: auto; max-height: none; }
   .home-banner-copy { left: 18px; top: auto; bottom: 20px; width: calc(100% - 36px); padding: 18px; border-radius: 20px; background: color-mix(in srgb, var(--banner-accent) 10%, #fff 88%); }
   .home-banner-copy h1 { font-size: clamp(28px, 8vw, 42px); }
   .home-banner-copy p { margin-top: 10px; font-size: 13px; }

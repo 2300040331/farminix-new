@@ -62,13 +62,13 @@ export const FeatureStripManager: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-purple-600 font-extrabold text-xs uppercase tracking-wider mb-1">
             <Zap className="w-4 h-4" />
-            <span>Trust Badges</span>
+            <span>Home Page Marquee</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-            Top 5 Feature Strip Management
+            Home Benefits Marquee
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Customize the 5 benefit cards: 10 Min Delivery, Quality Assured, Best Prices, Safe &amp; Secure, and Customer Support.
+            Edit the messages that scroll directly beneath the home banner and set their speed.
           </p>
         </div>
 
@@ -105,6 +105,12 @@ export const FeatureStripManager: React.FC = () => {
           <Plus className="w-4 h-4" />
           <span>Add Feature Card</span>
         </button>
+      </div>
+
+      <div className="admin-panel flex items-center gap-3 bg-white p-5 rounded-3xl border border-slate-200 shadow-2xs">
+        <label htmlFor="feature-marquee-speed" className="text-sm font-bold text-slate-700">Scroll loop duration</label>
+        <input id="feature-marquee-speed" type="number" min="12" max="90" value={formData.speedSeconds || 28} onChange={(event) => { const speedSeconds = Math.min(90, Math.max(12, Number(event.target.value))); const updated = { ...formData, speedSeconds }; setFormData(updated); updateFeatureStrip({ speedSeconds }); notifySaved(); }} className="w-24 rounded-lg border border-slate-300 p-2" />
+        <span className="text-sm text-slate-500">seconds per loop</span>
       </div>
 
       {/* Cards List */}
