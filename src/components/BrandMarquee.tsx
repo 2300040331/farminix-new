@@ -61,11 +61,17 @@ export const BrandMarquee: React.FC = () => {
             }}
           />
 
-          <div className="brand-marquee-track py-2" style={{animationDuration:`${Math.max(10, marquee.speedSeconds || 18)}s`}}>
-            {[0, 1].map((group) => <div className="brand-marquee-group" key={group} aria-hidden={group === 1 || undefined}>
-              {activeBrands.map((brand) => <LogoCard key={`${brand.id}-${group}`} brand={brand} />)}
-            </div>)}
-          </div>
+          {activeBrands.length > 4 ? (
+            <div className="brand-marquee-track py-2" style={{'--brand-loop':`${Math.max(10, marquee.speedSeconds || 18)}s`} as React.CSSProperties}>
+              {[0, 1].map((group) => <div className="brand-marquee-group" key={group} aria-hidden={group === 1 || undefined}>
+                {activeBrands.map((brand) => <LogoCard key={`${brand.id}-${group}`} brand={brand} />)}
+              </div>)}
+            </div>
+          ) : (
+            <div className="brand-marquee-static py-2">
+              {activeBrands.map((brand) => <LogoCard key={brand.id} brand={brand} />)}
+            </div>
+          )}
         </div>
 
       </div>
