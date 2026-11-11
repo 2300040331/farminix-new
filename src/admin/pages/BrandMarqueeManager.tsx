@@ -33,12 +33,12 @@ export const BrandMarqueeManager: React.FC = () => {
   };
 
   const handleAddBrand = () => {
+    if (!newBrandName.trim() || !newBrandLogo.trim()) return;
     const currentBrands = formData.brands || [];
-    const finalName = newBrandName.trim() || `New Brand Partner ${currentBrands.length + 1}`;
     const newBrand: PartnerBrand = {
       id: `b-${Date.now()}`,
-      name: finalName,
-      logo: newBrandLogo.trim() || '/farminix_logo.png',
+      name: newBrandName.trim(),
+      logo: newBrandLogo.trim(),
       enabled: true,
       order: currentBrands.length + 1,
     };
@@ -66,7 +66,7 @@ export const BrandMarqueeManager: React.FC = () => {
             Brand Partners Marquee
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Manage the continuous infinite partner brand marquee strip, logos, titles, and partner additions.
+            Add logos only for brands whose products are actually listed in your store. The logo row scrolls continuously.
           </p>
         </div>
 
@@ -132,7 +132,7 @@ export const BrandMarqueeManager: React.FC = () => {
           <label className="block text-xs font-bold text-slate-700">Strip background<input type="color" value={formData.backgroundColor || '#f8fafc'} onChange={e => handleUpdateField('backgroundColor', e.target.value)} className="mt-2 block h-10 w-full rounded-lg border" /></label>
           <label className="block text-xs font-bold text-slate-700">Text color<input type="color" value={formData.textColor || '#0f172a'} onChange={e => handleUpdateField('textColor', e.target.value)} className="mt-2 block h-10 w-full rounded-lg border" /></label>
           <label className="block text-xs font-bold text-slate-700">Accent color<input type="color" value={formData.accentColor || '#7c3aed'} onChange={e => handleUpdateField('accentColor', e.target.value)} className="mt-2 block h-10 w-full rounded-lg border" /></label>
-          <label className="block text-xs font-bold text-slate-700">Marquee loop seconds<input type="number" min="10" max="120" value={formData.speedSeconds || 35} onChange={e => handleUpdateField('speedSeconds', Math.min(120, Math.max(10, Number(e.target.value))))} className="mt-2 h-10 w-full rounded-lg border px-3" /></label>
+          <label className="block text-xs font-bold text-slate-700">Marquee loop seconds<input type="number" min="10" max="120" value={formData.speedSeconds || 18} onChange={e => handleUpdateField('speedSeconds', Math.min(120, Math.max(10, Number(e.target.value))))} className="mt-2 h-10 w-full rounded-lg border px-3" /></label>
         </div>
       </div>
 
@@ -141,6 +141,7 @@ export const BrandMarqueeManager: React.FC = () => {
         <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
           2. Add Partner Brand Logo
         </h2>
+        <p className="text-xs text-slate-500">Upload each brand’s real logo and enter its name. Add at least two distinct brands for a fuller partner marquee; do not add brands you do not carry.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -149,7 +150,7 @@ export const BrandMarqueeManager: React.FC = () => {
               type="text"
               value={newBrandName}
               onChange={(e) => setNewBrandName(e.target.value)}
-              placeholder="E.g., Nestle, Mother Dairy..."
+              placeholder="Brand name"
               className="w-full h-10 px-3.5 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500"
             />
           </div>
@@ -163,7 +164,8 @@ export const BrandMarqueeManager: React.FC = () => {
             />
             <button
               onClick={handleAddBrand}
-              className="w-full h-10 px-4 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer mt-2"
+              disabled={!newBrandName.trim() || !newBrandLogo.trim()}
+              className="w-full h-10 px-4 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer mt-2"
             >
               <Plus className="w-4 h-4" />
               <span>Add Brand Partner</span>

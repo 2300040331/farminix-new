@@ -483,12 +483,12 @@ export const defaultSiteConfig: AdminSiteConfig = {
   brandMarquee: {
     enabled: true,
     badgeText: 'Our Partners',
-    title: 'Trusted Brands We Carry',
-    description: "Authentic products from India's most loved brands — straight to your door.",
+    title: 'Brands in the Farminix Store',
+    description: 'Browse Farminix and the brand partners featured in our store.',
     backgroundColor: '#f8fafc',
     textColor: '#0f172a',
     accentColor: '#7c3aed',
-    speedSeconds: 35,
+    speedSeconds: 18,
     brands: brandLogosList.map((b, idx) => ({
       id: `b-${idx + 1}`,
       name: b.name,
@@ -499,7 +499,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
   },
   featureStrip: {
     enabled: true,
-    speedSeconds: 28,
+    speedSeconds: 18,
     features: [
       { id: 1, iconName: 'Zap', title: 'Family Choice Rice', subtitle: 'Explore the Farminix rice range', bgColor: 'bg-purple-100', enabled: true, order: 1 },
       { id: 2, iconName: 'ShieldCheck', title: 'Rice & Grains', subtitle: 'Browse products available on Farminix', bgColor: 'bg-emerald-100', enabled: true, order: 2 },

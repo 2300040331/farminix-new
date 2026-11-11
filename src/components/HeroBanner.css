@@ -27,7 +27,7 @@
 .farm-benefit > span:last-child { display: grid; gap: 4px; }
 .farm-benefit strong { color: #4b325c; font-size: 11px; font-weight: 600; }
 .farm-benefit > span > span { color: #96839e; font-size: 10px; line-height: 1.4; }
-.home-site-header { position: relative; top: auto; left: auto; width: 95%; margin: 12px auto; border-radius: 29px; background: #fffffff0; border: 1px solid #ffffffb3; backdrop-filter: blur(20px); box-shadow: 0 7px 35px #453e6012; color: #2c3b55; }
+.home-site-header { position: sticky; top: 12px; left: auto; width: 95%; margin: 12px auto; border-radius: 29px; background: #fffffff0; border: 1px solid #ffffffb3; backdrop-filter: blur(20px); box-shadow: 0 7px 35px #453e6012; color: #2c3b55; }
 .home-site-header > div:first-child { max-width: 1600px; height: 80px; padding-inline: 3.2%; }
 .home-site-header img { height: 48px; }
 .home-site-header nav button { font-size: 13px; font-weight: 600; padding-inline: 5px; }

@@ -27,7 +27,7 @@ export const BrandMarquee: React.FC = () => {
   if (!marquee.enabled) return null;
 
   const activeBrands = marquee.brands.filter((b) => b.enabled);
-  const doubled = [...activeBrands, ...activeBrands];
+  if (!activeBrands.length) return null;
 
   return (
     <section className="w-full border-b border-slate-100 py-8 select-none overflow-hidden" style={{backgroundColor:marquee.backgroundColor || '#f8fafc', color:marquee.textColor || '#0f172a'}} aria-label="Trusted Brands">
@@ -43,7 +43,7 @@ export const BrandMarquee: React.FC = () => {
         </div>
 
         {/* Marquee track */}
-        <div className="relative w-full overflow-hidden animate-marquee-paused">
+        <div className="relative w-full overflow-hidden">
           {/* Left gradient fade */}
           <div
             className="absolute left-0 top-0 bottom-0 z-10 pointer-events-none"
@@ -61,10 +61,10 @@ export const BrandMarquee: React.FC = () => {
             }}
           />
 
-          <div className="animate-marquee py-2" style={{animationDuration:`${Math.max(10, marquee.speedSeconds || 35)}s`}}>
-            {doubled.map((brand, idx) => (
-              <LogoCard key={`${brand.name}-${idx}`} brand={brand} />
-            ))}
+          <div className="brand-marquee-track py-2" style={{animationDuration:`${Math.max(10, marquee.speedSeconds || 18)}s`}}>
+            {[0, 1].map((group) => <div className="brand-marquee-group" key={group} aria-hidden={group === 1 || undefined}>
+              {activeBrands.map((brand) => <LogoCard key={`${brand.id}-${group}`} brand={brand} />)}
+            </div>)}
           </div>
         </div>
 
