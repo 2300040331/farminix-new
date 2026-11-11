@@ -289,6 +289,7 @@
 @keyframes home-benefit-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .brand-marquee-track { display: flex; width: max-content; animation: brand-marquee-scroll var(--brand-loop, 18s) linear infinite; will-change: transform; }
 .brand-marquee-group { display: flex; flex: 0 0 100vw; align-items: center; justify-content: center; gap: 24px; }
+.brand-marquee-static { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; }
 @keyframes brand-marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {
   .premium-storefront .home-benefit-track { animation-duration: var(--benefit-loop, 18s) !important; animation-iteration-count: infinite !important; }
