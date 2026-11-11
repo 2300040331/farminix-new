@@ -30,14 +30,14 @@ export const BrandMarquee: React.FC = () => {
   const doubled = [...activeBrands, ...activeBrands];
 
   return (
-    <section className="w-full bg-slate-50/80 border-b border-slate-100 py-8 select-none overflow-hidden" aria-label="Trusted Brands">
+    <section className="w-full border-b border-slate-100 py-8 select-none overflow-hidden" style={{backgroundColor:marquee.backgroundColor || '#f8fafc', color:marquee.textColor || '#0f172a'}} aria-label="Trusted Brands">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section heading */}
         <div className="mb-6 text-center">
-          <p className="text-[11px] font-extrabold text-[#7C3AED] uppercase tracking-[3px] mb-1">{marquee.badgeText}</p>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900">{marquee.title}</h2>
-          <p className="text-xs font-semibold text-slate-500 mt-1">
+          <p className="text-[11px] font-extrabold uppercase tracking-[3px] mb-1" style={{color:marquee.accentColor || '#7c3aed'}}>{marquee.badgeText}</p>
+          <h2 className="text-xl sm:text-2xl font-black">{marquee.title}</h2>
+          <p className="text-xs font-semibold opacity-70 mt-1">
             {marquee.description}
           </p>
         </div>
@@ -49,7 +49,7 @@ export const BrandMarquee: React.FC = () => {
             className="absolute left-0 top-0 bottom-0 z-10 pointer-events-none"
             style={{
               width: 80,
-              background: 'linear-gradient(to right, rgba(248, 250, 252, 1) 0%, transparent 100%)',
+              background: `linear-gradient(to right, ${marquee.backgroundColor || '#f8fafc'} 0%, transparent 100%)`,
             }}
           />
           {/* Right gradient fade */}
@@ -57,11 +57,11 @@ export const BrandMarquee: React.FC = () => {
             className="absolute right-0 top-0 bottom-0 z-10 pointer-events-none"
             style={{
               width: 80,
-              background: 'linear-gradient(to left, rgba(248, 250, 252, 1) 0%, transparent 100%)',
+              background: `linear-gradient(to left, ${marquee.backgroundColor || '#f8fafc'} 0%, transparent 100%)`,
             }}
           />
 
-          <div className="animate-marquee py-2">
+          <div className="animate-marquee py-2" style={{animationDuration:`${Math.max(10, marquee.speedSeconds || 35)}s`}}>
             {doubled.map((brand, idx) => (
               <LogoCard key={`${brand.name}-${idx}`} brand={brand} />
             ))}

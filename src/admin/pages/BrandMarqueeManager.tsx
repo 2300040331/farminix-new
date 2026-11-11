@@ -128,6 +128,12 @@ export const BrandMarqueeManager: React.FC = () => {
             />
           </div>
         </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-slate-100 pt-4">
+          <label className="block text-xs font-bold text-slate-700">Strip background<input type="color" value={formData.backgroundColor || '#f8fafc'} onChange={e => handleUpdateField('backgroundColor', e.target.value)} className="mt-2 block h-10 w-full rounded-lg border" /></label>
+          <label className="block text-xs font-bold text-slate-700">Text color<input type="color" value={formData.textColor || '#0f172a'} onChange={e => handleUpdateField('textColor', e.target.value)} className="mt-2 block h-10 w-full rounded-lg border" /></label>
+          <label className="block text-xs font-bold text-slate-700">Accent color<input type="color" value={formData.accentColor || '#7c3aed'} onChange={e => handleUpdateField('accentColor', e.target.value)} className="mt-2 block h-10 w-full rounded-lg border" /></label>
+          <label className="block text-xs font-bold text-slate-700">Marquee loop seconds<input type="number" min="10" max="120" value={formData.speedSeconds || 35} onChange={e => handleUpdateField('speedSeconds', Math.min(120, Math.max(10, Number(e.target.value))))} className="mt-2 h-10 w-full rounded-lg border px-3" /></label>
+        </div>
       </div>
 
       {/* Add New Brand */}

@@ -107,6 +107,12 @@ export interface HeroSlide {
   buttonText: string;
   enabled: boolean;
   legacyHotspots?: boolean;
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  accentColor?: string;
 }
 
 export interface HeroConfig {
@@ -133,6 +139,10 @@ export interface BrandMarqueeConfig {
   badgeText: string;
   title: string;
   description: string;
+  backgroundColor?: string;
+  textColor?: string;
+  accentColor?: string;
+  speedSeconds?: number;
   brands: PartnerBrand[];
 }
 

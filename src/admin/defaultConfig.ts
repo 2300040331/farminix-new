@@ -473,6 +473,8 @@ export const defaultSiteConfig: AdminSiteConfig = {
   ],
   hero: {
     enabled: true,
+    autoplay: true,
+    intervalSeconds: 6,
     bannerImage: '/hero_banner_original.jpg',
     altText: 'Farminix Fresh Groceries',
     shopNowUrl: '/products',
@@ -483,6 +485,10 @@ export const defaultSiteConfig: AdminSiteConfig = {
     badgeText: 'Our Partners',
     title: 'Trusted Brands We Carry',
     description: "Authentic products from India's most loved brands — straight to your door.",
+    backgroundColor: '#f8fafc',
+    textColor: '#0f172a',
+    accentColor: '#7c3aed',
+    speedSeconds: 35,
     brands: brandLogosList.map((b, idx) => ({
       id: `b-${idx + 1}`,
       name: b.name,
