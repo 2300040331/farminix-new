@@ -2,7 +2,11 @@ import type { Product, Category, DealCard } from '../types';
 import { BrandLogos } from '../assets/graphics';
 
 export const categories: Category[] = [
-  { id: 'rice', name: 'Rice & Grains', image: '/farminix_rice_front.png', itemCount: 1 },
+  { id: 'powders', name: 'Powders', image: '', itemCount: 0, items: ['Chilly Powder', 'Turmeric Powder', 'Coriander Powder'] },
+  { id: 'spices', name: 'Spices', image: '', itemCount: 0, items: ['Red Chilly', 'Cloves', 'Cumin', 'Cardamom pod'] },
+  { id: 'dry-fruits', name: 'Dry Fruits', image: '', itemCount: 0, items: ['Cashew Nuts', 'Almonds', 'Kishmish', 'Pistachios', 'Peanuts'] },
+  { id: 'grocery', name: 'Grocery', image: '', itemCount: 0, items: ['Dal', 'Sugar'] },
+  { id: 'oils', name: 'Oils', image: '', itemCount: 0, items: ['Groundnut Oil'] },
 ];
 
 export const farminixRiceProduct: Product = {

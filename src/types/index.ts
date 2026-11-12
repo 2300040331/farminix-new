@@ -118,6 +118,7 @@ export interface Category {
   name: string;
   image: string;
   itemCount: number;
+  items?: string[];
   enabled?: boolean; // Add support for Hide/Show
 }
 

@@ -15,6 +15,7 @@ export const CategoryManager: React.FC = () => {
   const [newCatName, setNewCatName] = useState('');
   const [newCatImage, setNewCatImage] = useState('');
   const [newCatItemCount, setNewCatItemCount] = useState(30);
+  const [newCatItems, setNewCatItems] = useState('');
 
   const notifySaved = () => {
     setSavedSuccess(true);
@@ -42,6 +43,7 @@ export const CategoryManager: React.FC = () => {
       name: finalName,
       image: newCatImage.trim() || '/cat_dals.jpg',
       itemCount: Number(newCatItemCount) || 1,
+      items: newCatItems.split('\n').map((item) => item.trim()).filter(Boolean),
       enabled: true, // Enabled / Visible by default
     };
     const updated = [...categoriesList, newCategory];
@@ -50,6 +52,7 @@ export const CategoryManager: React.FC = () => {
     setNewCatName('');
     setNewCatImage('');
     setNewCatItemCount(30);
+    setNewCatItems('');
     notifySaved();
   };
 
@@ -200,6 +203,11 @@ export const CategoryManager: React.FC = () => {
               />
             </div>
 
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Items shown on the home page (one per line)</label>
+              <textarea value={newCatItems} onChange={(e) => setNewCatItems(e.target.value)} rows={4} placeholder={'Chilly Powder\nTurmeric Powder'} className="w-full px-3.5 py-2.5 text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500" />
+            </div>
+
             <AdminImageUpload
               value={newCatImage}
               onChange={setNewCatImage}
@@ -304,6 +312,16 @@ export const CategoryManager: React.FC = () => {
                       value={cat.name}
                       onChange={(e) => handleEditCategory(cat.id, 'name', e.target.value)}
                       className="w-full h-9 px-3 text-xs font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase">Home Page Items (one per line)</label>
+                    <textarea
+                      value={(cat.items || []).join('\n')}
+                      onChange={(e) => handleEditCategory(cat.id, 'items', e.target.value.split('\n').map((item) => item.trim()).filter(Boolean))}
+                      rows={4}
+                      className="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-purple-500"
                     />
                   </div>
 
