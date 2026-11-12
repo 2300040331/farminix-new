@@ -143,7 +143,6 @@ const sanitizeProducts = (products: any[]): Product[] => {
       cleanProd.stockCount = Math.max(0, Math.floor(Number(cleanProd.stockCount) || 0));
       cleanProd.inStock = cleanProd.stockCount > 0;
     }
-    delete cleanProd.storySection;
     delete cleanProd.rating;
     delete cleanProd.reviewsCount;
     cleanProd.reviewsList = (cleanProd.reviewsList || []).filter((review: any) => review.source === 'admin');
@@ -158,21 +157,78 @@ const sanitizeProducts = (products: any[]): Product[] => {
 };
 
 const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSiteConfig>): AdminSiteConfig => {
-  if ((source.productCatalogVersion || 0) >= 1) return config;
-  const existingProductIds = new Set((config.products || []).map((product) => product.id));
+  const sourceVersion = source.productCatalogVersion || 0;
+  if (sourceVersion >= 2) return config;
   const existingCategoryIds = new Set((config.categories || []).map((category) => category.id));
+  const defaultProducts = new Map(defaultSiteConfig.products.map((product) => [product.id, product]));
+  const productsWithRestoredContent = (config.products || []).map((product) => {
+    const saved = product;
+    const fallback = defaultProducts.get(product.id);
+    if (!fallback) return saved;
+    const mergeList = <T,>(current: T[] | undefined, original: T[] | undefined, key?: keyof T): T[] => {
+      const merged = [...(current || [])];
+      for (const item of original || []) {
+        const itemKey = key ? item[key] : item;
+        if (!merged.some((existing) => (key ? existing[key] : existing) === itemKey)) merged.push(item);
+      }
+      return merged;
+    };
+    const hasShortDescription = (saved.description || '').length < (fallback.description || '').length * 0.75;
+    return {
+      ...fallback,
+      ...saved,
+      description: hasShortDescription ? fallback.description : saved.description,
+      image: saved.image || fallback.image,
+      galleryImages: mergeList(saved.galleryImages, fallback.galleryImages),
+      weight: saved.weight || fallback.weight,
+      weightOptions: mergeList(saved.weightOptions, fallback.weightOptions),
+      price: saved.price > 0 ? saved.price : fallback.price,
+      oldPrice: saved.oldPrice > 0 ? saved.oldPrice : fallback.oldPrice,
+      brand: saved.brand || fallback.brand,
+      deliveryTime: saved.deliveryTime || fallback.deliveryTime,
+      badges: mergeList(saved.badges, fallback.badges),
+      ingredients: mergeList(saved.ingredients, fallback.ingredients),
+      highlights: mergeList(saved.highlights, fallback.highlights, 'title'),
+      benefits: mergeList(saved.benefits, fallback.benefits),
+      specifications: mergeList(saved.specifications, fallback.specifications, 'label'),
+      howToUse: mergeList(saved.howToUse, fallback.howToUse),
+      faqs: mergeList(saved.faqs, fallback.faqs, 'question'),
+      storageInstructions: saved.storageInstructions || fallback.storageInstructions,
+      origin: saved.origin || fallback.origin,
+      shelfLife: saved.shelfLife || fallback.shelfLife,
+      dietaryType: saved.dietaryType || fallback.dietaryType,
+      nutritionBasis: saved.nutritionBasis || fallback.nutritionBasis,
+      nutritionalInfo: {
+        energy: saved.nutritionalInfo?.energy || fallback.nutritionalInfo?.energy || '',
+        protein: saved.nutritionalInfo?.protein || fallback.nutritionalInfo?.protein || '',
+        carbs: saved.nutritionalInfo?.carbs || fallback.nutritionalInfo?.carbs || '',
+        fat: saved.nutritionalInfo?.fat || fallback.nutritionalInfo?.fat || '',
+        fiber: saved.nutritionalInfo?.fiber || fallback.nutritionalInfo?.fiber,
+        sugar: saved.nutritionalInfo?.sugar || fallback.nutritionalInfo?.sugar,
+        sodium: saved.nutritionalInfo?.sodium || fallback.nutritionalInfo?.sodium,
+      },
+    };
+  });
+  const mergedProductIds = new Set(productsWithRestoredContent.map((product) => product.id));
   return {
     ...config,
-    productCatalogVersion: 1,
-    products: [...(config.products || []), ...defaultSiteConfig.products.filter((product) => product.catalogOnly && !existingProductIds.has(product.id))],
-    categories: [...(config.categories || []), ...defaultSiteConfig.categories.filter((category) => !existingCategoryIds.has(category.id))],
-    categorySection: { ...config.categorySection, enabled: true },
-    popularProducts: {
+    productCatalogVersion: 2,
+    products: [
+      ...productsWithRestoredContent,
+      ...(sourceVersion < 1 ? defaultSiteConfig.products.filter((product) => product.catalogOnly && !mergedProductIds.has(product.id)) : []),
+    ],
+    categories: sourceVersion < 1
+      ? [...(config.categories || []), ...defaultSiteConfig.categories.filter((category) => !existingCategoryIds.has(category.id))]
+      : config.categories,
+    categorySection: sourceVersion < 1 ? { ...config.categorySection, enabled: true } : config.categorySection,
+    popularProducts: sourceVersion < 1 ? {
       ...config.popularProducts,
       enabled: true,
       featuredProductIds: [...new Set([...(config.popularProducts?.featuredProductIds || []), ...defaultSiteConfig.products.map((product) => product.id)])],
-    },
-    sectionOrder: config.sectionOrder.map((section) => section.id === 'categorySection' ? { ...section, enabled: true } : section),
+    } : config.popularProducts,
+    sectionOrder: sourceVersion < 1
+      ? config.sectionOrder.map((section) => section.id === 'categorySection' ? { ...section, enabled: true } : section)
+      : config.sectionOrder,
   };
 };
 

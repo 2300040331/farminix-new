@@ -27,6 +27,51 @@ const parsePreparationStep = (stepText: string, index: number) => {
   };
 };
 
+const ProductDetailSection: React.FC<{ title: string; children: React.ReactNode; className?: string }> = ({ title, children, className = '' }) => (
+  <section className={`store-detail-content-section ${className}`}>
+    <h2>{title}</h2>
+    {children}
+  </section>
+);
+
+const CatalogOnlyProductPage: React.FC<{ product: Product; onBack: () => void }> = ({ product, onBack }) => {
+  const notAdded = 'Verified product information has not been added yet. Add it in Admin to show it here.';
+  const highlights = (product.highlights || []).filter((item) => item.title.trim() && item.desc.trim());
+  const benefits = (product.benefits || []).filter(Boolean);
+  const nutrition = Object.entries(product.nutritionalInfo || {}).filter(([, value]) => Boolean(value));
+  const specifications = (product.specifications || []).filter((item) => item.label.trim() && item.value.trim());
+  const methods = (product.howToUse || []).filter(Boolean);
+  const faqs = (product.faqs || []).filter((item) => item.question.trim() && item.answer.trim());
+  const panel = 'store-detail-content-panel';
+
+  return (
+    <main className="store-catalog-detail-page">
+      <nav className="store-detail-breadcrumb"><button onClick={onBack}>← Products</button><span>/</span><span>{product.category}</span><span>/</span><strong>{product.name}</strong></nav>
+      <header className="store-catalog-detail-hero">
+        <span className="store-catalog-detail-sparkle" aria-hidden="true">✦</span>
+        <p>{product.category}</p>
+        <h1>{product.name}</h1>
+        <span className="store-catalog-detail-status">Product details being prepared</span>
+        <p className="store-catalog-detail-copy">Price, pack size, image, and availability will appear here when verified details are added.</p>
+      </header>
+      <div className="store-detail-content-layout">
+        <ProductDetailSection title="About This Product" className={panel}><p>{product.description || notAdded}</p></ProductDetailSection>
+        <ProductDetailSection title="Why You’ll Love It" className={panel}>{highlights.length ? <ul>{highlights.map((item) => <li key={item.title}><strong>{item.title}</strong><span>{item.desc}</span></li>)}</ul> : <p>{notAdded}</p>}</ProductDetailSection>
+        <ProductDetailSection title="Benefits & Advantages" className={panel}>{benefits.length ? <ul>{benefits.map((item) => <li key={item}>{item}</li>)}</ul> : <p>{notAdded}</p>}</ProductDetailSection>
+        <ProductDetailSection title="Ingredients & Composition" className={panel}><p>{product.ingredients?.length ? product.ingredients.join(', ') : notAdded}</p></ProductDetailSection>
+        <ProductDetailSection title="Nutritional Information" className={panel}>{nutrition.length ? <dl>{nutrition.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl> : <p>{notAdded}</p>}</ProductDetailSection>
+        <ProductDetailSection title="Product Specifications" className={panel}>{specifications.length ? <dl>{specifications.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl> : <p>{notAdded}</p>}</ProductDetailSection>
+        <ProductDetailSection title="Origin & Shelf Life" className={panel}><dl><div><dt>Origin</dt><dd>{product.origin || notAdded}</dd></div><div><dt>Shelf life</dt><dd>{product.shelfLife || notAdded}</dd></div></dl></ProductDetailSection>
+        <ProductDetailSection title="How to Use / Preparation" className={panel}>{methods.length ? <ol>{methods.map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ol> : <p>{notAdded}</p>}</ProductDetailSection>
+        <ProductDetailSection title="Storage Instructions" className={panel}><p>{product.storageInstructions || notAdded}</p></ProductDetailSection>
+        <ProductDetailSection title="Frequently Asked Questions" className={panel}>{faqs.length ? <dl>{faqs.map((item) => <div key={item.question}><dt>{item.question}</dt><dd>{item.answer}</dd></div>)}</dl> : <p>{notAdded}</p>}</ProductDetailSection>
+        <ProductDetailSection title="Customer Reviews" className={panel}>{product.reviewsList?.some((review) => review.source === 'admin' && review.enabled !== false && review.userName.trim() && review.comment.trim()) ? <ProductReviews reviews={product.reviewsList} /> : <p>{notAdded}</p>}</ProductDetailSection>
+      </div>
+      <button type="button" className="store-catalog-detail-back" onClick={onBack}>Browse all products</button>
+    </main>
+  );
+};
+
 export const ProductDetailPage: React.FC = () => {
   const {
     currentRoute,
@@ -136,18 +181,7 @@ export const ProductDetailPage: React.FC = () => {
   }
 
   if (product.catalogOnly || !(product.price > 0 && product.weight && product.image)) {
-    return (
-      <main className="store-catalog-detail">
-        <div className="store-catalog-detail-card">
-          <span className="store-catalog-detail-sparkle" aria-hidden="true">✦</span>
-          <p>{product.category}</p>
-          <h1>{product.name}</h1>
-          <span className="store-catalog-detail-status">Product details coming soon</span>
-          <p className="store-catalog-detail-copy">Pack size, price, and product image will appear here after they are added in the store admin.</p>
-          <button type="button" className="store-button" onClick={() => navigate('/products')}>Back to products</button>
-        </div>
-      </main>
-    );
+    return <CatalogOnlyProductPage product={product} onBack={() => navigate('/products')} />;
   }
 
   // Weight / Variant calculations
@@ -192,6 +226,7 @@ export const ProductDetailPage: React.FC = () => {
   const specifications = (product.specifications || []).filter(s => s.label.trim() && s.value.trim());
   const howToUse = (product.howToUse || []).filter(s => s.trim());
   const faqs = (product.faqs || []).filter(f => f.question.trim() && f.answer.trim());
+  const story = product.storySection;
 
   // Frequently Bought Together Products
   const bundleProducts = allProducts
@@ -466,6 +501,20 @@ export const ProductDetailPage: React.FC = () => {
 
           </div>
         </div>
+
+        {story && Object.values(story).some((value) => Array.isArray(value) ? value.length > 0 : Boolean(value)) && (
+          <section className="store-product-story-panel mt-12">
+            {story.headline && <h2>{story.headline}</h2>}
+            {story.subheadline && <p className="store-product-story-subtitle">{story.subheadline}</p>}
+            {story.tags?.length ? <div className="store-product-story-tags">{story.tags.map((tag) => <span key={tag}>{tag}</span>)}</div> : null}
+            {(story.founderTitle || story.founderSubtitle || story.founderLetter || story.founderQuote || story.founderSignoff) && <div className="store-product-story-block"><h3>{story.founderTitle}</h3>{story.founderSubtitle && <p className="store-product-story-subtitle">{story.founderSubtitle}</p>}{story.founderLetter && <p>{story.founderLetter}</p>}{story.founderQuote && <blockquote>{story.founderQuote}</blockquote>}{story.founderSignoff && <strong>{story.founderSignoff}</strong>}</div>}
+            {(story.processTitle || story.processSubtitle || story.processSteps?.length) && <div className="store-product-story-block"><h3>{story.processTitle}</h3>{story.processSubtitle && <p>{story.processSubtitle}</p>}{story.processSteps?.length ? <ol>{story.processSteps.map((step, index) => <li key={`${step.step}-${index}`}><b>{step.step} · {step.title}</b><span>{step.desc}</span></li>)}</ol> : null}</div>}
+            {(story.philosophyTitle || story.philosophySubtitle || story.philosophyPillars?.length) && <div className="store-product-story-block"><h3>{story.philosophyTitle}</h3>{story.philosophySubtitle && <p>{story.philosophySubtitle}</p>}{story.philosophyPillars?.length ? <div className="store-product-story-pillars">{story.philosophyPillars.map((pillar, index) => <article key={`${pillar.title}-${index}`}><small>{pillar.tag}</small><b>{pillar.title}</b><p>{pillar.desc}</p><strong>{pillar.guarantee}</strong></article>)}</div> : null}</div>}
+            {(story.calloutTitle || story.calloutDesc) && <div className="store-product-story-callout"><h3>{story.calloutTitle}</h3><p>{story.calloutDesc}</p></div>}
+            {(story.contactPhone || story.contactEmail || story.contactLocation || story.companyAddress) && <div className="store-product-story-contact">{story.contactLocation && <span>{story.contactLocation}</span>}{story.companyAddress && <span>{story.companyAddress}</span>}{story.contactPhone && <a href={`tel:${story.contactPhone}`}>{story.contactPhone}</a>}{story.contactEmail && <a href={`mailto:${story.contactEmail}`}>{story.contactEmail}</a>}</div>}
+          </section>
+        )}
+        {product.storageInstructions && <div className="mt-12 p-6 sm:p-8 bg-white border border-slate-200/80 rounded-3xl text-left"><h2 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-3">Storage Instructions</h2><p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{product.storageInstructions}</p></div>}
 
         {/* ── KEY HIGHLIGHTS ("Why You'll Love It") ── */}
         {highlights.length > 0 && <div className="mt-14 pt-10 border-t border-slate-100">
