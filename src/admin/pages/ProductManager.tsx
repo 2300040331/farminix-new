@@ -28,7 +28,7 @@ export const ProductManager: React.FC<{ initialProductId?: string; startAdding?:
     name: '',
     category: config.categories[0]?.name || 'Rice & Grains',
     price: 0, oldPrice: 0, discountPercentage: 0, weight: '', weightOptions: [], image: '',
-    deliveryTime: '', inStock: false, stockCount: 0, brand: '', description: '',
+    deliveryTime: '', inStock: false, stockCount: 0, brand: '', description: '', catalogOnly: true,
     ingredients: [], nutritionalInfo: { energy: '', protein: '', carbs: '', fat: '' },
     badges: [], highlights: [], benefits: [], specifications: [], howToUse: [], storageInstructions: '', faqs: [],
   };
@@ -78,6 +78,7 @@ export const ProductManager: React.FC<{ initialProductId?: string; startAdding?:
       price: Number(formData.price) || 0,
       oldPrice: Number(formData.oldPrice) || 0,
       discountPercentage: formData.discountPercentage !== undefined ? Number(formData.discountPercentage) : 0,
+      catalogOnly: !(Number(formData.price) > 0 && formData.weight.trim() && formData.image.trim()),
     };
 
     if (editingProductId) {
@@ -204,15 +205,15 @@ export const ProductManager: React.FC<{ initialProductId?: string; startAdding?:
                 <tr key={product.id} className="hover:bg-slate-50/70 transition-colors">
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3 min-w-[200px]">
-                      <img
+                      {product.image ? <img
                         src={product.image}
                         alt={product.name}
                         className="w-10 h-10 rounded-xl object-cover border border-slate-100 bg-slate-50 shrink-0"
-                      />
+                      /> : <div className="w-10 h-10 rounded-xl border border-slate-200 bg-amber-50 shrink-0 grid place-items-center text-amber-700 font-black">{product.name.slice(0, 1)}</div>}
                       <div>
                         <div className="font-bold text-slate-900 line-clamp-1">{product.name}</div>
                         <div className="text-[11px] text-slate-500">
-                          {product.brand} • <span className="font-semibold">{product.weight}</span>
+                          {product.brand || 'Name-only listing'} {product.weight && <>• <span className="font-semibold">{product.weight}</span></>}
                         </div>
                       </div>
                     </div>
@@ -222,7 +223,7 @@ export const ProductManager: React.FC<{ initialProductId?: string; startAdding?:
 
                   <td className="py-3 px-4">
                     <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="font-black text-purple-700 text-sm">₹{product.price.toLocaleString('en-IN')}</span>
+                      {product.catalogOnly ? <span className="text-xs font-semibold text-amber-700">Details needed</span> : <span className="font-black text-purple-700 text-sm">₹{product.price.toLocaleString('en-IN')}</span>}
                       {product.oldPrice && product.oldPrice > product.price && (
                         <span className="text-[11px] text-slate-400 line-through">MRP ₹{product.oldPrice.toLocaleString('en-IN')}</span>
                       )}
@@ -242,16 +243,16 @@ export const ProductManager: React.FC<{ initialProductId?: string; startAdding?:
                   </td>
 
                   <td className="py-3 px-4">
-                    <span className="font-bold text-slate-800">{product.stockCount ?? 50} units</span>
+                    <span className="font-bold text-slate-800">{product.catalogOnly ? 'Not set' : `${product.stockCount ?? 0} units`}</span>
                   </td>
 
                   <td className="py-3 px-4">
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                        product.inStock ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'
+                        product.catalogOnly ? 'bg-amber-100 text-amber-800' : product.inStock ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'
                       }`}
                     >
-                      {product.inStock ? 'In Stock' : 'Out of Stock'}
+                      {product.catalogOnly ? 'Needs details' : product.inStock ? 'In Stock' : 'Out of Stock'}
                     </span>
                   </td>
 

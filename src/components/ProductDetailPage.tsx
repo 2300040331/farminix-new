@@ -135,6 +135,21 @@ export const ProductDetailPage: React.FC = () => {
     );
   }
 
+  if (product.catalogOnly || !(product.price > 0 && product.weight && product.image)) {
+    return (
+      <main className="store-catalog-detail">
+        <div className="store-catalog-detail-card">
+          <span className="store-catalog-detail-sparkle" aria-hidden="true">✦</span>
+          <p>{product.category}</p>
+          <h1>{product.name}</h1>
+          <span className="store-catalog-detail-status">Product details coming soon</span>
+          <p className="store-catalog-detail-copy">Pack size, price, and product image will appear here after they are added in the store admin.</p>
+          <button type="button" className="store-button" onClick={() => navigate('/products')}>Back to products</button>
+        </div>
+      </main>
+    );
+  }
+
   // Weight / Variant calculations
   const currentWeight = selectedWeight || product.weight;
   

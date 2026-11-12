@@ -518,6 +518,7 @@ export interface CustomerEnquiry {
 }
 
 export interface AdminSiteConfig {
+  productCatalogVersion?: number;
   inventoryRevision?: number;
   theme: ThemeTokens;
   sectionOrder: SectionOrderItem[];

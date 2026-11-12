@@ -241,6 +241,31 @@
 @media (max-width: 1000px) { .category-showcase-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .category-showcase-card { min-height: 260px; } }
 @media (max-width: 640px) { .store-category-section { padding-inline: 18px; } .category-showcase-heading { align-items: start; flex-direction: column; } .category-showcase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; } .category-showcase-card { min-height: 230px; padding: 17px 14px; border-radius: 19px; } .category-showcase-mark { width: 48px; height: 48px; margin-bottom: 21px; font-size: 30px; } .category-showcase-title-row h3 { font-size: 16px; } .category-showcase-card li { font-size: 9px; padding: 6px 7px; } }
 @media (prefers-reduced-motion: reduce) { .category-showcase-card, .category-showcase-mark, .category-showcase-orbit, .category-showcase-card li { animation: none !important; transition: none !important; } }
+
+/* Catalog-first product cards keep incomplete listings honest while still making the range browsable. */
+.store-product-placeholder { display: flex; position: relative; isolation: isolate; height: 100%; min-height: 220px; align-items: center; justify-content: center; overflow: hidden; border-radius: 20px; background: linear-gradient(140deg, #fff0c9, #ffc878); color: #6a3b1b; }
+.store-product-placeholder::before, .store-product-placeholder::after { content: ''; position: absolute; z-index: -1; border: 1px solid #ffffffa6; border-radius: 50%; animation: category-orbit 16s linear infinite; }
+.store-product-placeholder::before { width: 185px; height: 185px; box-shadow: 0 0 0 20px #ffffff20, 0 0 0 42px #ffffff16; }
+.store-product-placeholder::after { width: 125px; height: 125px; animation-direction: reverse; }
+.store-product-placeholder i { font-style: normal; font-size: 68px; font-weight: 900; opacity: .7; text-shadow: 0 4px 0 #fff7; animation: category-bob 4s ease-in-out infinite; }
+.store-product-placeholder b { position: absolute; left: 12px; bottom: 12px; padding: 7px 10px; border: 1px solid #ffffffa8; border-radius: 99px; background: #fff9; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+.store-product-placeholder.spices { background: linear-gradient(140deg, #ffd5c4, #ff946d); color: #742d1a; }
+.store-product-placeholder.dry-fruits { background: linear-gradient(140deg, #f4e2c6, #d6b083); color: #5e4026; }
+.store-product-placeholder.grocery { background: linear-gradient(140deg, #d8edc9, #a7d388); color: #35542b; }
+.store-product-placeholder.oils { background: linear-gradient(140deg, #fff1b0, #edcf5e); color: #5b4a0d; }
+.store-product-placeholder.powders { background: linear-gradient(140deg, #f7c8d9, #e786a5); color: #5d2440; }
+.store-product-catalog-note { margin: 0; color: #8a6943; font-size: 11px; font-weight: 700; }
+.store-catalog-detail { display: grid; min-height: 65vh; place-items: center; padding: 40px 20px; background: radial-gradient(ellipse at 50% 30%, #fff0cf, #fff9ee 70%); }
+.store-catalog-detail-card { position: relative; width: min(580px, 100%); padding: clamp(32px, 7vw, 62px); overflow: hidden; border: 1px solid #f1dfc8; border-radius: 32px; background: #fff; box-shadow: 0 20px 70px #73512a12; text-align: center; animation: category-rise .6s both; }
+.store-catalog-detail-sparkle { display: grid; place-items: center; width: 72px; height: 72px; margin: 0 auto 20px; border-radius: 24px; background: linear-gradient(145deg, #ffe4ae, #ffb853); color: #fff; font-size: 44px; animation: category-bob 4s ease-in-out infinite; }
+.store-catalog-detail-card > p:first-of-type { color: #bd5428; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+.store-catalog-detail-card h1 { margin: 12px 0 18px; color: #33241d; font-size: clamp(30px, 5vw, 46px); font-weight: 900; letter-spacing: -1.5px; }
+.store-catalog-detail-status { display: inline-flex; border-radius: 999px; padding: 9px 14px; background: #fff1d9; color: #88511d; font-size: 11px; font-weight: 800; }
+.store-catalog-detail-copy { margin: 18px 0 25px; color: #77695f; font-size: 13px; line-height: 1.8; }
+.store-home-collection .store-product-card { animation: category-rise .55s both; }
+.store-home-collection .store-product-card:nth-child(3n + 2) { animation-delay: .07s; }
+.store-home-collection .store-product-card:nth-child(3n) { animation-delay: .14s; }
+@media (prefers-reduced-motion: reduce) { .store-product-placeholder::before, .store-product-placeholder::after, .store-product-placeholder i, .store-catalog-detail-card, .store-catalog-detail-sparkle, .store-home-collection .store-product-card { animation: none !important; } }
 @media (max-width: 1100px) {
   .store-container { width: calc(100% - 56px); }
   .store-section { padding-block: 45px; }

@@ -10,6 +10,7 @@ import { CategorySection } from './components/CategorySection';
 import { CategoryPage } from './components/CategoryPage';
 import { FeatureStrip } from './components/FeatureStrip';
 import { BrandMarquee } from './components/BrandMarquee';
+import { DealsSection } from './components/DealsSection';
 
 // Pages
 import { ProductListingPage } from './components/ProductListingPage';
@@ -80,6 +81,7 @@ export function AppContent() {
       socialBlog: <SocialBlogSection key="socialBlog" />,
       categorySection: <CategorySection key="categorySection" />,
       categories: <CategorySection key="categories" />,
+      epicDeals: <DealsSection key="epicDeals" />,
     };
 
     return (

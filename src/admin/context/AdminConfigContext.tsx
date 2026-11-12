@@ -157,6 +157,25 @@ const sanitizeProducts = (products: any[]): Product[] => {
   });
 };
 
+const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSiteConfig>): AdminSiteConfig => {
+  if ((source.productCatalogVersion || 0) >= 1) return config;
+  const existingProductIds = new Set((config.products || []).map((product) => product.id));
+  const existingCategoryIds = new Set((config.categories || []).map((category) => category.id));
+  return {
+    ...config,
+    productCatalogVersion: 1,
+    products: [...(config.products || []), ...defaultSiteConfig.products.filter((product) => product.catalogOnly && !existingProductIds.has(product.id))],
+    categories: [...(config.categories || []), ...defaultSiteConfig.categories.filter((category) => !existingCategoryIds.has(category.id))],
+    categorySection: { ...config.categorySection, enabled: true },
+    popularProducts: {
+      ...config.popularProducts,
+      enabled: true,
+      featuredProductIds: [...new Set([...(config.popularProducts?.featuredProductIds || []), ...defaultSiteConfig.products.map((product) => product.id)])],
+    },
+    sectionOrder: config.sectionOrder.map((section) => section.id === 'categorySection' ? { ...section, enabled: true } : section),
+  };
+};
+
 const sanitizeFooter = (raw: any): FooterConfig => {
   const merged = { ...defaultSiteConfig.footer, ...(raw || {}) };
   const placeholderSocials = new Set(['https://www.instagram.com', 'https://www.facebook.com', 'https://twitter.com', 'https://www.youtube.com']);
@@ -197,7 +216,10 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [publishedConfig, setPublishedConfig] = useState<AdminSiteConfig>(() => {
     try {
       const cached = localStorage.getItem(PUBLISHED_KEY);
-      if (cached) return { ...defaultSiteConfig, ...JSON.parse(cached) };
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return normalizeCatalogConfig({ ...defaultSiteConfig, ...parsed, products: sanitizeProducts(parsed.products) }, parsed);
+      }
     } catch {}
     return defaultSiteConfig;
   });
@@ -208,7 +230,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const saved = localStorage.getItem(DRAFT_KEY);
       if (saved) {
         const parsed = removePlaceholderImages(JSON.parse(saved));
-        return {
+        return normalizeCatalogConfig({
           ...defaultSiteConfig,
           ...parsed,
           products: sanitizeProducts(parsed.products),
@@ -233,14 +255,14 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
             const miss = defaultSiteConfig.navItems.filter((n) => !ids.has(n.id));
             return [...s, ...miss];
           })(),
-        };
+        }, parsed);
       }
       
       // Fallback to published if no draft exists
       const publishedSaved = localStorage.getItem(PUBLISHED_KEY);
       if (publishedSaved) {
         const parsed = removePlaceholderImages(JSON.parse(publishedSaved));
-        return {
+        return normalizeCatalogConfig({
           ...defaultSiteConfig,
           ...parsed,
           products: sanitizeProducts(parsed.products),
@@ -265,7 +287,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
             const miss = defaultSiteConfig.navItems.filter((n) => !ids.has(n.id));
             return [...s, ...miss];
           })(),
-        };
+        }, parsed);
       }
     } catch (e) {
       console.warn('Failed to parse draft admin config, using defaults', e);
@@ -370,7 +392,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (disposed || savingRef.current || version !== publishVersion.current) return;
         if (data.config) {
           const liveRaw = removePlaceholderImages(data.config);
-          const live = { ...defaultSiteConfig, ...liveRaw, footer: sanitizeFooter(liveRaw.footer), introVideo: { ...defaultIntroVideoConfig, ...(liveRaw.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(liveRaw.socialBlog || {}), entries: Array.isArray(liveRaw.socialBlog?.entries) ? liveRaw.socialBlog.entries : [] }, products: sanitizeProducts(removePlaceholderImages(data.config.products)) };
+          const live = normalizeCatalogConfig({ ...defaultSiteConfig, ...liveRaw, footer: sanitizeFooter(liveRaw.footer), introVideo: { ...defaultIntroVideoConfig, ...(liveRaw.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(liveRaw.socialBlog || {}), entries: Array.isArray(liveRaw.socialBlog?.entries) ? liveRaw.socialBlog.entries : [] }, products: sanitizeProducts(removePlaceholderImages(data.config.products)) }, liveRaw);
           setPublishedConfig(live);
           try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(live)); } catch {}
           if (!dirtyRef.current) {
@@ -416,7 +438,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
       });
       if (response.ok) {
         const data = await response.json();
-        setPublishedConfig({ ...defaultSiteConfig, ...data.config, footer: sanitizeFooter(data.config.footer), introVideo: { ...defaultIntroVideoConfig, ...(data.config.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(data.config.socialBlog || {}), entries: Array.isArray(data.config.socialBlog?.entries) ? data.config.socialBlog.entries : [] } });
+        setPublishedConfig(normalizeCatalogConfig({ ...defaultSiteConfig, ...data.config, footer: sanitizeFooter(data.config.footer), introVideo: { ...defaultIntroVideoConfig, ...(data.config.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(data.config.socialBlog || {}), entries: Array.isArray(data.config.socialBlog?.entries) ? data.config.socialBlog.entries : [] }, products: sanitizeProducts(data.config.products) }, data.config));
         try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(data.config)); } catch {}
       } else {
         const data = await response.json().catch(() => ({}));

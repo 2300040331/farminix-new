@@ -107,14 +107,47 @@ export const farminixRiceProduct: Product = {
   ],
 };
 
-// Catalog contains exclusively the Farminix Family Choice Rice
-export const allProducts: Product[] = [
-  farminixRiceProduct,
+const requestedCatalogItems: Array<{ id: string; name: string; category: string }> = [
+  { id: 'prod-chilly-powder', name: 'Chilly Powder', category: 'Powders' },
+  { id: 'prod-turmeric-powder', name: 'Turmeric Powder', category: 'Powders' },
+  { id: 'prod-coriander-powder', name: 'Coriander Powder', category: 'Powders' },
+  { id: 'prod-red-chilly', name: 'Red Chilly', category: 'Spices' },
+  { id: 'prod-cloves', name: 'Cloves', category: 'Spices' },
+  { id: 'prod-cumin', name: 'Cumin', category: 'Spices' },
+  { id: 'prod-cardamom-pod', name: 'Cardamom pod', category: 'Spices' },
+  { id: 'prod-cashew-nuts', name: 'Cashew Nuts', category: 'Dry Fruits' },
+  { id: 'prod-almonds', name: 'Almonds', category: 'Dry Fruits' },
+  { id: 'prod-kishmish', name: 'Kishmish', category: 'Dry Fruits' },
+  { id: 'prod-pistachios', name: 'Pistachios', category: 'Dry Fruits' },
+  { id: 'prod-peanuts', name: 'Peanuts', category: 'Dry Fruits' },
+  { id: 'prod-dal', name: 'Dal', category: 'Grocery' },
+  { id: 'prod-sugar', name: 'Sugar', category: 'Grocery' },
+  { id: 'prod-groundnut-oil', name: 'Groundnut Oil', category: 'Oils' },
 ];
 
-// Popular Today contains only Farminix Family Choice Rice
+export const requestedCatalogProducts: Product[] = requestedCatalogItems.map((item) => ({
+  ...item,
+  price: 0,
+  oldPrice: 0,
+  discountPercentage: 0,
+  weight: '',
+  weightOptions: [],
+  image: '',
+  deliveryTime: '',
+  inStock: false,
+  stockCount: 0,
+  brand: '',
+  description: '',
+  enabled: true,
+  catalogOnly: true,
+}));
+
+// Keep the existing verified rice product and add the requested name-only catalog entries.
+export const allProducts: Product[] = [farminixRiceProduct, ...requestedCatalogProducts];
+
+// Popular Today starts with the full current catalog; admins can choose featured products.
 export const popularProducts: Product[] = [
-  farminixRiceProduct,
+  ...allProducts,
 ];
 
 export const epicDeals: DealCard[] = [

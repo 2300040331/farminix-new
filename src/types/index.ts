@@ -81,6 +81,7 @@ export interface Product {
   brand: string;
   description: string;
   enabled?: boolean; // Add support for Hide/Show
+  catalogOnly?: boolean; // Name/category listing until verified price, pack and image are added.
   ingredients?: string[];
   nutritionBasis?: string;
   nutritionalInfo?: {
