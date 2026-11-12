@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowUpRight, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAdminConfig } from '../admin/context/AdminConfigContext';
+import { defaultSiteConfig } from '../admin/defaultConfig';
 
 const palettes = [
   { tone: 'saffron', mark: '✦' },
@@ -14,10 +15,13 @@ const palettes = [
 export const CategorySection: React.FC = () => {
   const { navigate } = useApp();
   const { publishedConfig } = useAdminConfig();
-  const catSection = publishedConfig.categorySection;
-  const categories = (publishedConfig.categories || []).filter((category) => category.enabled !== false);
+  const catSection = publishedConfig.categorySection || defaultSiteConfig.categorySection;
+  const configuredCategories = (publishedConfig.categories || []).filter((category) => category.enabled !== false);
+  const categories = configuredCategories.some((c) => Array.isArray(c.items) && c.items.length > 0)
+    ? configuredCategories
+    : defaultSiteConfig.categories;
 
-  if (!catSection.enabled) return null;
+  if (catSection && catSection.enabled === false) return null;
 
   return (
     <section className="store-category-section" aria-labelledby="category-section-title">

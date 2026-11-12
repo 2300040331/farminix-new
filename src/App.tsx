@@ -69,7 +69,7 @@ export function AppContent() {
 
   const renderDynamicHomepageSections = () => {
     const sortedSections = [...publishedConfig.sectionOrder]
-      .filter((s) => s.enabled || s.id === 'featureStrip' || s.id === 'brandMarquee')
+      .filter((s) => s.enabled || s.id === 'featureStrip' || s.id === 'brandMarquee' || s.id === 'categorySection')
       .sort((a, b) => a.order - b.order);
 
     const sectionComponentMap: Record<string, React.ReactNode> = {
