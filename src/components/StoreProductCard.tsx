@@ -8,7 +8,6 @@ export function StoreProductCard({ product, name }: { product: Product; name?: R
   const { navigate, cart, addToCart, updateQuantity, wishlist, toggleWishlist, setIsCartOpen } = useApp();
   const quantity = cart.filter((item) => item.product.id === product.id).reduce((sum, item) => sum + item.quantity, 0);
   const isWishlisted = wishlist.includes(product.id);
-  const catalogOnly = product.catalogOnly === true || !(product.price > 0 && product.weight && product.image);
   const hasSavings = product.oldPrice > product.price;
   const discount = hasSavings ? Math.round((product.oldPrice - product.price) / product.oldPrice * 100) : 0;
   const available = product.inStock && product.stockCount > 0;
@@ -26,9 +25,9 @@ export function StoreProductCard({ product, name }: { product: Product; name?: R
       <div className="store-product-content">
         {(product.brand || product.weight) && <p className="store-product-meta">{product.brand}{product.brand && product.weight && <span>•</span>}{product.weight}</p>}
         <h3><button onClick={openProduct}>{name || product.name}<ArrowUpRight size={18} /></button></h3>
-        {catalogOnly ? <p className="store-product-catalog-note">Product details coming soon</p> : <div className="store-product-prices"><strong>₹{product.price.toLocaleString('en-IN')}</strong>{hasSavings && <del>₹{product.oldPrice.toLocaleString('en-IN')}</del>}</div>}
+        {product.price > 0 && <div className="store-product-prices"><strong>₹{product.price.toLocaleString('en-IN')}</strong>{hasSavings && <del>₹{product.oldPrice.toLocaleString('en-IN')}</del>}</div>}
         {hasSavings && <p className="store-product-savings">You save ₹{(product.oldPrice - product.price).toLocaleString('en-IN')}</p>}
-        {catalogOnly ? <button className="store-button store-product-add" onClick={openProduct}>View listing<ArrowUpRight size={17} /></button> : !available ? <button className="store-button store-product-add" disabled>Out of stock</button> : quantity === 0 ? (
+        {!available ? <button className="store-button store-product-add store-product-out-of-stock" disabled>Out of stock</button> : quantity === 0 ? (
           <button className="store-button store-product-add" onClick={() => { addToCart(product); setIsCartOpen(true); }}><ShoppingBag size={17} />Add to cart<Plus size={18} /></button>
         ) : (
           <div className="store-product-stepper" aria-label={`Quantity for ${product.name}`}><button aria-label={`Decrease ${product.name} quantity`} onClick={() => updateQuantity(product.id, -1)}><Minus size={18} /></button><span aria-live="polite">{quantity} in cart</span><button aria-label={`Increase ${product.name} quantity`} disabled={quantity >= product.stockCount} onClick={() => updateQuantity(product.id, 1)}><Plus size={18} /></button></div>

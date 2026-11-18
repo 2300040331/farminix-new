@@ -158,7 +158,7 @@ const sanitizeProducts = (products: any[]): Product[] => {
 
 const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSiteConfig>): AdminSiteConfig => {
   const sourceVersion = source.productCatalogVersion || 0;
-  if (sourceVersion >= 3) return config;
+  if (sourceVersion >= 4) return config;
   const existingCategoryIds = new Set((config.categories || []).map((category) => category.id));
   const defaultProducts = new Map(defaultSiteConfig.products.map((product) => [product.id, product]));
   const productsWithRestoredContent = (config.products || []).map((product) => {
@@ -212,7 +212,7 @@ const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSi
   const mergedProductIds = new Set(productsWithRestoredContent.map((product) => product.id));
   return {
     ...config,
-    productCatalogVersion: 3,
+    productCatalogVersion: 4,
     products: [
       ...productsWithRestoredContent,
       ...(sourceVersion < 1 ? defaultSiteConfig.products.filter((product) => product.catalogOnly && !mergedProductIds.has(product.id)) : []),
@@ -221,7 +221,7 @@ const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSi
       ? [...(config.categories || []), ...defaultSiteConfig.categories.filter((category) => !existingCategoryIds.has(category.id))]
       : config.categories,
     categorySection: sourceVersion < 1 ? { ...config.categorySection, enabled: true } : config.categorySection,
-    popularProducts: sourceVersion < 3 ? {
+    popularProducts: sourceVersion < 4 ? {
       ...config.popularProducts,
       enabled: true,
       featuredProductIds: ['r1'],

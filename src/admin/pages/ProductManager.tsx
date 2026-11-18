@@ -9,18 +9,25 @@ import {
   Check,
   Eye,
   EyeOff,
+  Download,
+  FileSpreadsheet,
+  Upload,
 } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
 import { ProductContentEditor } from '../components/ProductContentEditor';
 import type { Product } from '../../types';
+import { downloadProductSpreadsheet, importProductSpreadsheet } from '../utils/productSpreadsheet';
 
 export const ProductManager: React.FC<{ initialProductId?: string; startAdding?: boolean }> = ({ initialProductId, startAdding = false }) => {
-  const { config, addProduct, editProduct, deleteProduct, publishConfig, isSaving, saveError } = useAdminConfig();
+  const { config, addProduct, editProduct, deleteProduct, updateProducts, publishConfig, isSaving, saveError } = useAdminConfig();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(startAdding || Boolean(initialProductId && config.products.some(p => p.id === initialProductId)));
   const [editingProductId, setEditingProductId] = useState<string | null>(initialProductId || null);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [spreadsheetMessage, setSpreadsheetMessage] = useState('');
+  const [spreadsheetError, setSpreadsheetError] = useState(false);
+  const [spreadsheetBusy, setSpreadsheetBusy] = useState(false);
 
   // Form State
   const initialProductState: Product = {
@@ -93,6 +100,25 @@ export const ProductManager: React.FC<{ initialProductId?: string; startAdding?:
     setTimeout(() => setSavedSuccess(false), 2500);
   };
 
+  const handleSpreadsheetUpload = async (file?: File) => {
+    if (!file) return;
+    setSpreadsheetBusy(true);
+    setSpreadsheetMessage('');
+    setSpreadsheetError(false);
+    try {
+      const result = await importProductSpreadsheet(file, config.products);
+      updateProducts(result.products);
+      const published = await publishConfig();
+      if (!published) throw new Error(saveError || 'The spreadsheet is saved as a draft. Publishing did not complete.');
+      setSpreadsheetMessage(`Published ${result.changed} updated and ${result.added} new product${result.changed + result.added === 1 ? '' : 's'}.`);
+    } catch (error) {
+      setSpreadsheetMessage(error instanceof Error ? error.message : 'This spreadsheet could not be imported.');
+      setSpreadsheetError(true);
+    } finally {
+      setSpreadsheetBusy(false);
+    }
+  };
+
   if (isModalOpen) return <ProductContentEditor product={formData} onChange={product => {setFormData(product); if (editingProductId) editProduct(product);}} onBack={() => setIsModalOpen(false)} onSave={handleSave} saving={isSaving} error={saveError}/>;
 
   return (
@@ -142,6 +168,22 @@ export const ProductManager: React.FC<{ initialProductId?: string; startAdding?:
           JPG / PNG / WebP (Max 2MB)
         </div>
       </div>
+
+      <section className="admin-panel bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4" aria-labelledby="product-spreadsheet-title">
+        <div className="flex items-start gap-3">
+          <span className="grid place-items-center w-10 h-10 shrink-0 rounded-2xl bg-emerald-50 text-emerald-700"><FileSpreadsheet className="w-5 h-5" /></span>
+          <div><h2 id="product-spreadsheet-title" className="text-sm font-black text-slate-900">Bulk product content with Excel</h2><p className="mt-1 text-xs leading-relaxed text-slate-500">Download the current catalog as an .xlsx workbook, edit product copy and details in Excel, then upload it to publish. You can still make individual edits below.</p></div>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={() => downloadProductSpreadsheet(config.products)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:border-purple-300 hover:text-purple-700"><Download className="h-4 w-4" />Download Excel template</button>
+          <label className={`inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-purple-500 ${spreadsheetBusy ? 'cursor-wait opacity-60' : 'cursor-pointer'}`}>
+            <Upload className="h-4 w-4" />{spreadsheetBusy ? 'Importing and publishing…' : 'Upload completed workbook'}
+            <input type="file" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" disabled={spreadsheetBusy} className="sr-only" onChange={(event) => { void handleSpreadsheetUpload(event.currentTarget.files?.[0]); event.currentTarget.value = ''; }} />
+          </label>
+        </div>
+        <p className="text-[11px] leading-relaxed text-slate-500">Keep the ID column to update a product. Leave it blank to add a new one. Blank cells preserve current values. For lists, use one entry per line; for Highlights, Specifications, and FAQs, use <span className="font-semibold">Title :: description</span>.</p>
+        {spreadsheetMessage && <p role="status" className={`rounded-xl px-4 py-3 text-xs font-bold ${spreadsheetError ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-800'}`}>{spreadsheetMessage}</p>}
+      </section>
 
       {/* Live Saved Notification Banner */}
       {savedSuccess && (

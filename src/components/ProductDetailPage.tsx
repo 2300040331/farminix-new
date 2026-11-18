@@ -35,37 +35,41 @@ const ProductDetailSection: React.FC<{ title: string; children: React.ReactNode;
 );
 
 const CatalogOnlyProductPage: React.FC<{ product: Product; onBack: () => void }> = ({ product, onBack }) => {
-  const notAdded = 'Verified product information has not been added yet. Add it in Admin to show it here.';
   const highlights = (product.highlights || []).filter((item) => item.title.trim() && item.desc.trim());
   const benefits = (product.benefits || []).filter(Boolean);
   const nutrition = Object.entries(product.nutritionalInfo || {}).filter(([, value]) => Boolean(value));
   const specifications = (product.specifications || []).filter((item) => item.label.trim() && item.value.trim());
   const methods = (product.howToUse || []).filter(Boolean);
   const faqs = (product.faqs || []).filter((item) => item.question.trim() && item.answer.trim());
+  const reviews = (product.reviewsList || []).filter((review) => review.source === 'admin' && review.enabled !== false && review.userName.trim() && review.comment.trim());
+  const imageFallback = product.category === 'Powders' || product.category === 'Spices' ? '/cat_masala.jpg' : product.category === 'Dry Fruits' || product.category === 'Grocery' ? '/cat_dals.jpg' : product.category === 'Oils' ? '/cat_oils.jpg' : '/cat_household.jpg';
   const panel = 'store-detail-content-panel';
 
   return (
     <main className="store-catalog-detail-page">
       <nav className="store-detail-breadcrumb"><button onClick={onBack}>← Products</button><span>/</span><span>{product.category}</span><span>/</span><strong>{product.name}</strong></nav>
       <header className="store-catalog-detail-hero">
-        <span className="store-catalog-detail-sparkle" aria-hidden="true">✦</span>
-        <p>{product.category}</p>
-        <h1>{product.name}</h1>
-        <span className="store-catalog-detail-status">Product details being prepared</span>
-        <p className="store-catalog-detail-copy">Price, pack size, image, and availability will appear here when verified details are added.</p>
+        <div className="store-catalog-detail-image-wrap"><img src={product.image || imageFallback} alt={product.name} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = imageFallback; }} /><span>{product.category}</span></div>
+        <div className="store-catalog-detail-intro">
+          <p className="store-catalog-detail-category">Farminix <i>•</i> {product.category}</p>
+          <h1>{product.name}</h1>
+          <span className="store-catalog-detail-status">Temporarily out of stock</span>
+          <p className="store-catalog-detail-copy">We’re preparing verified pack, price, and availability details for this product.</p>
+          <button type="button" className="store-catalog-detail-stock-button" disabled>Out of stock</button>
+          {product.description && <section className="store-catalog-detail-about"><h2>About This Product</h2><p>{product.description}</p></section>}
+        </div>
       </header>
       <div className="store-detail-content-layout">
-        <ProductDetailSection title="About This Product" className={panel}><p>{product.description || notAdded}</p></ProductDetailSection>
-        <ProductDetailSection title="Why You’ll Love It" className={panel}>{highlights.length ? <ul>{highlights.map((item) => <li key={item.title}><strong>{item.title}</strong><span>{item.desc}</span></li>)}</ul> : <p>{notAdded}</p>}</ProductDetailSection>
-        <ProductDetailSection title="Benefits & Advantages" className={panel}>{benefits.length ? <ul>{benefits.map((item) => <li key={item}>{item}</li>)}</ul> : <p>{notAdded}</p>}</ProductDetailSection>
-        <ProductDetailSection title="Ingredients & Composition" className={panel}><p>{product.ingredients?.length ? product.ingredients.join(', ') : notAdded}</p></ProductDetailSection>
-        <ProductDetailSection title="Nutritional Information" className={panel}>{nutrition.length ? <dl>{nutrition.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl> : <p>{notAdded}</p>}</ProductDetailSection>
-        <ProductDetailSection title="Product Specifications" className={panel}>{specifications.length ? <dl>{specifications.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl> : <p>{notAdded}</p>}</ProductDetailSection>
-        <ProductDetailSection title="Origin & Shelf Life" className={panel}><dl><div><dt>Origin</dt><dd>{product.origin || notAdded}</dd></div><div><dt>Shelf life</dt><dd>{product.shelfLife || notAdded}</dd></div></dl></ProductDetailSection>
-        <ProductDetailSection title="How to Use / Preparation" className={panel}>{methods.length ? <ol>{methods.map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ol> : <p>{notAdded}</p>}</ProductDetailSection>
-        <ProductDetailSection title="Storage Instructions" className={panel}><p>{product.storageInstructions || notAdded}</p></ProductDetailSection>
-        <ProductDetailSection title="Frequently Asked Questions" className={panel}>{faqs.length ? <dl>{faqs.map((item) => <div key={item.question}><dt>{item.question}</dt><dd>{item.answer}</dd></div>)}</dl> : <p>{notAdded}</p>}</ProductDetailSection>
-        <ProductDetailSection title="Customer Reviews" className={panel}>{product.reviewsList?.some((review) => review.source === 'admin' && review.enabled !== false && review.userName.trim() && review.comment.trim()) ? <ProductReviews reviews={product.reviewsList} /> : <p>{notAdded}</p>}</ProductDetailSection>
+        {!!highlights.length && <ProductDetailSection title="Why You’ll Love It" className={panel}><ul>{highlights.map((item) => <li key={item.title}><strong>{item.title}</strong><span>{item.desc}</span></li>)}</ul></ProductDetailSection>}
+        {!!benefits.length && <ProductDetailSection title="Benefits & Advantages" className={panel}><ul>{benefits.map((item) => <li key={item}>{item}</li>)}</ul></ProductDetailSection>}
+        {!!product.ingredients?.length && <ProductDetailSection title="Ingredients & Composition" className={panel}><p>{product.ingredients.join(', ')}</p></ProductDetailSection>}
+        {!!nutrition.length && <ProductDetailSection title="Nutritional Information" className={panel}><dl>{nutrition.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></ProductDetailSection>}
+        {!!specifications.length && <ProductDetailSection title="Product Specifications" className={panel}><dl>{specifications.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl></ProductDetailSection>}
+        {(product.origin || product.shelfLife) && <ProductDetailSection title="Origin & Shelf Life" className={panel}><dl>{product.origin && <div><dt>Origin</dt><dd>{product.origin}</dd></div>}{product.shelfLife && <div><dt>Shelf life</dt><dd>{product.shelfLife}</dd></div>}</dl></ProductDetailSection>}
+        {!!methods.length && <ProductDetailSection title="How to Use / Preparation" className={panel}><ol>{methods.map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ol></ProductDetailSection>}
+        {!!product.storageInstructions && <ProductDetailSection title="Storage Instructions" className={panel}><p>{product.storageInstructions}</p></ProductDetailSection>}
+        {!!faqs.length && <ProductDetailSection title="Frequently Asked Questions" className={panel}><dl>{faqs.map((item) => <div key={item.question}><dt>{item.question}</dt><dd>{item.answer}</dd></div>)}</dl></ProductDetailSection>}
+        {!!reviews.length && <ProductDetailSection title="Customer Reviews" className={panel}><ProductReviews reviews={reviews} /></ProductDetailSection>}
       </div>
       <button type="button" className="store-catalog-detail-back" onClick={onBack}>Browse all products</button>
     </main>
