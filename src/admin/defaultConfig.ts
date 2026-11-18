@@ -410,7 +410,7 @@ export const defaultCheckoutPaymentConfig: CheckoutPaymentConfig = {
 };
 
 export const defaultSiteConfig: AdminSiteConfig = {
-  productCatalogVersion: 2,
+  productCatalogVersion: 3,
   theme: defaultThemeTokens,
   manufacturer: defaultManufacturerConfig,
   aboutPage: defaultAboutPageConfig,
@@ -518,11 +518,11 @@ export const defaultSiteConfig: AdminSiteConfig = {
   categories: categories,
   popularProducts: {
     enabled: true,
-    title: 'Explore the collection',
+    title: 'Popular today',
     viewAllText: 'View all products',
     viewAllUrl: '/products',
     badgeIcon: '⚡',
-    featuredProductIds: allProducts.map((product) => product.id),
+    featuredProductIds: ['r1'],
   },
   epicDeals: {
     enabled: true,

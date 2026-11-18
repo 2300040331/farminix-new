@@ -54,6 +54,27 @@
 .store-search input { min-width: 0; flex: 1; background: transparent; border: 0; padding-block: 8px; font-size: 12px; color: var(--store-ink); }
 .store-search input::placeholder { color: #a298ad; }
 .store-search button { background: #7c0bea; color: white; border-radius: 24px; padding: 11px 22px; font-size: 11px; font-weight: 500; }
+.catalog-filter-panel { background: #fff; border: 1px solid #eee5f2; border-radius: 22px; padding: 22px 24px 18px; margin-bottom: 30px; box-shadow: 0 9px 30px #4a245c06; }
+.catalog-filter-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 17px; color: #8d7e99; font-size: 11px; }
+.catalog-filter-heading > span:first-child { display: inline-flex; align-items: center; gap: 9px; color: #574264; font-size: 13px; font-weight: 600; }
+.catalog-filter-heading svg { color: var(--store-purple); }
+.catalog-category-pills, .catalog-subcategory-pills { display: flex; align-items: center; gap: 9px; overflow-x: auto; scrollbar-width: none; }
+.catalog-category-pills::-webkit-scrollbar, .catalog-subcategory-pills::-webkit-scrollbar { display: none; }
+.catalog-category-pills button, .catalog-subcategory-pills button { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto; border: 1px solid #e7dfea; border-radius: 999px; background: #fffdfa; padding: 10px 15px; color: #483850; font-size: 11px; font-weight: 600; transition: background 180ms, color 180ms, border-color 180ms, transform 180ms; }
+.catalog-category-pills button:hover, .catalog-subcategory-pills button:hover { transform: translateY(-1px); border-color: #be91e2; color: #7313c5; }
+.catalog-category-pills button.is-active, .catalog-subcategory-pills button.is-active { background: #24142d; border-color: #24142d; color: white; box-shadow: 0 5px 14px #24142d1c; }
+.catalog-category-pills small { color: inherit; opacity: .68; font-size: 9px; }
+.catalog-subcategory-pills { border-top: 1px solid #f1eaf3; margin-top: 17px; padding-top: 15px; }
+.catalog-subcategory-pills > span { flex: 0 0 auto; margin-right: 3px; color: #9b8da3; text-transform: uppercase; letter-spacing: 1px; font-size: 9px; font-weight: 700; }
+.catalog-subcategory-pills button { background: #f8f2fb; padding: 8px 13px; font-size: 10px; }
+.catalog-price-filter { border-top: 1px solid #f1eaf3; padding-top: 15px; margin-top: 17px; }
+.catalog-price-filter .price-filter-sidebar { display: grid; grid-template-columns: minmax(150px, .35fr) minmax(260px, 1fr); gap: 20px; align-items: start; border: 0; border-radius: 0; padding: 0; box-shadow: none; background: transparent; backdrop-filter: none; }
+.catalog-price-filter .price-filter-sidebar:hover { box-shadow: none; }
+.catalog-price-filter .pf-header { margin: 0; }
+.catalog-price-filter .pf-body { max-height: 240px; }
+.catalog-price-filter .pf-price-display { margin: 0 0 12px; justify-content: start; border: 0; background: transparent; padding: 0; }
+.catalog-price-filter .pf-slider-wrap { max-width: 520px; }
+.catalog-price-filter .pf-range-reset { display: none; }
 .store-collection-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
 .store-collection-toolbar h2, .store-recommendations > h2 { font: 500 clamp(29px, 3vw, 42px)/1.2 'Times New Roman', Georgia, serif; letter-spacing: -.8px; color: var(--store-ink); margin-top: 8px; }
 .store-collection-toolbar p { font-size: 12px; color: var(--store-muted); line-height: 1.8; margin-top: 10px; }
@@ -396,6 +417,14 @@
 .brand-marquee-group { display: flex; flex: 0 0 100vw; align-items: center; justify-content: center; gap: 24px; }
 .brand-marquee-static { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; }
 @keyframes brand-marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (max-width: 700px) {
+  .catalog-filter-panel { padding: 18px 16px 16px; border-radius: 18px; }
+  .catalog-filter-heading > span:first-child { font-size: 12px; }
+  .catalog-category-pills button { padding: 9px 12px; }
+  .catalog-price-filter .price-filter-sidebar { grid-template-columns: 1fr; gap: 7px; }
+  .catalog-price-filter .pf-header { margin-bottom: 5px; }
+  .catalog-price-filter .pf-price-display { margin-bottom: 10px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .premium-storefront .home-benefit-track { animation-duration: var(--benefit-loop, 18s) !important; animation-iteration-count: infinite !important; }
   .premium-storefront .brand-marquee-track { animation-duration: var(--brand-loop, 18s) !important; animation-iteration-count: infinite !important; }

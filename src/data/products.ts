@@ -125,6 +125,32 @@ const requestedCatalogItems: Array<{ id: string; name: string; category: string 
   { id: 'prod-groundnut-oil', name: 'Groundnut Oil', category: 'Oils' },
 ];
 
+const catalogVisuals: Record<string, string> = {
+  powders: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=900&q=85',
+  spices: 'https://ahbfoods.com/cdn/shop/collections/ChatGPT_Image_Mar_20_2026_03_36_43_PM.png?v=1774083584',
+  'dry-fruits': 'https://bynature.co.za/cdn/shop/files/BNBin-MixedNuts-HRS.jpg?v=1687965457',
+  grocery: 'https://organicmandya.com/cdn/shop/collections/Pulses.png?v=1779777460&width=1200',
+  oils: 'https://cdn.shopify.com/s/files/1/2598/1404/files/Two_Brothers_Blog_Cover_55_600x600.webp?v=1709711755',
+};
+
+const catalogDescriptions: Record<string, string> = {
+  'Chilly Powder': 'A bold, vibrant kitchen staple that brings warmth, colour, and a lively chilli finish to everyday curries, marinades, and snacks.',
+  'Turmeric Powder': 'A golden everyday spice with an earthy aroma, made for dals, curries, rice dishes, and comforting home cooking.',
+  'Coriander Powder': 'A fragrant, mellow spice with gentle citrus notes, ideal for building flavour in curries, gravies, and vegetable dishes.',
+  'Red Chilly': 'Whole red chillies add an aromatic, slow-building heat to tadka, pickles, chutneys, and freshly ground masalas.',
+  Cloves: 'Warm, aromatic whole cloves bring a deep, gently sweet spice to biryani, chai, marinades, and festive recipes.',
+  Cumin: 'Earthy, toasted cumin seeds add a familiar savoury aroma to tadka, dals, rice, and freshly blended spice mixes.',
+  'Cardamom pod': 'Fragrant green cardamom pods bring a bright, sweet aroma to chai, desserts, biryani, and special occasion cooking.',
+  'Cashew Nuts': 'Naturally rich, creamy cashews are a versatile pantry favourite for snacking, festive sweets, gravies, and desserts.',
+  Almonds: 'Crunchy almonds bring a delicate nutty flavour to breakfast bowls, sweets, baking, and everyday snacking.',
+  Kishmish: 'Sweet, chewy raisins add natural fruity notes to pulao, desserts, breakfast bowls, and baked favourites.',
+  Pistachios: 'Distinctive pistachios bring a mellow, buttery crunch to desserts, sweets, garnishes, and mindful snacking.',
+  Peanuts: 'A familiar, satisfying pantry staple for chutneys, snacks, curries, and adding a roasted crunch to meals.',
+  Dal: 'A wholesome everyday pulse for comforting dals, hearty soups, and nourishing family meals. Choose your preferred variety in the product details.',
+  Sugar: 'A dependable everyday sweetener for tea, coffee, home baking, and favourite Indian desserts.',
+  'Groundnut Oil': 'A versatile cooking oil with a warm, nutty character, suited to everyday sautéing, frying, and traditional recipes.',
+};
+
 export const requestedCatalogProducts: Product[] = requestedCatalogItems.map((item) => ({
   ...item,
   price: 0,
@@ -132,12 +158,29 @@ export const requestedCatalogProducts: Product[] = requestedCatalogItems.map((it
   discountPercentage: 0,
   weight: '',
   weightOptions: [],
-  image: '',
+  image: catalogVisuals[item.category.toLowerCase().replace(/\s+/g, '-')] || '/cat_household.jpg',
   deliveryTime: '',
   inStock: false,
   stockCount: 0,
   brand: '',
-  description: '',
+  description: catalogDescriptions[item.name] || `${item.name} is a versatile pantry essential for everyday home cooking. See product details for pack and availability information.`,
+  ingredients: [item.name],
+  highlights: [
+    { icon: '🌿', title: 'Made for everyday cooking', desc: catalogDescriptions[item.name] || `${item.name} is a versatile pantry essential for everyday home cooking.` },
+    { icon: '🍽️', title: 'Easy to use', desc: `${item.name} fits naturally into familiar recipes and everyday meals.` },
+    { icon: '✨', title: 'Product details in your hands', desc: 'Farminix can update pack, sourcing, and verified product information from the admin catalog.' },
+  ],
+  benefits: [
+    `A handy pantry choice for home cooks who enjoy ${item.name.toLowerCase()} in their everyday recipes.`,
+    'Useful across familiar family meals, from quick weekday cooking to special recipes.',
+    'Store in a cool, dry place and keep sealed between uses.',
+  ],
+  howToUse: [`Add ${item.name.toLowerCase()} to your recipe as needed, adjusting to your preferred taste and cooking method.`, 'Follow the preparation method for your chosen recipe.'],
+  storageInstructions: 'Keep in a clean, cool, dry place away from direct sunlight and moisture. Once opened, transfer to an airtight container.',
+  faqs: [
+    { question: `How can I use ${item.name}?`, answer: catalogDescriptions[item.name] || `${item.name} is suited to a range of familiar everyday recipes.` },
+    { question: 'When will pack and price details be available?', answer: 'Farminix is preparing verified pack, price, and availability information for this listing.' },
+  ],
   enabled: true,
   catalogOnly: true,
 }));
@@ -145,9 +188,9 @@ export const requestedCatalogProducts: Product[] = requestedCatalogItems.map((it
 // Keep the existing verified rice product and add the requested name-only catalog entries.
 export const allProducts: Product[] = [farminixRiceProduct, ...requestedCatalogProducts];
 
-// Popular Today starts with the full current catalog; admins can choose featured products.
+// Popular Today is curated; administrators can choose and reorder products in the dashboard.
 export const popularProducts: Product[] = [
-  ...allProducts,
+  farminixRiceProduct,
 ];
 
 export const epicDeals: DealCard[] = [
@@ -159,10 +202,19 @@ export const brandLogosList = [
 ];
 
 export const SUB_CATEGORIES: Record<string, string[]> = {
+  Powders: ['Chilly Powder', 'Turmeric Powder', 'Coriander Powder'],
+  Spices: ['Red Chilly', 'Cloves', 'Cumin', 'Cardamom pod'],
+  'Dry Fruits': ['Cashew Nuts', 'Almonds', 'Kishmish', 'Pistachios', 'Peanuts'],
+  Grocery: ['Dal', 'Sugar'],
+  Oils: ['Groundnut Oil'],
   'Rice & Grains': ['Family Choice Rice', '26 Kg Bags'],
 };
 
 export const SUBCATEGORY_KEYWORDS: Record<string, string[]> = {
+  'Chilly Powder': ['chilly powder'], 'Turmeric Powder': ['turmeric'], 'Coriander Powder': ['coriander'],
+  'Red Chilly': ['red chilly', 'chilli'], Cloves: ['cloves'], Cumin: ['cumin'], 'Cardamom pod': ['cardamom'],
+  'Cashew Nuts': ['cashew'], Almonds: ['almond'], Kishmish: ['kishmish', 'raisin'], Pistachios: ['pistachio'], Peanuts: ['peanut'],
+  Dal: ['dal'], Sugar: ['sugar'], 'Groundnut Oil': ['groundnut oil'],
   'Family Choice Rice': ['family choice', 'rice', 'farminix', '26kg', '26 kg'],
   '26 Kg Bags': ['26kg', '26 kg', 'bag', 'bags'],
 };

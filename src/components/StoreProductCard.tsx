@@ -19,7 +19,7 @@ export function StoreProductCard({ product, name }: { product: Product; name?: R
         {discount > 0 && <span className="store-product-discount">Save {discount}%</span>}
         <button className="store-product-wishlist" aria-label={`${isWishlisted ? 'Remove' : 'Save'} ${product.name} ${isWishlisted ? 'from' : 'to'} wishlist`} aria-pressed={isWishlisted} onClick={() => toggleWishlist(product.id)}><Heart size={19} fill={isWishlisted ? 'currentColor' : 'none'} /></button>
         <button className="store-product-image-button" onClick={openProduct} aria-label={`View ${product.name}`}>
-          {product.image ? <img src={product.image} alt={product.name} loading="lazy" /> : <span className={`store-product-placeholder ${product.category.toLowerCase().replace(/[^a-z]+/g, '-')}`} aria-hidden="true"><i>{product.name.slice(0, 1)}</i><b>{product.category}</b></span>}
+          {product.image ? <img src={product.image} alt={product.name} loading="lazy" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = product.category === 'Powders' || product.category === 'Spices' ? '/cat_masala.jpg' : product.category === 'Dry Fruits' || product.category === 'Grocery' ? '/cat_dals.jpg' : product.category === 'Oils' ? '/cat_oils.jpg' : '/cat_household.jpg'; }} /> : <span className={`store-product-placeholder ${product.category.toLowerCase().replace(/[^a-z]+/g, '-')}`} aria-hidden="true"><i>{product.name.slice(0, 1)}</i><b>{product.category}</b></span>}
         </button>
         <span className="store-product-category">{product.category}</span>
       </div>
