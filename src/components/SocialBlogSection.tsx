@@ -19,7 +19,7 @@ export const SocialBlogSection: React.FC = () => {
   const config = publishedConfig.socialBlog;
   const entries = (config?.entries || []).filter((entry) => entry.enabled && entry.mediaUrl.trim()).sort((a, b) => a.order - b.order);
 
-  if (!config?.enabled || entries.length === 0) return null;
+  if (!config?.enabled) return null;
 
   return (
     <section className="store-social-section w-full py-12 sm:py-16 bg-gradient-to-b from-white via-purple-50/30 to-white" aria-labelledby="farminix-social-blog-title">
@@ -33,7 +33,11 @@ export const SocialBlogSection: React.FC = () => {
           <span className="text-xs font-bold text-slate-400">Shared by Farminix</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {entries.length === 0 ? <div className="social-empty-stories">
+          <div className="social-empty-intro"><span>THE FARMINIX JOURNAL</span><h3>Good food has a story.</h3><p>Our latest kitchen moments, farm stories and quick recipes will find a home here.</p></div>
+          <div className="social-empty-visuals"><img src="/cat_rice.jpg" alt="Rice and grains" loading="lazy" /><img src="/cat_masala.jpg" alt="Indian spices" loading="lazy" /><img src="/cat_dals.jpg" alt="Dals and pulses" loading="lazy" /></div>
+          <span className="social-empty-note"><Camera className="w-4 h-4" /> Reels &amp; stories coming soon</span>
+        </div> : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {entries.map((entry) => {
             const instagramUrl = instagramEmbedUrl(entry.mediaUrl);
             return (
@@ -58,7 +62,7 @@ export const SocialBlogSection: React.FC = () => {
               </article>
             );
           })}
-        </div>
+        </div>}
       </div>
     </section>
   );

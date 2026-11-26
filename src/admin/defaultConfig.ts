@@ -40,7 +40,7 @@ export const defaultQueriesPageConfig = {
 };
 
 export const defaultSocialBlogConfig = {
-  enabled: false,
+  enabled: true,
   title: 'From Farminix on Instagram',
   subtitle: 'Watch the latest updates shared by Farminix.',
   entries: [],
@@ -423,7 +423,7 @@ export const defaultSiteConfig: AdminSiteConfig = {
     { id: 'brandMarquee', name: 'Trusted Brands Marquee', enabled: true, order: 5 },
     { id: 'categorySection', name: 'Shop by Category', enabled: true, order: 4 },
     { id: 'popularProducts', name: 'Popular Today ⚡', enabled: true, order: 5 },
-    { id: 'socialBlog', name: 'Instagram & Blog Videos', enabled: false, order: 6 },
+    { id: 'socialBlog', name: 'Instagram & Blog Videos', enabled: true, order: 6 },
     { id: 'epicDeals', name: 'Epic Deals All Day', enabled: false, order: 7 },
     { id: 'futureArrivals', name: 'Future Arrivals', enabled: false, order: 8 },
     { id: 'bottomFeatureStrip', name: 'Bottom Benefits Strip', enabled: false, order: 9 },
