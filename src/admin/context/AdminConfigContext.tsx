@@ -184,14 +184,19 @@ const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSi
     const nextOrder = (source.homepageSectionsVersion || 0) < 3
       ? migratedSections.length + 1
       : migratedSections.length ? Math.max(...migratedSections.map((section) => section.order || 0)) + 1 : 1;
-    const restoredReviewIds = (source.homepageSectionsVersion || 0) < 3;
-    const defaultRiceReviews = defaultSiteConfig.products.find((product) => product.id === 'r1')?.reviewsList || [];
+    const removeOldSampleReviews = (source.homepageSectionsVersion || 0) < 4;
+    const realRiceReviews = defaultSiteConfig.products.find((product) => product.id === 'r1')?.reviewsList || [];
     return {
       ...value,
-      homepageSectionsVersion: 3,
+      homepageSectionsVersion: 4,
       socialBlog: restoreSocialBlog ? { ...value.socialBlog, enabled: true } : value.socialBlog,
       featuredOffer: { ...defaultSiteConfig.featuredOffer, ...(value.featuredOffer || {}) },
-      products: restoredReviewIds ? (value.products || []).map((product) => product.id === 'r1' && !product.reviewsList?.length ? { ...product, reviewsList: defaultRiceReviews } : product) : value.products,
+      products: removeOldSampleReviews ? (value.products || []).map((product) => {
+        if (product.id !== 'r1') return product;
+        const existingReviews = (product.reviewsList || []).filter((review) => !(review as any).isSample);
+        const reviewById = new Map([...realRiceReviews, ...existingReviews].map((review) => [review.id, review]));
+        return { ...product, reviewsList: Array.from(reviewById.values()) };
+      }) : value.products,
       pageVisibility: { ...defaultSiteConfig.pageVisibility, ...(value.pageVisibility || {}) },
       sectionOrder: [...migratedSections.map((section, index) => ({ ...section, order: (source.homepageSectionsVersion || 0) < 3 ? index + 1 : section.order })), ...defaultSiteConfig.sectionOrder.filter((section) => !ids.has(section.id)).map((section, index) => ({ ...section, order: nextOrder + index }))],
     };

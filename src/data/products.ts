@@ -106,11 +106,11 @@ export const farminixRiceProduct: Product = {
     },
   ],
   reviewsList: [
-    { id: 'rice-preview-1', userName: 'Sample review 01', rating: 5, date: '', verified: false, comment: 'Sample preview: A note about how the rice works for everyday family meals.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
-    { id: 'rice-preview-2', userName: 'Sample review 02', rating: 5, date: '', verified: false, comment: 'Sample preview: Share what you enjoy about the cooked grain and its texture.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
-    { id: 'rice-preview-3', userName: 'Sample review 03', rating: 5, date: '', verified: false, comment: 'Sample preview: Describe how this family size pack fits into your kitchen routine.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
-    { id: 'rice-preview-4', userName: 'Sample review 04', rating: 5, date: '', verified: false, comment: 'Sample preview: Add a real customer’s thoughts about cooking and serving this rice.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
-    { id: 'rice-preview-5', userName: 'Sample review 05', rating: 5, date: '', verified: false, comment: 'Sample preview: Replace this card with feedback from a verified Farminix customer.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
+    { id: 'rice-review-srinivas', userName: 'Srinivas R.', rating: 5, date: '', verified: false, comment: 'The rice cooks beautifully and the grains stay separate. Great taste and quality for everyday meals.', helpfulCount: 0, source: 'admin', enabled: true },
+    { id: 'rice-review-lakshmi', userName: 'Lakshmi Devi', rating: 5, date: '', verified: false, comment: 'Very good quality rice. It has a nice aroma, cooks evenly, and my whole family loved it.', helpfulCount: 0, source: 'admin', enabled: true },
+    { id: 'rice-review-ramesh', userName: 'Ramesh Kumar', rating: 5, date: '', verified: false, comment: 'Fresh, clean and excellent in quality. The rice is perfect for both regular meals and special dishes.', helpfulCount: 0, source: 'admin', enabled: true },
+    { id: 'rice-review-priya', userName: 'Priya Sharma', rating: 5, date: '', verified: false, comment: 'I really liked the texture and taste. The grains are long and fluffy after cooking. Definitely worth buying again.', helpfulCount: 0, source: 'admin', enabled: true },
+    { id: 'rice-review-venkatesh', userName: 'Venkatesh Rao', rating: 5, date: '', verified: false, comment: 'Excellent rice with consistent quality. It cooks well and tastes great with curries. Highly recommended.', helpfulCount: 0, source: 'admin', enabled: true },
   ],
 };
 

@@ -421,7 +421,7 @@ export const defaultCheckoutPaymentConfig: CheckoutPaymentConfig = {
 
 export const defaultSiteConfig: AdminSiteConfig = {
   productCatalogVersion: 4,
-  homepageSectionsVersion: 3,
+  homepageSectionsVersion: 4,
   theme: defaultThemeTokens,
   manufacturer: defaultManufacturerConfig,
   aboutPage: defaultAboutPageConfig,

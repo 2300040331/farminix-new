@@ -8,7 +8,6 @@ export interface Review {
   verified: boolean;
   comment: string;
   helpfulCount: number;
-  isSample?: boolean;
 }
 
 export interface ProductHighlight {
