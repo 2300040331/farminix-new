@@ -43,7 +43,17 @@ export const defaultSocialBlogConfig = {
   enabled: true,
   title: 'From Farminix on Instagram',
   subtitle: 'Watch the latest updates shared by Farminix.',
-  entries: [],
+  entries: [
+    {
+      id: 'entry-1',
+      title: 'Farminix Story',
+      caption: 'Watch the latest updates shared by Farminix.',
+      mediaUrl: 'https://www.instagram.com/reel/DgFU7RDs4Yk/',
+      sourceUrl: 'https://www.instagram.com/reel/DgFU7RDs4Yk/',
+      enabled: true,
+      order: 1,
+    },
+  ],
 };
 
 export const defaultThemeTokens: ThemeTokens = {

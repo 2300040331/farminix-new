@@ -330,7 +330,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           products: sanitizeProducts(parsed.products),
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: sanitizeFooter(parsed.footer),
-          socialBlog: { ...defaultSocialBlogConfig, ...(parsed.socialBlog || {}), entries: Array.isArray(parsed.socialBlog?.entries) ? parsed.socialBlog.entries : [] },
+          socialBlog: { ...defaultSocialBlogConfig, ...(parsed.socialBlog || {}), entries: Array.isArray(parsed.socialBlog?.entries) && parsed.socialBlog.entries.length > 0 ? parsed.socialBlog.entries : defaultSocialBlogConfig.entries },
           introVideo: { ...defaultIntroVideoConfig, ...(parsed.introVideo || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
@@ -362,7 +362,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           products: sanitizeProducts(parsed.products),
           theme: { ...defaultThemeTokens, ...(parsed.theme || {}) },
           footer: sanitizeFooter(parsed.footer),
-          socialBlog: { ...defaultSocialBlogConfig, ...(parsed.socialBlog || {}), entries: Array.isArray(parsed.socialBlog?.entries) ? parsed.socialBlog.entries : [] },
+          socialBlog: { ...defaultSocialBlogConfig, ...(parsed.socialBlog || {}), entries: Array.isArray(parsed.socialBlog?.entries) && parsed.socialBlog.entries.length > 0 ? parsed.socialBlog.entries : defaultSocialBlogConfig.entries },
           introVideo: { ...defaultIntroVideoConfig, ...(parsed.introVideo || {}) },
           header: { ...defaultSiteConfig.header, ...(parsed.header || {}) },
           manufacturer: sanitizeManufacturer(parsed.manufacturer),
@@ -486,7 +486,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (disposed || savingRef.current || version !== publishVersion.current) return;
         if (data.config) {
           const liveRaw = removePlaceholderImages(data.config);
-          const live = normalizeCatalogConfig({ ...defaultSiteConfig, ...liveRaw, footer: sanitizeFooter(liveRaw.footer), introVideo: { ...defaultIntroVideoConfig, ...(liveRaw.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(liveRaw.socialBlog || {}), entries: Array.isArray(liveRaw.socialBlog?.entries) ? liveRaw.socialBlog.entries : [] }, products: sanitizeProducts(removePlaceholderImages(data.config.products)) }, liveRaw);
+          const live = normalizeCatalogConfig({ ...defaultSiteConfig, ...liveRaw, footer: sanitizeFooter(liveRaw.footer), introVideo: { ...defaultIntroVideoConfig, ...(liveRaw.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(liveRaw.socialBlog || {}), entries: Array.isArray(liveRaw.socialBlog?.entries) && liveRaw.socialBlog.entries.length > 0 ? liveRaw.socialBlog.entries : defaultSocialBlogConfig.entries }, products: sanitizeProducts(removePlaceholderImages(data.config.products)) }, liveRaw);
           setPublishedConfig(live);
           try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(live)); } catch {}
           if (!dirtyRef.current) {
@@ -532,7 +532,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
       });
       if (response.ok) {
         const data = await response.json();
-        setPublishedConfig(normalizeCatalogConfig({ ...defaultSiteConfig, ...data.config, footer: sanitizeFooter(data.config.footer), introVideo: { ...defaultIntroVideoConfig, ...(data.config.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(data.config.socialBlog || {}), entries: Array.isArray(data.config.socialBlog?.entries) ? data.config.socialBlog.entries : [] }, products: sanitizeProducts(data.config.products) }, data.config));
+        setPublishedConfig(normalizeCatalogConfig({ ...defaultSiteConfig, ...data.config, footer: sanitizeFooter(data.config.footer), introVideo: { ...defaultIntroVideoConfig, ...(data.config.introVideo || {}) }, socialBlog: { ...defaultSocialBlogConfig, ...(data.config.socialBlog || {}), entries: Array.isArray(data.config.socialBlog?.entries) && data.config.socialBlog.entries.length > 0 ? data.config.socialBlog.entries : defaultSocialBlogConfig.entries }, products: sanitizeProducts(data.config.products) }, data.config));
         try { localStorage.setItem(PUBLISHED_KEY, JSON.stringify(data.config)); } catch {}
       } else {
         const data = await response.json().catch(() => ({}));
