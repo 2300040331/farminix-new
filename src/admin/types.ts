@@ -196,6 +196,19 @@ export interface SocialBlogConfig {
   entries: SocialBlogEntry[];
 }
 
+export interface FeaturedOfferConfig {
+  enabled: boolean;
+  productId: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  ctaText: string;
+  image: string;
+  backgroundStart: string;
+  backgroundEnd: string;
+  accentColor: string;
+}
+
 export interface EpicDealsConfig {
   enabled: boolean;
   topPillText: string;
@@ -522,6 +535,7 @@ export interface CustomerEnquiry {
 export interface AdminSiteConfig {
   productCatalogVersion?: number;
   homepageSectionsVersion?: number;
+  featuredOffer: FeaturedOfferConfig;
   inventoryRevision?: number;
   theme: ThemeTokens;
   sectionOrder: SectionOrderItem[];

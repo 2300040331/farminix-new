@@ -13,6 +13,8 @@ import { BrandMarquee } from './components/BrandMarquee';
 import { DealsSection } from './components/DealsSection';
 import { FutureArrivals } from './components/FutureArrivals';
 import { BottomFeatureStrip } from './components/BottomFeatureStrip';
+import { FeaturedOfferBanner } from './components/FeaturedOfferBanner';
+import { HomeRiceReviewsSection } from './components/HomeRiceReviewsSection';
 
 // Pages
 import { ProductListingPage } from './components/ProductListingPage';
@@ -86,6 +88,8 @@ export function AppContent() {
       epicDeals: <DealsSection key="epicDeals" />,
       futureArrivals: <FutureArrivals key="futureArrivals" />,
       bottomFeatureStrip: <BottomFeatureStrip key="bottomFeatureStrip" />,
+      featuredOffer: <FeaturedOfferBanner key="featuredOffer" />,
+      riceReviews: <HomeRiceReviewsSection key="riceReviews" />,
     };
 
     return (

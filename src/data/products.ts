@@ -105,6 +105,13 @@ export const farminixRiceProduct: Product = {
       answer: 'Based on the standard 45g (1/4 cup) serving size, each 26 Kg pack provides over 260+ wholesome servings.',
     },
   ],
+  reviewsList: [
+    { id: 'rice-preview-1', userName: 'Sample review 01', rating: 5, date: '', verified: false, comment: 'Sample preview: A note about how the rice works for everyday family meals.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
+    { id: 'rice-preview-2', userName: 'Sample review 02', rating: 5, date: '', verified: false, comment: 'Sample preview: Share what you enjoy about the cooked grain and its texture.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
+    { id: 'rice-preview-3', userName: 'Sample review 03', rating: 5, date: '', verified: false, comment: 'Sample preview: Describe how this family size pack fits into your kitchen routine.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
+    { id: 'rice-preview-4', userName: 'Sample review 04', rating: 5, date: '', verified: false, comment: 'Sample preview: Add a real customer’s thoughts about cooking and serving this rice.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
+    { id: 'rice-preview-5', userName: 'Sample review 05', rating: 5, date: '', verified: false, comment: 'Sample preview: Replace this card with feedback from a verified Farminix customer.', helpfulCount: 0, source: 'admin', enabled: true, isSample: true },
+  ],
 };
 
 const requestedCatalogItems: Array<{ id: string; name: string; category: string }> = [

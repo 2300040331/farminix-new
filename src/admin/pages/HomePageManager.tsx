@@ -7,6 +7,8 @@ import {
   Home,
   ExternalLink,
   Eye,
+  Sparkles,
+  Star,
 } from 'lucide-react';
 import { HeaderManager } from './HeaderManager';
 import { HeroManager } from './HeroManager';
@@ -15,8 +17,10 @@ import { PopularProductsManager } from './PopularProductsManager';
 import { SocialBlogManager } from './SocialBlogManager';
 import { SectionOrderingHub } from './SectionOrderingHub';
 import { useAdminConfig } from '../context/AdminConfigContext';
+import { FeaturedOfferManager } from './FeaturedOfferManager';
+import { RiceReviewsManager } from './RiceReviewsManager';
 
-type HomeTab = 'header' | 'hero' | 'categories' | 'popular' | 'socialBlog' | 'visibility';
+type HomeTab = 'header' | 'hero' | 'categories' | 'popular' | 'socialBlog' | 'visibility' | 'offer' | 'reviews';
 
 const storePages = [
   ['home', 'Home page'], ['products', 'Product listing'], ['productDetail', 'Product details'], ['offers', 'Offers'],
@@ -74,6 +78,8 @@ export const HomePageManager: React.FC = () => {
       desc: 'Publish real Instagram posts or video links below Popular Today',
     },
     { id: 'visibility', label: 'Pages & Sections', icon: <Eye className="w-4 h-4" />, desc: 'Hide pages and control homepage section visibility' },
+    { id: 'offer', label: 'Rice Offer Banner', icon: <Sparkles className="w-4 h-4" />, desc: 'Edit the featured rice offer image and copy' },
+    { id: 'reviews', label: 'Rice Reviews', icon: <Star className="w-4 h-4" />, desc: 'Edit the rice bag review carousel' },
   ];
 
   return (
@@ -134,8 +140,10 @@ export const HomePageManager: React.FC = () => {
         {activeTab === 'categories' && <CategoryManager />}
         {activeTab === 'popular' && <PopularProductsManager />}
         {activeTab === 'socialBlog' && <SocialBlogManager />}
+        {activeTab === 'offer' && <FeaturedOfferManager />}
+        {activeTab === 'reviews' && <RiceReviewsManager />}
         {activeTab === 'visibility' && <><SectionOrderingHub onNavigateToSection={(id) => {
-          const tab: HomeTab | undefined = id === 'hero' ? 'hero' : id === 'categorySection' ? 'categories' : id === 'popularProducts' ? 'popular' : id === 'socialBlog' ? 'socialBlog' : undefined;
+          const tab: HomeTab | undefined = id === 'hero' ? 'hero' : id === 'categorySection' ? 'categories' : id === 'popularProducts' ? 'popular' : id === 'socialBlog' ? 'socialBlog' : id === 'featuredOffer' ? 'offer' : id === 'riceReviews' ? 'reviews' : undefined;
           if (tab) setActiveTab(tab);
         }} /><VisibilityManager /></>}
       </div>

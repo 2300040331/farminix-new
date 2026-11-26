@@ -20,6 +20,7 @@ import type {
   FooterConfig,
   IntroVideoConfig,
   OffersPageConfig,
+  FeaturedOfferConfig,
   SectionOrderItem,
   StorePageVisibility,
   MediaItem,
@@ -72,6 +73,7 @@ interface AdminContextType {
   updatePopularProducts: (cfg: Partial<PopularProductsConfig>) => void;
   updateSocialBlog: (cfg: Partial<SocialBlogConfig>) => void;
   updateEpicDeals: (cfg: Partial<EpicDealsConfig>) => void;
+  updateFeaturedOffer: (cfg: Partial<FeaturedOfferConfig>) => void;
   updateFutureArrivals: (cfg: Partial<FutureArrivalsConfig>) => void;
   updateBottomFeatureStrip: (cfg: Partial<BottomFeatureStripConfig>) => void;
   updateFooter: (cfg: Partial<FooterConfig>) => void;
@@ -161,21 +163,37 @@ const sanitizeProducts = (products: any[]): Product[] => {
 const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSiteConfig>): AdminSiteConfig => {
   const sourceVersion = source.productCatalogVersion || 0;
   const mergeVisibilityAndSections = (value: AdminSiteConfig): AdminSiteConfig => {
-    const saved = Array.isArray(value.sectionOrder) ? value.sectionOrder : [];
+    const saved = (Array.isArray(value.sectionOrder) ? value.sectionOrder : []).slice().sort((a, b) => a.order - b.order);
     // Older published configs kept the reels section disabled from its original rollout.
     // Restore it once, then let the normal section visibility control stay authoritative.
     const restoreSocialBlog = (source.homepageSectionsVersion || 0) < 1;
-    const migratedSections = restoreSocialBlog
+    let migratedSections = restoreSocialBlog
       ? saved.map((section) => section.id === 'socialBlog' ? { ...section, enabled: true } : section)
       : saved;
+    const addAfter = (id: string, anchorId: string) => {
+      if (migratedSections.some((section) => section.id === id)) return;
+      const fallback = defaultSiteConfig.sectionOrder.find((section) => section.id === id);
+      if (!fallback) return;
+      const anchorIndex = migratedSections.findIndex((section) => section.id === anchorId);
+      migratedSections.splice(anchorIndex >= 0 ? anchorIndex + 1 : migratedSections.length, 0, { ...fallback, enabled: true });
+    };
+    if ((source.homepageSectionsVersion || 0) < 1 && !migratedSections.some((section) => section.id === 'socialBlog')) addAfter('socialBlog', 'popularProducts');
+    if ((source.homepageSectionsVersion || 0) < 2) addAfter('featuredOffer', 'hero');
+    if ((source.homepageSectionsVersion || 0) < 3) addAfter('riceReviews', 'socialBlog');
     const ids = new Set(migratedSections.map((section) => section.id));
-    const nextOrder = migratedSections.length ? Math.max(...migratedSections.map((section) => section.order || 0)) + 1 : 1;
+    const nextOrder = (source.homepageSectionsVersion || 0) < 3
+      ? migratedSections.length + 1
+      : migratedSections.length ? Math.max(...migratedSections.map((section) => section.order || 0)) + 1 : 1;
+    const restoredReviewIds = (source.homepageSectionsVersion || 0) < 3;
+    const defaultRiceReviews = defaultSiteConfig.products.find((product) => product.id === 'r1')?.reviewsList || [];
     return {
       ...value,
-      homepageSectionsVersion: 1,
+      homepageSectionsVersion: 3,
       socialBlog: restoreSocialBlog ? { ...value.socialBlog, enabled: true } : value.socialBlog,
+      featuredOffer: { ...defaultSiteConfig.featuredOffer, ...(value.featuredOffer || {}) },
+      products: restoredReviewIds ? (value.products || []).map((product) => product.id === 'r1' && !product.reviewsList?.length ? { ...product, reviewsList: defaultRiceReviews } : product) : value.products,
       pageVisibility: { ...defaultSiteConfig.pageVisibility, ...(value.pageVisibility || {}) },
-      sectionOrder: [...migratedSections, ...defaultSiteConfig.sectionOrder.filter((section) => !ids.has(section.id)).map((section, index) => ({ ...section, order: nextOrder + index }))],
+      sectionOrder: [...migratedSections.map((section, index) => ({ ...section, order: (source.homepageSectionsVersion || 0) < 3 ? index + 1 : section.order })), ...defaultSiteConfig.sectionOrder.filter((section) => !ids.has(section.id)).map((section, index) => ({ ...section, order: nextOrder + index }))],
     };
   };
   if (sourceVersion >= 4) return mergeVisibilityAndSections(config);
@@ -585,6 +603,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
       epicDeals: { ...current.epicDeals, enabled: enabled('epicDeals', current.epicDeals.enabled) },
       futureArrivals: { ...current.futureArrivals, enabled: enabled('futureArrivals', current.futureArrivals.enabled) },
       bottomFeatureStrip: { ...current.bottomFeatureStrip, enabled: enabled('bottomFeatureStrip', current.bottomFeatureStrip.enabled) },
+      featuredOffer: { ...current.featuredOffer, enabled: enabled('featuredOffer', current.featuredOffer.enabled) },
     });
   };
 
@@ -665,6 +684,15 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const updateEpicDeals = (cfg: Partial<EpicDealsConfig>) => {
     saveConfig({ ...config, epicDeals: { ...config.epicDeals, ...cfg } });
+  };
+
+  const updateFeaturedOffer = (cfg: Partial<FeaturedOfferConfig>) => {
+    const current = draftRef.current;
+    const enabled = cfg.enabled ?? current.featuredOffer.enabled;
+    const sectionOrder = current.sectionOrder.some((section) => section.id === 'featuredOffer')
+      ? current.sectionOrder.map((section) => section.id === 'featuredOffer' ? { ...section, enabled } : section)
+      : [...current.sectionOrder, { id: 'featuredOffer', name: 'Featured Rice Offer', enabled, order: current.sectionOrder.length + 1 }];
+    saveConfig({ ...current, featuredOffer: { ...current.featuredOffer, ...cfg }, sectionOrder });
   };
 
   const updateFutureArrivals = (cfg: Partial<FutureArrivalsConfig>) => {
@@ -794,6 +822,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         updatePopularProducts,
         updateSocialBlog,
         updateEpicDeals,
+        updateFeaturedOffer,
         updateFutureArrivals,
         updateBottomFeatureStrip,
         updateFooter,
