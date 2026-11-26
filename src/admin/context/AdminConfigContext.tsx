@@ -21,6 +21,7 @@ import type {
   IntroVideoConfig,
   OffersPageConfig,
   SectionOrderItem,
+  StorePageVisibility,
   MediaItem,
   ShopNowPageConfig,
   ManufacturerConfig,
@@ -56,6 +57,7 @@ interface AdminContextType {
   discardDraft: () => void;
   updateTheme: (tokens: Partial<ThemeTokens>) => void;
   updateSectionOrder: (newOrder: SectionOrderItem[]) => void;
+  updatePageVisibility: (visibility: StorePageVisibility) => void;
   toggleSection: (id: string, enabled: boolean) => void;
   updateTopOfferBar: (cfg: Partial<TopOfferBarConfig>) => void;
   updateHeader: (cfg: Partial<HeaderConfig>) => void;
@@ -158,7 +160,17 @@ const sanitizeProducts = (products: any[]): Product[] => {
 
 const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSiteConfig>): AdminSiteConfig => {
   const sourceVersion = source.productCatalogVersion || 0;
-  if (sourceVersion >= 4) return config;
+  const mergeVisibilityAndSections = (value: AdminSiteConfig): AdminSiteConfig => {
+    const saved = Array.isArray(value.sectionOrder) ? value.sectionOrder : [];
+    const ids = new Set(saved.map((section) => section.id));
+    const nextOrder = saved.length ? Math.max(...saved.map((section) => section.order || 0)) + 1 : 1;
+    return {
+      ...value,
+      pageVisibility: { ...defaultSiteConfig.pageVisibility, ...(value.pageVisibility || {}) },
+      sectionOrder: [...saved, ...defaultSiteConfig.sectionOrder.filter((section) => !ids.has(section.id)).map((section, index) => ({ ...section, order: nextOrder + index }))],
+    };
+  };
+  if (sourceVersion >= 4) return mergeVisibilityAndSections(config);
   const existingCategoryIds = new Set((config.categories || []).map((category) => category.id));
   const defaultProducts = new Map(defaultSiteConfig.products.map((product) => [product.id, product]));
   const productsWithRestoredContent = (config.products || []).map((product) => {
@@ -210,7 +222,7 @@ const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSi
     };
   });
   const mergedProductIds = new Set(productsWithRestoredContent.map((product) => product.id));
-  return {
+  return mergeVisibilityAndSections({
     ...config,
     productCatalogVersion: 4,
     products: [
@@ -229,7 +241,7 @@ const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSi
     sectionOrder: sourceVersion < 1
       ? config.sectionOrder.map((section) => section.id === 'categorySection' ? { ...section, enabled: true } : section)
       : config.sectionOrder,
-  };
+  });
 };
 
 const sanitizeFooter = (raw: any): FooterConfig => {
@@ -551,12 +563,30 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const updateSectionOrder = (newOrder: SectionOrderItem[]) => {
-    saveConfig({ ...config, sectionOrder: newOrder });
+    const enabled = (id: string, fallback: boolean) => newOrder.find((section) => section.id === id)?.enabled ?? fallback;
+    const current = draftRef.current;
+    saveConfig({
+      ...current,
+      sectionOrder: newOrder,
+      hero: { ...current.hero, enabled: enabled('hero', current.hero.enabled) },
+      featureStrip: { ...current.featureStrip, enabled: enabled('featureStrip', current.featureStrip.enabled) },
+      brandMarquee: { ...current.brandMarquee, enabled: enabled('brandMarquee', current.brandMarquee.enabled) },
+      categorySection: { ...current.categorySection, enabled: enabled('categorySection', current.categorySection.enabled) },
+      popularProducts: { ...current.popularProducts, enabled: enabled('popularProducts', current.popularProducts.enabled) },
+      socialBlog: { ...current.socialBlog, enabled: enabled('socialBlog', current.socialBlog.enabled) },
+      epicDeals: { ...current.epicDeals, enabled: enabled('epicDeals', current.epicDeals.enabled) },
+      futureArrivals: { ...current.futureArrivals, enabled: enabled('futureArrivals', current.futureArrivals.enabled) },
+      bottomFeatureStrip: { ...current.bottomFeatureStrip, enabled: enabled('bottomFeatureStrip', current.bottomFeatureStrip.enabled) },
+    });
+  };
+
+  const updatePageVisibility = (visibility: StorePageVisibility) => {
+    saveConfig({ ...draftRef.current, pageVisibility: { ...draftRef.current.pageVisibility, ...visibility } });
   };
 
   const toggleSection = (id: string, enabled: boolean) => {
-    const updatedOrder = config.sectionOrder.map((s) => (s.id === id ? { ...s, enabled } : s));
-    saveConfig({ ...config, sectionOrder: updatedOrder });
+    const updatedOrder = draftRef.current.sectionOrder.map((section) => section.id === id ? { ...section, enabled } : section);
+    updateSectionOrder(updatedOrder);
   };
 
   const updateTopOfferBar = (cfg: Partial<TopOfferBarConfig>) => {
@@ -741,6 +771,7 @@ export const AdminConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         discardDraft,
         updateTheme,
         updateSectionOrder,
+        updatePageVisibility,
         toggleSection,
         updateTopOfferBar,
         updateHeader,

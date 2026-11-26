@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useAdminConfig } from '../context/AdminConfigContext';
 import type { SectionOrderItem } from '../types';
+import { defaultSiteConfig } from '../defaultConfig';
 
 export const SectionOrderingHub: React.FC<{ onNavigateToSection: (id: string) => void }> = ({
   onNavigateToSection,
@@ -42,17 +43,7 @@ export const SectionOrderingHub: React.FC<{ onNavigateToSection: (id: string) =>
   };
 
   const handleReset = () => {
-    const defaultOrder: SectionOrderItem[] = [
-      { id: 'hero', name: 'Hero Banner', enabled: true, order: 1 },
-      { id: 'brandMarquee', name: 'Trusted Brands Marquee', enabled: false, order: 2 },
-      { id: 'featureStrip', name: 'Top 5 Feature Strip', enabled: false, order: 3 },
-      { id: 'categorySection', name: 'Shop by Category', enabled: false, order: 4 },
-      { id: 'popularProducts', name: 'Popular Today', enabled: true, order: 5 },
-      { id: 'socialBlog', name: 'Instagram & Blog Videos', enabled: false, order: 6 },
-      { id: 'epicDeals', name: 'Epic Deals All Day', enabled: false, order: 7 },
-      { id: 'futureArrivals', name: 'Future Arrivals', enabled: false, order: 8 },
-      { id: 'bottomFeatureStrip', name: 'Bottom Benefits Strip', enabled: false, order: 9 },
-    ];
+    const defaultOrder: SectionOrderItem[] = defaultSiteConfig.sectionOrder.map((item) => ({ ...item }));
     setSections(defaultOrder);
     updateSectionOrder(defaultOrder);
     showNotice('Reset to default production layout!');

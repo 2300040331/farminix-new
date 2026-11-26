@@ -322,6 +322,17 @@
 .social-empty-visuals img:nth-child(3) { transform: rotate(8deg); }
 .social-empty-note { position: absolute; right: 27px; bottom: 18px; display: inline-flex; align-items: center; gap: 7px; color: #785987; font-size: 10px; font-weight: 700; }
 @media(max-width:640px) { .social-empty-stories { grid-template-columns: 1fr; gap: 20px; padding: 24px 20px 50px; } .social-empty-visuals img { height: 135px; } .social-empty-visuals img:nth-child(2) { height: 165px; } .social-empty-note { right: 18px; bottom: 15px; } }
+.store-catalog-detail-facts { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; margin: 17px 0 9px; }
+.store-catalog-detail-facts > span { display: flex; min-width: 0; flex-direction: column; gap: 5px; padding: 12px; border: 1px solid #eadff0; border-radius: 14px; background: #fff; }
+.store-catalog-detail-facts small { color: #8b7198; font-size: 9px; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; }
+.store-catalog-detail-facts strong { overflow-wrap: anywhere; color: #382446; font-size: 11px; }
+.store-catalog-detail-note { margin: 5px 0 0; color: #8b7c91; font-size: 10px; line-height: 1.6; }
+.store-page-hidden { display: flex; min-height: 54vh; flex-direction: column; align-items: center; justify-content: center; padding: 32px 20px; text-align: center; background: radial-gradient(ellipse at center,#f5ecfa,transparent 70%),#fcfaf7; }
+.store-page-hidden > span { color: #875a9e; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+.store-page-hidden h1 { margin: 10px 0; color: #372445; font: 500 clamp(30px,5vw,46px)/1.1 'Times New Roman',Georgia,serif; }
+.store-page-hidden p { margin: 0 0 20px; color: #74677a; font-size: 13px; }
+.store-page-hidden button { padding: 11px 18px; border: 0; border-radius: 99px; background: #432c20; color: white; font-size: 12px; font-weight: 700; cursor: pointer; }
+@media(max-width:640px) { .store-catalog-detail-facts { grid-template-columns: 1fr; } }
 
 /* Catalog-first product cards keep incomplete listings honest while still making the range browsable. */
 .store-product-placeholder { display: flex; position: relative; isolation: isolate; height: 100%; min-height: 220px; align-items: center; justify-content: center; overflow: hidden; border-radius: 20px; background: linear-gradient(140deg, #fff0c9, #ffc878); color: #6a3b1b; }

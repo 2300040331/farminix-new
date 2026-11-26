@@ -6,14 +6,38 @@ import {
   Zap,
   Home,
   ExternalLink,
+  Eye,
 } from 'lucide-react';
 import { HeaderManager } from './HeaderManager';
 import { HeroManager } from './HeroManager';
 import { CategoryManager } from './CategoryManager';
 import { PopularProductsManager } from './PopularProductsManager';
 import { SocialBlogManager } from './SocialBlogManager';
+import { SectionOrderingHub } from './SectionOrderingHub';
+import { useAdminConfig } from '../context/AdminConfigContext';
 
-type HomeTab = 'header' | 'hero' | 'categories' | 'popular' | 'socialBlog';
+type HomeTab = 'header' | 'hero' | 'categories' | 'popular' | 'socialBlog' | 'visibility';
+
+const storePages = [
+  ['home', 'Home page'], ['products', 'Product listing'], ['productDetail', 'Product details'], ['offers', 'Offers'],
+  ['about', 'About Farminix'], ['reachOut', 'Reach Out'], ['queries', 'Queries & Support'], ['careers', 'Careers'],
+  ['manufacturer', 'Manufacturer'], ['checkout', 'Checkout'], ['orders', 'Order history'], ['legal', 'Policies & legal pages'],
+] as const;
+
+const VisibilityManager: React.FC = () => {
+  const { config, updatePageVisibility } = useAdminConfig();
+  return <div className="admin-panel bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
+    <div><h2 className="text-lg font-black text-slate-900">Store page visibility</h2><p className="mt-1 text-xs text-slate-500">Hide a page from customers. Hidden pages show the unavailable page notice when opened directly.</p></div>
+    <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">{storePages.map(([id, label]) => {
+      const visible = config.pageVisibility?.[id] !== false;
+      return <label key={id} className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 cursor-pointer ${visible ? 'border-slate-200 bg-white' : 'border-slate-200 bg-slate-50 opacity-70'}`}>
+        <span className="flex items-center gap-2 text-sm font-bold text-slate-800"><Eye size={16} className={visible ? 'text-emerald-600' : 'text-slate-400'} />{label}</span>
+        <span className="flex items-center gap-2 text-xs font-semibold text-slate-500"><input type="checkbox" checked={visible} onChange={(event) => updatePageVisibility({ [id]: event.target.checked })} />{visible ? 'Visible' : 'Hidden'}</span>
+      </label>;
+    })}</div>
+    <p className="text-[11px] text-slate-400">Use Save Changes in the admin header to publish visibility updates.</p>
+  </div>;
+};
 
 export const HomePageManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState<HomeTab>('header');
@@ -49,6 +73,7 @@ export const HomePageManager: React.FC = () => {
       icon: <Image className="w-4 h-4" />,
       desc: 'Publish real Instagram posts or video links below Popular Today',
     },
+    { id: 'visibility', label: 'Pages & Sections', icon: <Eye className="w-4 h-4" />, desc: 'Hide pages and control homepage section visibility' },
   ];
 
   return (
@@ -109,6 +134,10 @@ export const HomePageManager: React.FC = () => {
         {activeTab === 'categories' && <CategoryManager />}
         {activeTab === 'popular' && <PopularProductsManager />}
         {activeTab === 'socialBlog' && <SocialBlogManager />}
+        {activeTab === 'visibility' && <><SectionOrderingHub onNavigateToSection={(id) => {
+          const tab: HomeTab | undefined = id === 'hero' ? 'hero' : id === 'categorySection' ? 'categories' : id === 'popularProducts' ? 'popular' : id === 'socialBlog' ? 'socialBlog' : undefined;
+          if (tab) setActiveTab(tab);
+        }} /><VisibilityManager /></>}
       </div>
     </div>
   );

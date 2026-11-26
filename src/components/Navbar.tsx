@@ -6,9 +6,14 @@ export const Navbar: React.FC = () => {
   const { categories, selectedCategory, navigate, currentRoute } = useApp();
   const { publishedConfig } = useAdminConfig();
 
-  const activeNavItems = publishedConfig.navItems.filter(
-    (i) => i.enabled && i.catId !== 'manufacturer' && i.label.toLowerCase() !== 'manufacturer'
-  );
+  const visibility = publishedConfig.pageVisibility || {};
+  const activeNavItems = publishedConfig.navItems.filter((item) => {
+    if (!item.enabled || item.catId === 'manufacturer' || item.label.toLowerCase() === 'manufacturer') return false;
+    if (item.catId === null) return visibility.home !== false;
+    if (item.catId === 'offers') return visibility.offers !== false;
+    if (item.catId === 'careers') return visibility.careers !== false;
+    return visibility.products !== false;
+  });
   const activeCategories = categories;
 
   return (

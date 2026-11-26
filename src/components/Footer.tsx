@@ -8,14 +8,29 @@ export const Footer: React.FC = () => {
   const { navigate, setIsSupportOpen, setIsCartOpen } = useApp();
   const { publishedConfig } = useAdminConfig();
   const footerConfig = publishedConfig.footer;
+  const pageVisibility = publishedConfig.pageVisibility || {};
 
   if (!footerConfig.enabled) return null;
 
-  const companyLinks = (footerConfig.companyLinks || []).filter((link) => link.enabled !== false && link.label.trim());
-  const helpLinks = (footerConfig.helpLinks || []).filter((link) => link.enabled !== false && link.label.trim());
-  if (!helpLinks.some(link => link.url === '/orders')) helpLinks.push({ id: 'customer-order-history', label: 'Order History', url: '/orders', enabled: true, actionType: 'url' });
+  const isPageVisible = (url: string) => {
+    if (url === '/') return pageVisibility.home !== false;
+    if (url.startsWith('/product/')) return pageVisibility.productDetail !== false;
+    if (url.startsWith('/products')) return pageVisibility.products !== false;
+    if (url.startsWith('/offers')) return pageVisibility.offers !== false;
+    if (url.startsWith('/about')) return pageVisibility.about !== false;
+    if (url.startsWith('/reach-out')) return pageVisibility.reachOut !== false;
+    if (['/queries', '/contact', '/compliance'].some((path) => url.startsWith(path))) return pageVisibility.queries !== false;
+    if (url.startsWith('/careers')) return pageVisibility.careers !== false;
+    if (url.startsWith('/manufacturer')) return pageVisibility.manufacturer !== false;
+    if (url.startsWith('/checkout')) return pageVisibility.checkout !== false;
+    if (url.startsWith('/orders')) return pageVisibility.orders !== false;
+    return true;
+  };
+  const companyLinks = (footerConfig.companyLinks || []).filter((link) => link.enabled !== false && link.label.trim() && isPageVisible(link.url));
+  const helpLinks = (footerConfig.helpLinks || []).filter((link) => link.enabled !== false && link.label.trim() && isPageVisible(link.url));
+  if (pageVisibility.orders !== false && !helpLinks.some(link => link.url === '/orders')) helpLinks.push({ id: 'customer-order-history', label: 'Order History', url: '/orders', enabled: true, actionType: 'url' });
   if (!helpLinks.some(link => link.actionType === 'support')) helpLinks.push({ id: 'customer-support', label: 'Customer Support', url: '#', enabled: true, actionType: 'support' });
-  const legalLinks = footerPolicyLinks(footerConfig.legalLinks).filter(link => link.enabled !== false);
+  const legalLinks = pageVisibility.legal === false ? [] : footerPolicyLinks(footerConfig.legalLinks).filter(link => link.enabled !== false);
   const whatsappUrl = buildWhatsAppUrl(footerConfig.whatsappPhone, footerConfig.whatsappMessage);
 
   const handleLinkClick = (item: { label: string; url?: string; actionType?: string }) => {

@@ -53,10 +53,10 @@ const CatalogOnlyProductPage: React.FC<{ product: Product; onBack: () => void }>
         <div className="store-catalog-detail-intro">
           <p className="store-catalog-detail-category">Farminix <i>•</i> {product.category}</p>
           <h1>{product.name}</h1>
-          <span className="store-catalog-detail-status">Temporarily out of stock</span>
-          <p className="store-catalog-detail-copy">We’re preparing verified pack, price, and availability details for this product.</p>
-          <button type="button" className="store-catalog-detail-stock-button" disabled>Out of stock</button>
-          {product.description && <section className="store-catalog-detail-about"><h2>About This Product</h2><p>{product.description}</p></section>}
+          <span className="store-catalog-detail-status">Product information</span>
+          <p className="store-catalog-detail-copy">{product.description || `${product.name} is part of our ${product.category} selection.`}</p>
+          <div className="store-catalog-detail-facts"><span><small>Category</small><strong>{product.category}</strong></span><span><small>Pack &amp; price</small><strong>{product.price > 0 && product.weight ? `${product.weight} · ₹${product.price.toLocaleString('en-IN')}` : 'Details being confirmed'}</strong></span><span><small>Availability</small><strong>{product.inStock ? 'In stock' : 'To be confirmed'}</strong></span></div>
+          <p className="store-catalog-detail-note">Pack size, price and availability are shown once verified product information is available.</p>
         </div>
       </header>
       <div className="store-detail-content-layout">

@@ -151,6 +151,24 @@ const catalogDescriptions: Record<string, string> = {
   'Groundnut Oil': 'A versatile cooking oil with a warm, nutty character, suited to everyday sautéing, frying, and traditional recipes.',
 };
 
+const catalogUses: Record<string, string> = {
+  'Chilly Powder': 'Stir into curries, marinades, chutneys, and snack seasonings. Add gradually to suit your preferred heat.',
+  'Turmeric Powder': 'Use in dals, vegetable curries, rice dishes, and marinades. Add a small amount while cooking so it blends evenly.',
+  'Coriander Powder': 'Add to curries, gravies, vegetable dishes, and spice blends for a rounded coriander flavour.',
+  'Red Chilly': 'Use whole in tempering, pickle masala, and slow-cooked curries, or crush to add heat to a dish.',
+  Cloves: 'Add whole cloves to biryani, chai, stocks, and slow-cooked dishes; remove whole spices before serving where preferred.',
+  Cumin: 'Toast or temper the seeds for dals, rice, vegetables, and savoury spice blends.',
+  'Cardamom pod': 'Crush lightly for chai and desserts, or add whole to biryani and other fragrant rice dishes.',
+  'Cashew Nuts': 'Enjoy as a snack or use in sweets, desserts, breakfast bowls, and creamy gravies.',
+  Almonds: 'Enjoy as a snack, or chop into breakfast bowls, sweets, and baked recipes.',
+  Kishmish: 'Add to pulao, desserts, breakfast bowls, and baked recipes for a naturally sweet note.',
+  Pistachios: 'Chop for sweets, desserts, breakfast bowls, and garnishes, or enjoy as a snack.',
+  Peanuts: 'Use in chutneys, snacks, curries, and savoury dishes; roast or cook according to your recipe.',
+  Dal: 'Use in dals, soups, and hearty family meals. Follow the preparation and cooking method for the selected dal variety.',
+  Sugar: 'Use to sweeten tea and coffee, or as an ingredient in baking and desserts.',
+  'Groundnut Oil': 'Use for everyday sautéing, frying, and traditional recipes. Follow the heating guidance on the pack.',
+};
+
 export const requestedCatalogProducts: Product[] = requestedCatalogItems.map((item) => ({
   ...item,
   price: 0,
@@ -167,12 +185,12 @@ export const requestedCatalogProducts: Product[] = requestedCatalogItems.map((it
   ingredients: [item.name],
   highlights: [
     { icon: '🌿', title: 'Made for everyday cooking', desc: catalogDescriptions[item.name] || `${item.name} is a versatile pantry essential for everyday home cooking.` },
-    { icon: '🍽️', title: 'Easy to use', desc: `${item.name} fits naturally into familiar recipes and everyday meals.` },
-    { icon: '✨', title: 'Product details in your hands', desc: 'Farminix can update pack, sourcing, and verified product information from the admin catalog.' },
+    { icon: '🍽️', title: 'Kitchen inspiration', desc: catalogUses[item.name] || `Use ${item.name.toLowerCase()} in recipes that call for it, adjusting to taste.` },
+    { icon: '✨', title: 'A versatile pantry choice', desc: `Keep ${item.name.toLowerCase()} on hand for familiar recipes and everyday meals.` },
   ],
   benefits: [
-    `A handy pantry choice for home cooks who enjoy ${item.name.toLowerCase()} in their everyday recipes.`,
-    'Useful across familiar family meals, from quick weekday cooking to special recipes.',
+    catalogUses[item.name] || `Use ${item.name.toLowerCase()} in recipes that call for it, adjusting to taste.`,
+    `Pairs naturally with the ingredients and flavours used in ${item.category.toLowerCase()} recipes.`,
     'Store in a cool, dry place and keep sealed between uses.',
   ],
   howToUse: [`Add ${item.name.toLowerCase()} to your recipe as needed, adjusting to your preferred taste and cooking method.`, 'Follow the preparation method for your chosen recipe.'],

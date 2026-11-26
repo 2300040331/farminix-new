@@ -7,6 +7,7 @@ export const MainHeader: React.FC = () => {
   const { cart, setIsCartOpen, navigate, currentRoute, user, requestLogin } = useApp();
   const { publishedConfig } = useAdminConfig();
   const headerCfg = publishedConfig.header;
+  const pageVisibility = publishedConfig.pageVisibility || {};
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -29,13 +30,13 @@ export const MainHeader: React.FC = () => {
   const isCareersActive = currentRoute.pathname === '/careers';
 
   const navLinks = [
-    { label: 'Home', path: '/', isActive: isHomeActive },
-    { label: 'Products', path: '/products', isActive: isProductsActive },
-    { label: 'About Farminix', path: '/about', isActive: isAboutActive },
-    ...(publishedConfig.queriesPage?.enabled === false ? [] : [{ label: 'Any Queries?', path: '/queries', isActive: currentRoute.pathname === '/queries' }]),
-    ...(publishedConfig.reachOutPage?.enabled === false ? [] : [{ label: 'Reach Out', path: '/reach-out', isActive: currentRoute.pathname.startsWith('/reach-out') }]),
-    { label: 'Manufacturer', path: '/manufacturer', isActive: isManufacturerActive },
-    ...(publishedConfig.careersPage?.enabled === false ? [] : [{ label: 'Careers', path: '/careers', isActive: isCareersActive }]),
+    ...(pageVisibility.home === false ? [] : [{ label: 'Home', path: '/', isActive: isHomeActive }]),
+    ...(pageVisibility.products === false ? [] : [{ label: 'Products', path: '/products', isActive: isProductsActive }]),
+    ...(pageVisibility.about === false ? [] : [{ label: 'About Farminix', path: '/about', isActive: isAboutActive }]),
+    ...(pageVisibility.queries === false || publishedConfig.queriesPage?.enabled === false ? [] : [{ label: 'Any Queries?', path: '/queries', isActive: currentRoute.pathname === '/queries' }]),
+    ...(pageVisibility.reachOut === false || publishedConfig.reachOutPage?.enabled === false ? [] : [{ label: 'Reach Out', path: '/reach-out', isActive: currentRoute.pathname.startsWith('/reach-out') }]),
+    ...(pageVisibility.manufacturer === false ? [] : [{ label: 'Manufacturer', path: '/manufacturer', isActive: isManufacturerActive }]),
+    ...(pageVisibility.careers === false || publishedConfig.careersPage?.enabled === false ? [] : [{ label: 'Careers', path: '/careers', isActive: isCareersActive }]),
   ];
 
   return (

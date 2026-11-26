@@ -11,6 +11,8 @@ import { CategoryPage } from './components/CategoryPage';
 import { FeatureStrip } from './components/FeatureStrip';
 import { BrandMarquee } from './components/BrandMarquee';
 import { DealsSection } from './components/DealsSection';
+import { FutureArrivals } from './components/FutureArrivals';
+import { BottomFeatureStrip } from './components/BottomFeatureStrip';
 
 // Pages
 import { ProductListingPage } from './components/ProductListingPage';
@@ -70,7 +72,7 @@ export function AppContent() {
 
   const renderDynamicHomepageSections = () => {
     const sortedSections = [...publishedConfig.sectionOrder]
-      .filter((s) => s.enabled || s.id === 'featureStrip' || s.id === 'brandMarquee' || s.id === 'categorySection')
+      .filter((s) => s.enabled)
       .sort((a, b) => a.order - b.order);
 
     const sectionComponentMap: Record<string, React.ReactNode> = {
@@ -82,6 +84,8 @@ export function AppContent() {
       categorySection: <CategorySection key="categorySection" />,
       categories: <CategorySection key="categories" />,
       epicDeals: <DealsSection key="epicDeals" />,
+      futureArrivals: <FutureArrivals key="futureArrivals" />,
+      bottomFeatureStrip: <BottomFeatureStrip key="bottomFeatureStrip" />,
     };
 
     return (
@@ -93,6 +97,20 @@ export function AppContent() {
 
   const renderMainContent = () => {
     const policy = policyForPath(currentRoute.pathname);
+    const pageVisibility = publishedConfig.pageVisibility || {};
+    const pageId = policy ? 'legal' : currentRoute.pathname === '/' ? 'home'
+      : currentRoute.pathname === '/products' || currentRoute.searchParams.has('search') || currentRoute.searchParams.has('category') ? 'products'
+      : currentRoute.pathname.startsWith('/product/') ? 'productDetail'
+      : currentRoute.pathname === '/offers' ? 'offers'
+      : currentRoute.pathname === '/about' ? 'about'
+      : ['/reach-out', '/reach-out-to-us'].includes(currentRoute.pathname) ? 'reachOut'
+      : ['/queries', '/compliance', '/contact'].includes(currentRoute.pathname) ? 'queries'
+      : currentRoute.pathname === '/careers' ? 'careers'
+      : currentRoute.pathname === '/manufacturer' ? 'manufacturer'
+      : currentRoute.pathname === '/checkout' ? 'checkout'
+      : currentRoute.pathname === '/orders' ? 'orders'
+      : null;
+    if (pageId && pageVisibility[pageId] === false) return <div className="store-page-hidden" role="status"><span>Page unavailable</span><h1>This page is currently hidden.</h1><p>Please visit the homepage or check back later.</p><button onClick={() => navigate('/')}>Go to homepage</button></div>;
     if (policy) return <PolicyPage key={policy.id} policy={policy} />;
     const isSearchPage = currentRoute.pathname === '/products' || currentRoute.searchParams.has('search') || currentRoute.searchParams.has('category');
     const isDetailPage = currentRoute.pathname.startsWith('/product/');

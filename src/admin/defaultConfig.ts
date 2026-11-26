@@ -428,6 +428,10 @@ export const defaultSiteConfig: AdminSiteConfig = {
     { id: 'futureArrivals', name: 'Future Arrivals', enabled: false, order: 8 },
     { id: 'bottomFeatureStrip', name: 'Bottom Benefits Strip', enabled: false, order: 9 },
   ],
+  pageVisibility: {
+    home: true, products: true, productDetail: true, offers: true, about: true,
+    reachOut: true, queries: true, careers: true, manufacturer: true, checkout: true, orders: true, legal: true,
+  },
   topOfferBar: {
     enabled: false,
     leftTextPrefix: '10% OFF on your first order | Use code: ',

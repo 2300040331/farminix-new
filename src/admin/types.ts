@@ -279,6 +279,8 @@ export interface SectionOrderItem {
   order: number;
 }
 
+export type StorePageVisibility = Record<string, boolean>;
+
 export interface OffersPageConfig {
   enabled: boolean;
   heroBadge: string;
@@ -522,6 +524,7 @@ export interface AdminSiteConfig {
   inventoryRevision?: number;
   theme: ThemeTokens;
   sectionOrder: SectionOrderItem[];
+  pageVisibility: StorePageVisibility;
   topOfferBar: TopOfferBarConfig;
   header: HeaderConfig;
   navItems: NavItemConfig[];
