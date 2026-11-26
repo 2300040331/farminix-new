@@ -162,12 +162,20 @@ const normalizeCatalogConfig = (config: AdminSiteConfig, source: Partial<AdminSi
   const sourceVersion = source.productCatalogVersion || 0;
   const mergeVisibilityAndSections = (value: AdminSiteConfig): AdminSiteConfig => {
     const saved = Array.isArray(value.sectionOrder) ? value.sectionOrder : [];
-    const ids = new Set(saved.map((section) => section.id));
-    const nextOrder = saved.length ? Math.max(...saved.map((section) => section.order || 0)) + 1 : 1;
+    // Older published configs kept the reels section disabled from its original rollout.
+    // Restore it once, then let the normal section visibility control stay authoritative.
+    const restoreSocialBlog = (source.homepageSectionsVersion || 0) < 1;
+    const migratedSections = restoreSocialBlog
+      ? saved.map((section) => section.id === 'socialBlog' ? { ...section, enabled: true } : section)
+      : saved;
+    const ids = new Set(migratedSections.map((section) => section.id));
+    const nextOrder = migratedSections.length ? Math.max(...migratedSections.map((section) => section.order || 0)) + 1 : 1;
     return {
       ...value,
+      homepageSectionsVersion: 1,
+      socialBlog: restoreSocialBlog ? { ...value.socialBlog, enabled: true } : value.socialBlog,
       pageVisibility: { ...defaultSiteConfig.pageVisibility, ...(value.pageVisibility || {}) },
-      sectionOrder: [...saved, ...defaultSiteConfig.sectionOrder.filter((section) => !ids.has(section.id)).map((section, index) => ({ ...section, order: nextOrder + index }))],
+      sectionOrder: [...migratedSections, ...defaultSiteConfig.sectionOrder.filter((section) => !ids.has(section.id)).map((section, index) => ({ ...section, order: nextOrder + index }))],
     };
   };
   if (sourceVersion >= 4) return mergeVisibilityAndSections(config);
