@@ -1036,8 +1036,3 @@ html, body, body * {
 .review-marquee-group { display: flex; align-items: stretch; gap: 1rem; padding-right: 1rem; }
 .review-marquee:focus-within .review-marquee-track { animation-play-state: paused; }
 @keyframes product-review-scroll { to { transform: translate3d(-50%,0,0); } }
-@media (prefers-reduced-motion: reduce) {
-  .review-marquee { overflow-x: auto; }
-  .review-marquee-track { animation: none; }
-  .review-marquee-group[aria-hidden="true"] { display: none; }
-}
