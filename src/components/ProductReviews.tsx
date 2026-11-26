@@ -1,7 +1,36 @@
+import { useEffect, useRef } from 'react';
 import type { Review } from '../types';
 
 export function ProductReviews({ reviews, title = 'Customer reviews', compact = false }: { reviews?: Review[]; title?: string; compact?: boolean }) {
+  const trackRef = useRef<HTMLDivElement>(null);
   const visible = (reviews || []).filter(r => r.source === 'admin' && r.enabled !== false && r.userName.trim() && r.comment.trim());
+
+  useEffect(() => {
+    const track = trackRef.current;
+    const firstGroup = track?.querySelector<HTMLElement>('.review-marquee-group');
+    if (!track || !firstGroup) return;
+
+    let offset = 0;
+    let previousTime = 0;
+    let frame = 0;
+    const pixelsPerSecond = 36;
+    const move = (time: number) => {
+      if (previousTime) {
+        const elapsed = Math.min(time - previousTime, 50);
+        const loopWidth = firstGroup.scrollWidth;
+        if (loopWidth > 0) {
+          offset = (offset + (elapsed / 1000) * pixelsPerSecond) % loopWidth;
+          track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+        }
+      }
+      previousTime = time;
+      frame = window.requestAnimationFrame(move);
+    };
+
+    frame = window.requestAnimationFrame(move);
+    return () => window.cancelAnimationFrame(frame);
+  }, [visible.length]);
+
   if (!visible.length) return null;
   const cards = (duplicate = false) => <div className="review-marquee-group" aria-hidden={duplicate || undefined}>{visible.map(r => <article key={r.id} className="w-[min(370px,82vw)] shrink-0 rounded-[26px] border border-[#eadfce] bg-[#fffdf8] p-6 sm:p-7 text-left shadow-[0_12px_40px_rgba(69,43,30,.06)]">
     <div className="text-amber-500" aria-label={`${r.rating} out of 5 stars`}>{'★'.repeat(Math.min(5,Math.max(0,Math.round(r.rating))))}</div>
@@ -11,6 +40,6 @@ export function ProductReviews({ reviews, title = 'Customer reviews', compact = 
   </article>)}</div>;
   return <section className={`${compact ? '' : 'mt-12'} home-review-carousel`} aria-label={title}>
     <div className="flex flex-wrap items-end justify-between gap-3 mb-5"><div><h2 className="text-2xl sm:text-3xl font-semibold text-[#392c23]">{title}</h2></div><span className="review-count-label">{visible.length} {visible.length === 1 ? 'CUSTOMER REVIEW' : 'CUSTOMER REVIEWS'}</span></div>
-    <div className="review-marquee" tabIndex={0} aria-label={`${title}. Reviews move automatically. Focus to pause.`}><div className="review-marquee-track" style={{animationDuration:`${Math.max(18,visible.length*5)}s`}}>{cards()}{cards(true)}</div></div>
+    <div className="review-marquee" aria-label={`${title}. Reviews move continuously.`}><div ref={trackRef} className="review-marquee-track">{cards()}{cards(true)}</div></div>
   </section>;
 }
